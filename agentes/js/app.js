@@ -61,6 +61,12 @@
   let filterTimer = null;
   let agentsInCategory = [];
 
+  function agentDisplayName(agent) {
+    const map = window.AGENT_LABELS_ES;
+    if (map && map[agent.id]) return map[agent.id];
+    return agent.label;
+  }
+
   function currentCategoryId() {
     return categorySelect.value;
   }
@@ -93,16 +99,19 @@
     agentsInCategory = meta ? meta.agents.slice() : [];
     const q = (filterText || "").trim().toLowerCase();
     const filtered = q
-      ? agentsInCategory.filter(
-          (a) =>
+      ? agentsInCategory.filter((a) => {
+          const name = agentDisplayName(a).toLowerCase();
+          return (
+            name.includes(q) ||
             a.label.toLowerCase().includes(q) ||
             a.id.toLowerCase().includes(q) ||
             a.path.toLowerCase().includes(q)
-        )
+          );
+        })
       : agentsInCategory;
 
     agentSelect.innerHTML = filtered.length
-      ? filtered.map((a) => `<option value="${a.id}">${a.label}</option>`).join("")
+      ? filtered.map((a) => `<option value="${a.id}">${agentDisplayName(a)}</option>`).join("")
       : '<option value="">— Ningún agente coincide con la búsqueda —</option>';
 
     updateAgentHint();
@@ -151,7 +160,7 @@
     const gConstraints = document.getElementById("g-constraints")?.value.trim();
 
     const lines = [];
-    lines.push(`# Brief para agente: ${meta.label}`);
+    lines.push(`# Brief para agente: ${agentDisplayName(meta)}`);
     lines.push("");
     lines.push(`**Repositorio**: https://github.com/msitarzewski/agency-agents`);
     lines.push(`**Carpeta del repositorio**: \`${catId}/\` (${categoryLabelEs(catId)})`);
@@ -160,7 +169,7 @@
     lines.push("## Instrucción de activación");
     lines.push("");
     lines.push(
-      `Activa el modo del agente **${meta.label}** según el markdown en \`${meta.path}\`. ` +
+      `Activa el modo del agente **${agentDisplayName(meta)}** (repo: \`${meta.label}\`) según el markdown en \`${meta.path}\`. ` +
         `Respeta personalidad, reglas críticas y plantillas de entregables del archivo.`
     );
     lines.push("");
