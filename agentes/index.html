@@ -29,32 +29,32 @@
           >
         </h1>
         <p class="hero__lede">
-          Elige la <strong>carpeta</strong> del repositorio (<code>engineering/</code>, <code>design/</code>,
-          <code>marketing/</code>, <code>product/</code>, etc.), el agente concreto y los parámetros. El brief generado
+          Elige la <strong>carpeta del repositorio</strong> (<code>engineering/</code>, <code>design/</code>,
+          <code>marketing/</code>, <code>product/</code>, etc.), el <strong>agente especializado</strong> y los parámetros. El brief generado
           sirve para Claude Code, Cursor, Copilot y el resto de integraciones del proyecto.
         </p>
       </header>
 
       <form id="brief-form" class="form-card" novalidate>
         <div class="field">
-          <label for="category">Carpeta en el repo</label>
+          <label for="category">Carpeta del repositorio</label>
           <select id="category" name="category" required></select>
           <p class="field__hint" id="category-desc"></p>
         </div>
 
         <div class="field agent-row">
-          <label for="agent-filter">Buscar agente</label>
+          <label for="agent-filter">Buscar en el catálogo</label>
           <input
             id="agent-filter"
             type="search"
             placeholder="Filtrar por nombre…"
             autocomplete="off"
-            aria-label="Filtrar lista de agentes"
+            aria-label="Filtrar la lista de especialistas"
           />
         </div>
 
         <div class="field">
-          <label for="agent">Agente</label>
+          <label for="agent">Agente especializado</label>
           <select id="agent" name="agent" required size="8" class="select--tall"></select>
           <p class="field__hint" id="agent-hint"></p>
         </div>
@@ -72,7 +72,7 @@
             />
           </div>
           <div class="field">
-            <label for="g-context">Qué necesitas del agente</label>
+            <label for="g-context">Qué necesitas del especialista</label>
             <textarea
               id="g-context"
               name="g_context"
@@ -100,7 +100,7 @@
         </div>
 
         <div id="design-fields" class="field-group is-hidden">
-          <h3 class="field-group__title">Parámetros extra · Design</h3>
+          <h3 class="field-group__title">Parámetros adicionales · Diseño</h3>
           <div class="field">
             <label for="d-brand">Marca, tono y restricciones</label>
             <textarea id="d-brand" name="d_brand" rows="2" placeholder="Guías, personalidad, competencia a evitar…"></textarea>
@@ -136,7 +136,7 @@
         </div>
 
         <div id="product-fields" class="field-group is-hidden">
-          <h3 class="field-group__title">Parámetros extra · Product (esqueleto PRD)</h3>
+          <h3 class="field-group__title">Parámetros adicionales · Producto (esqueleto PRD)</h3>
           <div class="field">
             <label for="p-problem">Problema u oportunidad + evidencia</label>
             <textarea id="p-problem" name="p_problem" rows="3" placeholder="Dolor del usuario, datos, soporte, competencia…"></textarea>
@@ -180,7 +180,7 @@
           <div class="output__actions">
             <button type="button" id="copy-brief" class="btn btn--small">Copiar</button>
             <a id="agent-gh-link" class="btn btn--small btn--link" href="#" target="_blank" rel="noopener noreferrer"
-              >Ver agente en GitHub</a
+              >Ver perfil en GitHub</a
             >
           </div>
         </div>

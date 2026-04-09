@@ -20,6 +20,29 @@
     "examples",
   ];
 
+  /** Nombres en español para el desplegable (la clave del repo sigue siendo el id en inglés). */
+  const CATEGORY_LABEL_ES = {
+    engineering: "Ingeniería",
+    design: "Diseño",
+    marketing: "Marketing",
+    sales: "Ventas",
+    product: "Producto",
+    testing: "Pruebas y calidad",
+    support: "Soporte",
+    "game-development": "Videojuegos",
+    academic: "Académico",
+    specialized: "Especializados",
+    "paid-media": "Medios de pago",
+    "project-management": "Gestión de proyectos",
+    strategy: "Estrategia",
+    "spatial-computing": "Computación espacial",
+    examples: "Ejemplos",
+  };
+
+  function categoryLabelEs(id) {
+    return CATEGORY_LABEL_ES[id] ?? data.categories[id]?.label ?? id;
+  }
+
   const form = document.getElementById("brief-form");
   const categorySelect = document.getElementById("category");
   const categoryDesc = document.getElementById("category-desc");
@@ -47,7 +70,7 @@
       if (!meta) continue;
       const opt = document.createElement("option");
       opt.value = id;
-      opt.textContent = `${meta.label} (${meta.agents.length})`;
+      opt.textContent = `${categoryLabelEs(id)} (${meta.agents.length} agentes)`;
       frag.appendChild(opt);
     }
     categorySelect.innerHTML = "";
@@ -57,7 +80,9 @@
   function updateCategoryDesc() {
     const id = currentCategoryId();
     const meta = data.categories[id];
-    categoryDesc.textContent = meta ? `${meta.description} · carpeta \`${id}/\`` : "";
+    categoryDesc.textContent = meta
+      ? `${meta.description} · ruta en el repositorio: \`${id}/\``
+      : "";
   }
 
   function populateAgents(filterText) {
@@ -76,7 +101,7 @@
 
     agentSelect.innerHTML = filtered.length
       ? filtered.map((a) => `<option value="${a.id}">${a.label}</option>`).join("")
-      : '<option value="">— Ningún agente coincide —</option>';
+      : '<option value="">— Ningún agente coincide con la búsqueda —</option>';
 
     updateAgentHint();
   }
@@ -127,8 +152,8 @@
     lines.push(`# Brief para agente: ${meta.label}`);
     lines.push("");
     lines.push(`**Repositorio**: https://github.com/msitarzewski/agency-agents`);
-    lines.push(`**Carpeta**: \`${catId}/\` (${catMeta?.label ?? catId})`);
-    lines.push(`**Archivo del agente**: \`${meta.path}\``);
+    lines.push(`**Carpeta del repositorio**: \`${catId}/\` (${categoryLabelEs(catId)})`);
+    lines.push(`**Archivo del agente especializado**: \`${meta.path}\``);
     lines.push("");
     lines.push("## Instrucción de activación");
     lines.push("");
@@ -169,7 +194,7 @@
       const acc = document.getElementById("d-accessibility")?.value || "";
       const deliverable = document.getElementById("d-deliverable")?.value || "";
 
-      lines.push("## Parámetros Design (repo / UI Designer y afines)");
+      lines.push("## Parámetros adicionales · Diseño (UI Designer y afines)");
       lines.push("");
       if (brand) {
         lines.push(`### Marca y tono`);
@@ -195,7 +220,7 @@
       const stakeholders = document.getElementById("p-stakeholders")?.value.trim();
       const horizon = document.getElementById("p-horizon")?.value.trim();
 
-      lines.push("## Parámetros Product (esqueleto PRD del proyecto)");
+      lines.push("## Parámetros adicionales · Producto (esqueleto PRD)");
       lines.push("");
       if (problem) {
         lines.push(`### Problema / oportunidad y evidencia`);
