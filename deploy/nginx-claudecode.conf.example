@@ -1,21 +1,40 @@
 # Archivo en el repo: deploy/nginx-claudecode.conf.example
+# Patrón alineado con otros sitios (ej. complex): HTTP→HTTPS + bloque SSL separado.
 #
-# En el servidor (ajusta dominio en server_name):
-#   sudo cp /var/www/html/claudecode/deploy/nginx-claudecode.conf.example /etc/nginx/sites-available/claudecode
-#   sudo nano /etc/nginx/sites-available/claudecode   # server_name
+# En el servidor:
+#   sudo cp .../deploy/nginx-claudecode.conf.example /etc/nginx/sites-available/claudecode
+#   sudo nano /etc/nginx/sites-available/claudecode   # dominio y rutas cert si cambian
 #   sudo ln -sf /etc/nginx/sites-available/claudecode /etc/nginx/sites-enabled/
+#   sudo certbot --nginx -d ia.ulpik.com   # si aún no hay certificado
 #   sudo nginx -t && sudo systemctl reload nginx
 
+# HTTP → HTTPS (mismo criterio que complex.ulpik.com)
 server {
     listen 80;
     listen [::]:80;
-    server_name tu-dominio.com www.tu-dominio.com;
+    server_name ia.ulpik.com;
 
-    # Raíz del sitio (index.html, css/, landing/)
+    if ($host = ia.ulpik.com) {
+        return 301 https://$host$request_uri;
+    }
+
+    return 404;
+}
+
+# HTTPS — estático (index.html, css/, landing/)
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl ipv6only=on;
+    server_name ia.ulpik.com;
+
+    ssl_certificate     /etc/letsencrypt/live/ia.ulpik.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/ia.ulpik.com/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
     root /var/www/html/claudecode;
     index index.html;
 
-    # Logs (opcional)
     access_log /var/log/nginx/claudecode.access.log;
     error_log  /var/log/nginx/claudecode.error.log;
 
@@ -24,10 +43,9 @@ server {
     gzip_min_length 256;
 
     location / {
-        try_files $uri $uri/ =404;
+        try_files $uri $uri/ /index.html;
     }
 
-    # Caché ligera para assets estáticos
     location ~* \.(css|js|woff2?|ico|svg)$ {
         expires 7d;
         add_header Cache-Control "public, immutable";
@@ -36,22 +54,3 @@ server {
     add_header X-Content-Type-Options "nosniff" always;
     add_header Referrer-Policy "strict-origin-when-cross-origin" always;
 }
-
-# Tras certificar con Let's Encrypt, Certbot suele añadir un bloque server :443.
-# O descomenta y adapta:
-#
-# server {
-#     listen 443 ssl http2;
-#     listen [::]:443 ssl http2;
-#     server_name tu-dominio.com www.tu-dominio.com;
-#
-#     ssl_certificate     /etc/letsencrypt/live/tu-dominio.com/fullchain.pem;
-#     ssl_certificate_key /etc/letsencrypt/live/tu-dominio.com/privkey.pem;
-#
-#     root /var/www/html/claudecode;
-#     index index.html;
-#
-#     location / {
-#         try_files $uri $uri/ =404;
-#     }
-# }
