@@ -20,16 +20,16 @@
     "examples",
   ];
 
-  /** Nombres en español para el desplegable (la clave del repo sigue siendo el id en inglés). */
+  /** Nombres en español para el desplegable (el valor `value` sigue siendo el id del repo en inglés). */
   const CATEGORY_LABEL_ES = {
     engineering: "Ingeniería",
     design: "Diseño",
-    marketing: "Marketing",
+    marketing: "Mercadotecnia",
     sales: "Ventas",
     product: "Producto",
     testing: "Pruebas y calidad",
     support: "Soporte",
-    "game-development": "Videojuegos",
+    "game-development": "Desarrollo de videojuegos",
     academic: "Académico",
     specialized: "Especializados",
     "paid-media": "Medios de pago",
@@ -40,7 +40,9 @@
   };
 
   function categoryLabelEs(id) {
-    return CATEGORY_LABEL_ES[id] ?? data.categories[id]?.label ?? id;
+    const es = CATEGORY_LABEL_ES[id];
+    if (es) return es;
+    return data.categories[id]?.label ?? id;
   }
 
   const form = document.getElementById("brief-form");
