@@ -36,6 +36,21 @@ body {
   padding: 2.5rem 0 4rem;
 }
 
+.home-link {
+  margin: 0 0 1.25rem;
+  font-size: 0.88rem;
+}
+
+.home-link a {
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.home-link a:hover {
+  color: var(--product);
+}
+
 .hero__tag {
   margin: 0 0 0.35rem;
   font-size: 0.75rem;
