@@ -1,57 +1,19 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>ClaudeCode · Inicio</title>
-    <meta
-      name="description"
-      content="Herramientas y recursos alrededor de la IA y agentes especializados."
-    />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ClaudeCode</title>
+    <meta name="description" content="Herramientas y recursos alrededor de la IA y agentes especializados." />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="css/home.css" />
   </head>
   <body>
-    <div class="home">
-      <header class="home__header">
-        <p class="home__eyebrow">Proyecto claudecode</p>
-        <h1 class="home__title">Herramientas para trabajar con IA</h1>
-        <p class="home__lede">
-          Punto de entrada a utilidades locales: genera briefs para agentes, enlaza con repos open source y amplía el
-          ecosistema cuando quieras.
-        </p>
-      </header>
-
-      <p class="home__section-title">Aplicaciones</p>
-      <div class="home__grid" role="list">
-        <a class="home__card" href="agentes/" role="listitem">
-          <span class="home__card-icon" aria-hidden="true">◈</span>
-          <h2 class="home__card-title">Agentes Claude</h2>
-          <p class="home__card-desc">
-            Consulta y brief para 155+ agentes del repo Agency Agents: elige carpeta, agente y parámetros para Claude
-            Code, Cursor y más.
-          </p>
-        </a>
-
-        <div class="home__card home__card--soon" role="listitem">
-          <span class="home__card-icon" aria-hidden="true">○</span>
-          <h2 class="home__card-title">Próximamente</h2>
-          <p class="home__card-desc">Aquí podrás añadir más módulos o enlaces a otros proyectos.</p>
-        </div>
-      </div>
-
-      <footer class="home__footer">
-        <p>
-          <a href="https://github.com/cto-ulpik/claudecode" target="_blank" rel="noopener noreferrer">GitHub · claudecode</a>
-          ·
-          <a href="https://github.com/msitarzewski/agency-agents" target="_blank" rel="noopener noreferrer">agency-agents</a>
-        </p>
-      </footer>
-    </div>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

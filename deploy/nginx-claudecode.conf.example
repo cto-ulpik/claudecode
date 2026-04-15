@@ -21,7 +21,7 @@ server {
     return 404;
 }
 
-# HTTPS — estático (index.html, css/, agentes/)
+# HTTPS — SPA React build (dist/)
 server {
     listen 443 ssl;
     listen [::]:443 ssl ipv6only=on;
@@ -32,8 +32,8 @@ server {
     include /etc/letsencrypt/options-ssl-nginx.conf;
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
-    # Raíz del repo: index.html (home), css/, agentes/ (herramienta briefs)
-    root /var/www/html/claudecode;
+    # Servir build de Vite generado en dist/
+    root /var/www/html/claudecode/dist;
     index index.html;
 
     access_log /var/log/nginx/claudecode.access.log;
