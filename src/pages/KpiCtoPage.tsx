@@ -9,6 +9,10 @@ function formatDate(iso: string): string {
   return new Date(iso).toLocaleString();
 }
 
+function fmt4(n: number): string {
+  return n.toFixed(4);
+}
+
 export function KpiCtoPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -108,8 +112,8 @@ export function KpiCtoPage() {
         <LineChartCard
           title="Uptime servidor (%)"
           labels={filterSeriesByDays(snapshot?.series ?? [], daysFilter).map((row) => row.dateLabel)}
-          formatValue={(v) => `${v}%`}
-          formatRangeValue={(v) => String(v)}
+          formatValue={(v) => `${fmt4(v)}%`}
+          formatRangeValue={fmt4}
           lines={[
             {
               name: "Uptime",
@@ -121,8 +125,8 @@ export function KpiCtoPage() {
         <LineChartCard
           title="Tiempos de respuesta por region (ms)"
           labels={filterSeriesByDays(snapshot?.series ?? [], daysFilter).map((row) => row.dateLabel)}
-          formatValue={(v) => `${v} ms`}
-          formatRangeValue={(v) => String(v)}
+          formatValue={(v) => `${fmt4(v)} ms`}
+          formatRangeValue={fmt4}
           lines={responseSeries(filterSeriesByDays(snapshot?.series ?? [], daysFilter))}
         />
         <LineChartCard
@@ -184,10 +188,10 @@ function buildFilteredMetrics(series: KpiDailyRow[], daysFilter: string) {
   const avgLighthouse = latest.lighthouseScores.reduce((acc, v) => acc + v, 0) / latest.lighthouseScores.length;
   return [
     { label: "Fecha", value: latest.dateLabel },
-    { label: "Uptime servidor", value: `${latest.uptimePercent}%` },
+    { label: "Uptime servidor", value: `${fmt4(latest.uptimePercent)}%` },
     {
       label: "Tiempo respuesta promedio",
-      value: `${avgResponse} ms`,
+      value: `${fmt4(avgResponse)} ms`,
       detail: "Promedio eu_west, se_asia, us_east, us_west",
     },
     {
