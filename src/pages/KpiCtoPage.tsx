@@ -108,7 +108,8 @@ export function KpiCtoPage() {
         <LineChartCard
           title="Uptime servidor (%)"
           labels={filterSeriesByDays(snapshot?.series ?? [], daysFilter).map((row) => row.dateLabel)}
-          formatValue={(v) => `${v.toFixed(2)}%`}
+          formatValue={(v) => `${v}%`}
+          formatRangeValue={(v) => String(v)}
           lines={[
             {
               name: "Uptime",
@@ -120,7 +121,8 @@ export function KpiCtoPage() {
         <LineChartCard
           title="Tiempos de respuesta por region (ms)"
           labels={filterSeriesByDays(snapshot?.series ?? [], daysFilter).map((row) => row.dateLabel)}
-          formatValue={(v) => `${Math.round(v)} ms`}
+          formatValue={(v) => `${v} ms`}
+          formatRangeValue={(v) => String(v)}
           lines={responseSeries(filterSeriesByDays(snapshot?.series ?? [], daysFilter))}
         />
         <LineChartCard
@@ -182,10 +184,10 @@ function buildFilteredMetrics(series: KpiDailyRow[], daysFilter: string) {
   const avgLighthouse = latest.lighthouseScores.reduce((acc, v) => acc + v, 0) / latest.lighthouseScores.length;
   return [
     { label: "Fecha", value: latest.dateLabel },
-    { label: "Uptime servidor", value: `${latest.uptimePercent.toFixed(2)}%` },
+    { label: "Uptime servidor", value: `${latest.uptimePercent}%` },
     {
       label: "Tiempo respuesta promedio",
-      value: `${avgResponse.toFixed(0)} ms`,
+      value: `${avgResponse} ms`,
       detail: "Promedio eu_west, se_asia, us_east, us_west",
     },
     {
@@ -227,11 +229,14 @@ function LineChartCard({
   labels,
   lines,
   formatValue = (v: number) => String(v),
+  formatRangeValue = (v: number) => v.toFixed(2),
 }: {
   title: string;
   labels: string[];
   lines: ChartLine[];
   formatValue?: (value: number) => string;
+  /** Min/Max bajo el titulo (por defecto dos decimales). */
+  formatRangeValue?: (value: number) => string;
 }) {
   const [hover, setHover] = useState<{ idx: number; clientX: number; clientY: number } | null>(null);
 
@@ -301,7 +306,7 @@ function LineChartCard({
       <div className="chart-card__head">
         <h3>{title}</h3>
         <p>
-          Min: {min.toFixed(2)} · Max: {max.toFixed(2)} · Registros: {labels.length}
+          Min: {formatRangeValue(min)} · Max: {formatRangeValue(max)} · Registros: {labels.length}
         </p>
       </div>
 
