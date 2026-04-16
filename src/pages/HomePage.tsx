@@ -26,13 +26,13 @@ export function HomePage() {
           </p>
         </Link>
 
-        <div className="home__card home__card--soon" role="listitem">
+        <Link className="home__card" to="/kpi-cto" role="listitem">
           <span className="home__card-icon" aria-hidden="true">
-            ○
+            ▲
           </span>
-          <h2 className="home__card-title">Proximamente</h2>
-          <p className="home__card-desc">Aqui podras anadir mas modulos o enlaces a otros proyectos.</p>
-        </div>
+          <h2 className="home__card-title">KPI CTO</h2>
+          <p className="home__card-desc">Panel tecnico con uptime del servidor y score SEO del sitio web.</p>
+        </Link>
       </div>
 
       <footer className="home__footer">
