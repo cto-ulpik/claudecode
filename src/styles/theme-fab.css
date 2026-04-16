@@ -1,0 +1,33 @@
+.theme-fab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid var(--card-border, rgba(255, 255, 255, 0.12));
+  background: var(--bg-elevated, #16141a);
+  color: var(--text, #f2f0f7);
+  font-family: var(--sans, system-ui, sans-serif);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.theme-fab:hover {
+  border-color: var(--accent, #c9a227);
+}
+
+.theme-fab:focus-visible {
+  outline: 2px solid var(--accent, #c9a227);
+  outline-offset: 2px;
+}
+
+.theme-fab__icon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+html[data-theme="light"] .theme-fab {
+  box-shadow: 0 10px 28px rgba(26, 23, 20, 0.12);
+}

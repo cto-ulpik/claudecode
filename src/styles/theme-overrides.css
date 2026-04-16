@@ -1,0 +1,19 @@
+/* Ajustes para modo oscuro en formularios Agentes (colores fijos en styles.css). */
+
+html[data-theme="dark"] .field input[type="text"],
+html[data-theme="dark"] .field select,
+html[data-theme="dark"] .field textarea {
+  background: var(--surface);
+  color: var(--ink);
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .output {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+html[data-theme="light"] .brief {
+  background: #f0ebe3;
+  color: #1a1714;
+}

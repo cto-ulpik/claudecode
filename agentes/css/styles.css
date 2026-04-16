@@ -1,34 +1,4 @@
-:root {
-  --bg: #f6f2eb;
-  --surface: #fffcf7;
-  --ink: #1a1714;
-  --muted: #5c564e;
-  --line: rgba(26, 23, 20, 0.12);
-  --design: #c45c3e;
-  --design-soft: rgba(196, 92, 62, 0.12);
-  --product: #2d6a6a;
-  --product-soft: rgba(45, 106, 106, 0.12);
-  --mono: "IBM Plex Mono", ui-monospace, monospace;
-  --sans: "Instrument Sans", system-ui, sans-serif;
-  --radius: 14px;
-  --shadow: 0 12px 40px rgba(26, 23, 20, 0.08);
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: var(--sans);
-  font-size: 1.05rem;
-  line-height: 1.55;
-  color: var(--ink);
-  background: var(--bg);
-  min-height: 100vh;
-}
+/* Variables de color: src/styles/theme-global.css (html[data-theme]). */
 
 .page {
   width: min(720px, calc(100% - 2rem));
