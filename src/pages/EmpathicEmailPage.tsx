@@ -48,16 +48,18 @@ export function EmpathicEmailPage() {
     try {
       const ai = await generateEmpathicEmailWithOpenAI(input);
       setResult(ai);
-    } catch {
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : String(err);
+      const shortDetail = detail.replace(/\s+/g, " ").slice(0, 260);
       const built = buildEmpathicEmail(input);
       if (built) {
         setResult(built);
         setApiNote(
-          "ChatGPT no respondió (clave, red o proxy). Revisa `OPENAI_API_KEY` en `.env.local` y ejecuta `npm run dev` o `npm run preview`. Se muestra el borrador local.",
+          `ChatGPT no respondió. Error API: ${shortDetail || "desconocido"}. Revisa OPENAI_API_KEY en .env.local y ejecuta npm run dev o npm run preview. Se muestra el borrador local.`,
         );
       } else {
         setResult(null);
-        setError("No se pudo generar el borrador.");
+        setError(`No se pudo generar el borrador. Error API: ${shortDetail || "desconocido"}`);
       }
     } finally {
       setLoading(false);
