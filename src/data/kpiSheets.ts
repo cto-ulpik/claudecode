@@ -8,8 +8,8 @@ export interface KpiSheetOption {
 }
 
 export const KPI_SHEET_OPTIONS: KpiSheetOption[] = [
-  { tabName: "Hoja 1", label: "ulpik.com" },
-  { tabName: "Hoja 2", label: "deshunshoacrack.com" },
+  { tabName: "ulpik.com", label: "ulpik.com" },
+  { tabName: "deshunshoacrack.com", label: "deshunshoacrack.com" },
 ];
 
 export function kpiSheetLabel(tabName: string): string {

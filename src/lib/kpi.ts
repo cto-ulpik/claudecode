@@ -33,8 +33,15 @@ interface GvizTable {
   rows: GvizRow[];
 }
 
+interface GvizError {
+  message?: string;
+  reason?: string;
+}
+
 interface GvizResponse {
-  table: GvizTable;
+  status?: string;
+  errors?: GvizError[];
+  table?: GvizTable;
 }
 
 const SHEET_URL =
@@ -58,7 +65,18 @@ function cellText(cell: GvizCell | null | undefined): string {
 }
 
 function normalizeRows(table: GvizTable): string[][] {
-  return table.rows.map((row) => row.c.map((cell) => cellText(cell)));
+  const width = Math.max(
+    10,
+    table.cols?.length ?? 0,
+    ...table.rows.map((row) => row.c?.length ?? 0)
+  );
+  return table.rows.map((row) => {
+    const cells = (row.c ?? []).map((cell) => cellText(cell));
+    while (cells.length < width) {
+      cells.push("");
+    }
+    return cells;
+  });
 }
 
 function parseNumber(raw: string): number | null {
@@ -101,7 +119,14 @@ export async function loadKpiSnapshot(sheetTabName: string, sheetLabel: string):
     throw new Error(`No se pudo leer Google Sheet (HTTP ${response.status})`);
   }
   const raw = await response.text();
-  const gviz = parseGvizPayload(raw);
+  const gviz = parseGvizPayload(raw) as GvizResponse;
+  if (gviz.status === "error") {
+    const msg = gviz.errors?.map((e) => e.message ?? e.reason).filter(Boolean).join(" · ") || "Error desconocido";
+    throw new Error(`Google Sheets (${sheetTabName}): ${msg}`);
+  }
+  if (!gviz.table) {
+    throw new Error(`Google Sheets (${sheetTabName}): respuesta sin tabla`);
+  }
   const rows = normalizeRows(gviz.table);
   const series = rows.map((cells) => rowToSeries(cells)).filter((row): row is KpiDailyRow => row !== null);
 

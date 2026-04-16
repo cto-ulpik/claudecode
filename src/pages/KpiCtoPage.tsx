@@ -13,7 +13,7 @@ export function KpiCtoPage() {
   const [error, setError] = useState("");
   const [snapshot, setSnapshot] = useState<KpiSnapshot | null>(null);
   const [daysFilter, setDaysFilter] = useState("30");
-  const [sheetTab, setSheetTab] = useState(KPI_SHEET_OPTIONS[0]?.tabName ?? "Hoja 1");
+  const [sheetTab, setSheetTab] = useState(KPI_SHEET_OPTIONS[0]?.tabName ?? "ulpik.com");
 
   const refresh = useCallback(async () => {
     setLoading(true);
