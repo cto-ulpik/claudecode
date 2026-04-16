@@ -1,12 +1,10 @@
 export type EmpathicTone = "warm" | "professional" | "formal";
 
 export interface EmpathicEmailInput {
-  advisorName: string;
   recipientName: string;
-  relationship: string;
-  situation: string;
+  reason: string;
+  message: string;
   tone: EmpathicTone;
-  includeSubject: boolean;
 }
 
 export interface EmpathicEmailResult {
@@ -67,11 +65,11 @@ function salutation(recipientName: string, tone: EmpathicTone): string {
 }
 
 function subjectLine(input: EmpathicEmailInput, recipient: string): string {
-  const sit = t(input.situation);
-  const snippet = sit.length > 52 ? `${sit.slice(0, 49)}…` : sit;
+  const reason = t(input.reason);
+  const snippet = reason.length > 52 ? `${reason.slice(0, 49)}…` : reason;
   switch (input.tone) {
     case "warm":
-      return recipient ? `Una nota para ti, ${recipient}` : "Una nota para ti";
+      return recipient ? `Acompañándote con esto, ${recipient}` : "Acompañándote con esto";
     case "professional":
       return snippet || "Seguimiento";
     case "formal":
@@ -86,32 +84,26 @@ function subjectLine(input: EmpathicEmailInput, recipient: string): string {
  * Requiere al menos `situation` con texto; el resto admite valores por defecto suaves.
  */
 export function buildEmpathicEmail(input: EmpathicEmailInput): EmpathicEmailResult | null {
-  const situation = t(input.situation);
-  if (!situation) return null;
-
-  const advisor = t(input.advisorName) || "[tu nombre]";
+  const reason = t(input.reason);
+  const message = t(input.message);
+  if (!reason || !message) return null;
   const recipient = t(input.recipientName);
-  const relationship = t(input.relationship);
 
   const parts: string[] = [];
   parts.push(salutation(input.recipientName, input.tone));
   parts.push("");
   parts.push(opening(input.tone));
-  if (relationship) {
-    const relSentence =
-      relationship.charAt(0).toUpperCase() + relationship.slice(1) + (relationship.endsWith(".") ? "" : ".");
-    parts.push("");
-    parts.push(`Como contexto compartido: ${relSentence}`);
-  }
+  parts.push("");
+  parts.push(`Motivo: ${reason}.`);
   parts.push("");
   parts.push(bridge(input.tone));
   parts.push("");
-  parts.push(situation);
+  parts.push(message);
   parts.push("");
-  parts.push(empathyClosing(input.tone, advisor));
+  parts.push(empathyClosing(input.tone, "[tu nombre]"));
 
   const body = parts.join("\n");
-  const subject = input.includeSubject ? subjectLine(input, recipient) : "";
+  const subject = subjectLine(input, recipient);
 
   return { subject, body };
 }

@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import {
   buildEmpathicEmail,
   fullEmailText,
+  type EmpathicEmailInput,
   type EmpathicEmailResult,
   type EmpathicTone,
 } from "../lib/empathicEmail";
+import { generateEmpathicEmailWithOpenAI } from "../lib/openaiEmpathicEmail";
 import "../styles/empathic-email.css";
 
 const TONE_OPTIONS: { value: EmpathicTone; label: string }[] = [
@@ -15,35 +17,52 @@ const TONE_OPTIONS: { value: EmpathicTone; label: string }[] = [
 ];
 
 export function EmpathicEmailPage() {
-  const [advisorName, setAdvisorName] = useState("");
   const [recipientName, setRecipientName] = useState("");
-  const [relationship, setRelationship] = useState("");
-  const [situation, setSituation] = useState("");
+  const [reason, setReason] = useState("");
+  const [message, setMessage] = useState("");
   const [tone, setTone] = useState<EmpathicTone>("warm");
-  const [includeSubject, setIncludeSubject] = useState(true);
 
   const [result, setResult] = useState<EmpathicEmailResult | null>(null);
   const [error, setError] = useState("");
   const [copyMsg, setCopyMsg] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [apiNote, setApiNote] = useState("");
 
-  const generate = useCallback(() => {
+  const generate = useCallback(async () => {
     setError("");
     setCopyMsg("");
-    const built = buildEmpathicEmail({
-      advisorName,
+    setApiNote("");
+    const input: EmpathicEmailInput = {
       recipientName,
-      relationship,
-      situation,
+      reason,
+      message,
       tone,
-      includeSubject,
-    });
-    if (!built) {
+    };
+    if (!recipientName.trim() || !reason.trim() || !message.trim()) {
       setResult(null);
-      setError("Describe la situación o el mensaje que quieres transmitir (campo obligatorio).");
+      setError("Completa destinatario, motivo y mensaje (campos obligatorios).");
       return;
     }
-    setResult(built);
-  }, [advisorName, recipientName, relationship, situation, tone, includeSubject]);
+
+    setLoading(true);
+    try {
+      const ai = await generateEmpathicEmailWithOpenAI(input);
+      setResult(ai);
+    } catch {
+      const built = buildEmpathicEmail(input);
+      if (built) {
+        setResult(built);
+        setApiNote(
+          "ChatGPT no respondió (clave, red o proxy). Revisa `OPENAI_API_KEY` en `.env.local` y ejecuta `npm run dev` o `npm run preview`. Se muestra el borrador local.",
+        );
+      } else {
+        setResult(null);
+        setError("No se pudo generar el borrador.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [recipientName, reason, message, tone]);
 
   const copy = useCallback(async () => {
     if (!result) return;
@@ -66,8 +85,12 @@ export function EmpathicEmailPage() {
         <p className="emp-mail__tag">Comunicación</p>
         <h1>Correo empático</h1>
         <p>
-          Rellena los datos como asesor y genera un borrador de correo con tono humano: reconoce el contexto, ordena el
-          mensaje y deja un cierre claro. Revísalo siempre antes de enviarlo.
+          Rellena solo los datos clave y genera un correo empático con ChatGPT usando el prompt definido.
+        </p>
+        <p className="emp-mail__hero-note">
+          Con <strong>OPENAI_API_KEY</strong> en <code>.env.local</code> (plantilla en <code>.env.example</code>) y{" "}
+          <code>npm run dev</code> o <code>npm run preview</code>, el borrador lo redacta ChatGPT. Si la API falla, se
+          usa el generador local.
         </p>
       </header>
 
@@ -75,23 +98,9 @@ export function EmpathicEmailPage() {
         className="emp-mail__form"
         onSubmit={(e) => {
           e.preventDefault();
-          generate();
+          void generate();
         }}
       >
-        <div className="emp-mail__field">
-          <label htmlFor="emp-advisor">Tu nombre (asesor)</label>
-          <input
-            id="emp-advisor"
-            name="advisorName"
-            type="text"
-            autoComplete="name"
-            placeholder="Ej. Laura Méndez"
-            value={advisorName}
-            onChange={(e) => setAdvisorName(e.target.value)}
-          />
-          <p className="emp-mail__hint">Firmará el correo; si lo dejas vacío verás un marcador para completarlo.</p>
-        </div>
-
         <div className="emp-mail__field">
           <label htmlFor="emp-recipient">Nombre de quien recibe el correo</label>
           <input
@@ -105,27 +114,19 @@ export function EmpathicEmailPage() {
         </div>
 
         <div className="emp-mail__field">
-          <label htmlFor="emp-relation">Contexto o vínculo (opcional)</label>
-          <input
-            id="emp-relation"
-            name="relationship"
-            type="text"
-            placeholder="Ej. nos acompañas en el plan desde enero"
-            value={relationship}
-            onChange={(e) => setRelationship(e.target.value)}
-          />
-          <p className="emp-mail__hint">Una línea que ancle la relación sin ser larga.</p>
+          <label htmlFor="emp-reason">Motivo del correo</label>
+          <input id="emp-reason" name="reason" type="text" placeholder="Ej. Retraso en entrega" value={reason} onChange={(e) => setReason(e.target.value)} />
         </div>
 
         <div className="emp-mail__field">
-          <label htmlFor="emp-situation">Situación o mensaje a transmitir</label>
+          <label htmlFor="emp-message">Lo que se desea transmitir</label>
           <textarea
-            id="emp-situation"
-            name="situation"
+            id="emp-message"
+            name="message"
             required
-            placeholder="Ej. Hubo un retraso en la documentación y queremos explicarte los pasos siguientes sin que te quedes con la incertidumbre…"
-            value={situation}
-            onChange={(e) => setSituation(e.target.value)}
+            placeholder="Ej. Queremos acompañarte y proponerte un plan claro para normalizar fechas."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
           />
         </div>
 
@@ -140,17 +141,6 @@ export function EmpathicEmailPage() {
           </select>
         </div>
 
-        <div className="emp-mail__row">
-          <label className="emp-mail__check">
-            <input
-              type="checkbox"
-              checked={includeSubject}
-              onChange={(e) => setIncludeSubject(e.target.checked)}
-            />
-            Incluir línea de asunto sugerida
-          </label>
-        </div>
-
         {error ? (
           <p className="emp-mail__error" role="alert">
             {error}
@@ -158,11 +148,17 @@ export function EmpathicEmailPage() {
         ) : null}
 
         <div className="emp-mail__actions">
-          <button type="submit" className="emp-mail__btn emp-mail__btn--primary">
-            Generar borrador
+          <button type="submit" className="emp-mail__btn emp-mail__btn--primary" disabled={loading}>
+            {loading ? "Generando…" : "Generar borrador"}
           </button>
         </div>
       </form>
+
+      {apiNote ? (
+        <p className="emp-mail__api-note" role="status">
+          {apiNote}
+        </p>
+      ) : null}
 
       {result ? (
         <section className="emp-mail__output" aria-live="polite">
