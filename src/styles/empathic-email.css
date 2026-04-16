@@ -1,0 +1,210 @@
+.emp-mail {
+  width: min(720px, calc(100% - 2.5rem));
+  margin: 0 auto;
+  padding: 2.5rem 0 4rem;
+  font-family: var(--sans);
+  color: var(--text);
+}
+
+.emp-mail__back {
+  margin: 0 0 1.5rem;
+}
+
+.emp-mail__back a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.emp-mail__back a:hover {
+  color: var(--accent);
+}
+
+.emp-mail__hero {
+  margin-bottom: 2rem;
+}
+
+.emp-mail__tag {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.emp-mail__hero h1 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.85rem, 4vw, 2.35rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+}
+
+.emp-mail__hero p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.05rem;
+  max-width: 52ch;
+  line-height: 1.5;
+}
+
+.emp-mail__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  padding: 1.35rem 1.25rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  margin-bottom: 1.75rem;
+}
+
+.emp-mail__field label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  color: var(--text);
+}
+
+.emp-mail__field .emp-mail__hint {
+  margin: 0.25rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--muted);
+}
+
+.emp-mail__field input,
+.emp-mail__field textarea,
+.emp-mail__field select {
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+}
+
+.emp-mail__field textarea {
+  min-height: 6.5rem;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+.emp-mail__field input:focus,
+.emp-mail__field textarea:focus,
+.emp-mail__field select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.emp-mail__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+}
+
+.emp-mail__check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.emp-mail__check input {
+  width: auto;
+  accent-color: var(--accent);
+}
+
+.emp-mail__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.25rem;
+}
+
+.emp-mail__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.65rem 1.15rem;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  border-radius: 10px;
+  border: 1px solid var(--card-border);
+  background: var(--accent-dim);
+  color: var(--text);
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.emp-mail__btn:hover {
+  border-color: var(--card-hover);
+}
+
+.emp-mail__btn--primary {
+  background: var(--accent);
+  color: #1a1510;
+  border-color: transparent;
+}
+
+.emp-mail__btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.emp-mail__error {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #c45c3e;
+}
+
+html[data-theme="dark"] .emp-mail__error {
+  color: #ff9a8a;
+}
+
+.emp-mail__output {
+  padding: 1.25rem 1.2rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--card-border);
+  background: var(--bg-elevated);
+}
+
+.emp-mail__output h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.emp-mail__subject {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.emp-mail__subject strong {
+  color: var(--text);
+}
+
+.emp-mail__body {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.emp-mail__copy-msg {
+  margin: 0.85rem 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}

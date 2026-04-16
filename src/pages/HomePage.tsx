@@ -33,6 +33,16 @@ export function HomePage() {
           <h2 className="home__card-title">KPI CTO</h2>
           <p className="home__card-desc">Panel tecnico con uptime del servidor y score SEO del sitio web.</p>
         </Link>
+
+        <Link className="home__card" to="/correo-empatico" role="listitem">
+          <span className="home__card-icon" aria-hidden="true">
+            ✉
+          </span>
+          <h2 className="home__card-title">Correo empático</h2>
+          <p className="home__card-desc">
+            Guía al asesor con unos datos y obtén un borrador de correo claro, cercano y listo para revisar.
+          </p>
+        </Link>
       </div>
 
       <footer className="home__footer">
