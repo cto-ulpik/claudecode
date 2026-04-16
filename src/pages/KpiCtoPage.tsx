@@ -13,6 +13,13 @@ function fmt4(n: number): string {
   return n.toFixed(4);
 }
 
+/** Promedio de ms por región; los 0 se ignoran (sin medición o sin dato). */
+function averageResponseMsExcludingZeros(samples: readonly number[]): number | null {
+  const nonzero = samples.filter((v) => v !== 0);
+  if (nonzero.length === 0) return null;
+  return nonzero.reduce((a, v) => a + v, 0) / nonzero.length;
+}
+
 export function KpiCtoPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -184,15 +191,15 @@ function buildFilteredMetrics(series: KpiDailyRow[], daysFilter: string) {
   const filtered = filterSeriesByDays(series, daysFilter);
   const latest = filtered[filtered.length - 1];
   if (!latest) return [];
-  const avgResponse = latest.responseTimesMs.reduce((acc, v) => acc + v, 0) / latest.responseTimesMs.length;
+  const avgResponse = averageResponseMsExcludingZeros(latest.responseTimesMs);
   const avgLighthouse = latest.lighthouseScores.reduce((acc, v) => acc + v, 0) / latest.lighthouseScores.length;
   return [
     { label: "Fecha", value: latest.dateLabel },
     { label: "Uptime servidor", value: `${fmt4(latest.uptimePercent)}%` },
     {
       label: "Tiempo respuesta promedio",
-      value: `${fmt4(avgResponse)} ms`,
-      detail: "Promedio eu_west, se_asia, us_east, us_west",
+      value: avgResponse == null ? "-- ms" : `${fmt4(avgResponse)} ms`,
+      detail: "Promedio eu_west, se_asia, us_east, us_west (sin contar 0 ms)",
     },
     {
       label: "Calificacion Lighthouse promedio",
