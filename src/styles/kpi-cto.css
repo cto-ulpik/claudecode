@@ -25,6 +25,48 @@
   max-width: 60ch;
 }
 
+.kpi-streak {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.25rem;
+  padding: 1rem 1.15rem;
+  border-radius: 14px;
+  border: 1px solid var(--kpi-border);
+  background: var(--kpi-help-bg);
+}
+
+.kpi-streak__value {
+  margin: 0;
+  font-size: clamp(2.2rem, 6vw, 2.85rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: var(--kpi-accent);
+  min-width: 4.5rem;
+  text-align: center;
+}
+
+.kpi-streak__body {
+  flex: 1;
+  min-width: min(100%, 18rem);
+}
+
+.kpi-streak__title {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--kpi-text);
+}
+
+.kpi-streak__detail {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--kpi-muted);
+}
+
 .kpi-hero__tag {
   color: var(--kpi-accent);
   text-transform: uppercase;
@@ -179,6 +221,61 @@
   display: block;
   background: var(--kpi-chart-fill);
   border-radius: 10px;
+  cursor: crosshair;
+  touch-action: none;
+}
+
+.chart__cursor {
+  stroke: var(--kpi-accent);
+  stroke-width: 1;
+  stroke-dasharray: 5 4;
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+.chart__dot {
+  pointer-events: none;
+}
+
+.chart-tooltip {
+  position: fixed;
+  z-index: 100;
+  pointer-events: none;
+  min-width: 10rem;
+  max-width: min(16rem, calc(100vw - 1.5rem));
+  padding: 0.5rem 0.65rem;
+  border-radius: 10px;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  background: var(--kpi-surface);
+  border: 1px solid var(--kpi-border);
+  color: var(--kpi-text);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.28);
+}
+
+html[data-theme="light"] .chart-tooltip {
+  box-shadow: 0 10px 28px rgba(26, 23, 20, 0.15);
+}
+
+.chart-tooltip strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--kpi-text);
+}
+
+.chart-tooltip__row {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  margin-top: 0.15rem;
+}
+
+.chart-tooltip__swatch {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 2px;
+  flex-shrink: 0;
 }
 
 .chart__axis {

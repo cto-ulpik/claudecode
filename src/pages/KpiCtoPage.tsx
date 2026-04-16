@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getUptimeStreakForTab } from "../data/kpiUptimeStreak";
 import { KPI_SHEET_OPTIONS, kpiSheetLabel } from "../data/kpiSheets";
 import { loadKpiSnapshot, type KpiSnapshot, type KpiDailyRow } from "../lib/kpi";
 import "../styles/kpi-cto.css";
@@ -47,6 +48,20 @@ export function KpiCtoPage() {
         </p>
       </header>
 
+      {(() => {
+        const streak = getUptimeStreakForTab(sheetTab);
+        if (!streak) return null;
+        return (
+          <aside className="kpi-streak" aria-label="Días de uptime del servicio">
+            <p className="kpi-streak__value">{streak.days}</p>
+            <div className="kpi-streak__body">
+              <p className="kpi-streak__title">{streak.title}</p>
+              <p className="kpi-streak__detail">{streak.detail}</p>
+            </div>
+          </aside>
+        );
+      })()}
+
       <div className="kpi-filters">
         <label htmlFor="sheet-filter">Hoja</label>
         <select id="sheet-filter" value={sheetTab} onChange={(event) => setSheetTab(event.target.value)}>
@@ -93,6 +108,7 @@ export function KpiCtoPage() {
         <LineChartCard
           title="Uptime servidor (%)"
           labels={filterSeriesByDays(snapshot?.series ?? [], daysFilter).map((row) => row.dateLabel)}
+          formatValue={(v) => `${v.toFixed(2)}%`}
           lines={[
             {
               name: "Uptime",
@@ -104,11 +120,13 @@ export function KpiCtoPage() {
         <LineChartCard
           title="Tiempos de respuesta por region (ms)"
           labels={filterSeriesByDays(snapshot?.series ?? [], daysFilter).map((row) => row.dateLabel)}
+          formatValue={(v) => `${Math.round(v)} ms`}
           lines={responseSeries(filterSeriesByDays(snapshot?.series ?? [], daysFilter))}
         />
         <LineChartCard
           title="Calificaciones por fecha (0-100)"
           labels={filterSeriesByDays(snapshot?.series ?? [], daysFilter).map((row) => row.dateLabel)}
+          formatValue={(v) => `${Math.round(v)}`}
           lines={scoreSeries(filterSeriesByDays(snapshot?.series ?? [], daysFilter))}
         />
       </section>
@@ -204,7 +222,19 @@ function scoreSeries(series: KpiDailyRow[]): ChartLine[] {
   ];
 }
 
-function LineChartCard({ title, labels, lines }: { title: string; labels: string[]; lines: ChartLine[] }) {
+function LineChartCard({
+  title,
+  labels,
+  lines,
+  formatValue = (v: number) => String(v),
+}: {
+  title: string;
+  labels: string[];
+  lines: ChartLine[];
+  formatValue?: (value: number) => string;
+}) {
+  const [hover, setHover] = useState<{ idx: number; clientX: number; clientY: number } | null>(null);
+
   const width = 900;
   const height = 260;
   const padding = 28;
@@ -213,15 +243,58 @@ function LineChartCard({ title, labels, lines }: { title: string; labels: string
   const min = hasData ? Math.min(...allValues) : 0;
   const max = hasData ? Math.max(...allValues) : 100;
   const range = max - min || 1;
+  const span = Math.max(1, labels.length - 1);
+  const stepX = (width - padding * 2) / span;
 
   const pointsFor = (values: number[]) =>
     values
       .map((value, idx) => {
-        const x = padding + (idx * (width - padding * 2)) / Math.max(1, values.length - 1);
+        const x = padding + (idx * (width - padding * 2)) / span;
         const y = height - padding - ((value - min) / range) * (height - padding * 2);
         return `${x},${y}`;
       })
       .join(" ");
+
+  function onSvgPointerMove(event: React.PointerEvent<SVGSVGElement>) {
+    const svg = event.currentTarget;
+    const rect = svg.getBoundingClientRect();
+    const relX = event.clientX - rect.left;
+    if (relX < 0 || relX > rect.width) {
+      setHover(null);
+      return;
+    }
+    const viewX = (relX / rect.width) * width;
+    if (viewX < padding || viewX > width - padding) {
+      setHover(null);
+      return;
+    }
+    let idx = Math.round((viewX - padding) / stepX);
+    idx = Math.max(0, Math.min(labels.length - 1, idx));
+    setHover({ idx, clientX: event.clientX, clientY: event.clientY });
+  }
+
+  function onSvgPointerLeave() {
+    setHover(null);
+  }
+
+  const hoverIdx = hover ? Math.min(Math.max(0, hover.idx), Math.max(0, labels.length - 1)) : null;
+  const cursorX = hoverIdx != null ? padding + hoverIdx * stepX : null;
+
+  let tooltipStyle: React.CSSProperties = {};
+  if (hover) {
+    const pad = 12;
+    let left = hover.clientX + pad;
+    let top = hover.clientY + pad;
+    if (typeof window !== "undefined") {
+      left = Math.min(left, window.innerWidth - 220);
+      left = Math.max(8, left);
+      if (top > window.innerHeight - 100) {
+        top = hover.clientY - 100;
+      }
+      top = Math.max(8, top);
+    }
+    tooltipStyle = { left, top };
+  }
 
   return (
     <article className="chart-card">
@@ -233,13 +306,47 @@ function LineChartCard({ title, labels, lines }: { title: string; labels: string
       </div>
 
       {hasData ? (
-        <svg className="chart" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={title}>
-          <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} className="chart__axis" />
-          <line x1={padding} y1={padding} x2={padding} y2={height - padding} className="chart__axis" />
-          {lines.map((line) => (
-            <polyline key={line.name} fill="none" stroke={line.color} strokeWidth="2.5" points={pointsFor(line.values)} />
-          ))}
-        </svg>
+        <>
+          <svg
+            className="chart"
+            viewBox={`0 0 ${width} ${height}`}
+            role="img"
+            aria-label={title}
+            onPointerMove={onSvgPointerMove}
+            onPointerLeave={onSvgPointerLeave}
+            onPointerCancel={onSvgPointerLeave}
+          >
+            <line x1={padding} y1={height - padding} x2={width - padding} y2={height - padding} className="chart__axis" />
+            <line x1={padding} y1={padding} x2={padding} y2={height - padding} className="chart__axis" />
+            {cursorX != null ? (
+              <line x1={cursorX} y1={padding} x2={cursorX} y2={height - padding} className="chart__cursor" />
+            ) : null}
+            {lines.map((line) => (
+              <polyline key={line.name} fill="none" stroke={line.color} strokeWidth="2.5" points={pointsFor(line.values)} />
+            ))}
+            {hoverIdx != null
+              ? lines.map((line) => {
+                  const value = line.values[hoverIdx];
+                  const x = padding + hoverIdx * stepX;
+                  const y = height - padding - ((value - min) / range) * (height - padding * 2);
+                  return <circle key={`dot-${line.name}`} className="chart__dot" cx={x} cy={y} r={4} fill={line.color} />;
+                })
+              : null}
+          </svg>
+          {hover && hoverIdx != null ? (
+            <div className="chart-tooltip" style={tooltipStyle}>
+              <strong>{labels[hoverIdx]}</strong>
+              {lines.map((line) => (
+                <div key={`tip-${line.name}`} className="chart-tooltip__row">
+                  <span className="chart-tooltip__swatch" style={{ backgroundColor: line.color }} aria-hidden="true" />
+                  <span>
+                    {line.name}: <b>{formatValue(line.values[hoverIdx])}</b>
+                  </span>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </>
       ) : (
         <p className="chart__empty">Sin datos para graficar.</p>
       )}
