@@ -65,6 +65,31 @@
   font-weight: 600;
 }
 
+.dash-view__form-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.dash-view__btn-cancel {
+  padding: 0.4rem 0.75rem;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.dash-view__btn-cancel:hover {
+  color: var(--text);
+  border-color: var(--muted);
+}
+
 .dash-view__field label {
   display: block;
   font-size: 0.82rem;
@@ -302,6 +327,30 @@
   gap: 0.5rem;
   align-items: center;
   justify-content: space-between;
+}
+
+.dash-view__card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.dash-view__edit {
+  padding: 0.25rem 0.5rem;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.dash-view__edit:hover {
+  border-color: var(--accent);
+  background: var(--accent-dim);
 }
 
 .dash-view__cat {

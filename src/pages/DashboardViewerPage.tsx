@@ -4,6 +4,7 @@ import {
   addDashboard,
   deleteDashboard,
   loadDashboards,
+  updateDashboard,
   uniqueCategories,
   type SavedDashboard,
 } from "../lib/dashboardStorage";
@@ -24,6 +25,7 @@ export function DashboardViewerPage() {
   const [filterCat, setFilterCat] = useState<string | null>(null);
   const [formMsg, setFormMsg] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const refresh = useCallback(() => {
     setList(loadDashboards());
@@ -43,7 +45,43 @@ export function DashboardViewerPage() {
     setSearchParams(searchParams, { replace: true });
   }, [searchParams, setSearchParams]);
 
-  const onAdd = useCallback(
+  const toggleFormPanel = useCallback(() => {
+    if (showAddForm) {
+      setShowAddForm(false);
+      setEditingId(null);
+      setName("");
+      setCategory("");
+      setHtml("");
+      setFormMsg("");
+    } else {
+      setEditingId(null);
+      setName("");
+      setCategory("");
+      setHtml("");
+      setFormMsg("");
+      setShowAddForm(true);
+    }
+  }, [showAddForm]);
+
+  const startEdit = useCallback((d: SavedDashboard, e: MouseEvent) => {
+    e.stopPropagation();
+    setName(d.name);
+    setCategory(d.category);
+    setHtml(d.html);
+    setEditingId(d.id);
+    setFormMsg("");
+    setShowAddForm(true);
+  }, []);
+
+  const cancelEdit = useCallback(() => {
+    setEditingId(null);
+    setName("");
+    setCategory("");
+    setHtml("");
+    setFormMsg("");
+  }, []);
+
+  const onSubmitForm = useCallback(
     (e: FormEvent) => {
       e.preventDefault();
       setFormMsg("");
@@ -54,6 +92,20 @@ export function DashboardViewerPage() {
         setFormMsg("Completa nombre, categoría y HTML.");
         return;
       }
+      if (editingId) {
+        const updated = updateDashboard(editingId, { name: n, category: c, html: h });
+        if (!updated) {
+          setFormMsg("No se encontró el dashboard a editar.");
+          return;
+        }
+        setEditingId(null);
+        setName("");
+        setCategory("");
+        setHtml("");
+        refresh();
+        setFormMsg("Cambios guardados en este navegador.");
+        return;
+      }
       addDashboard({ name: n, category: c, html: h });
       setName("");
       setCategory("");
@@ -61,7 +113,7 @@ export function DashboardViewerPage() {
       refresh();
       setFormMsg("Dashboard guardado en este navegador.");
     },
-    [name, category, html, refresh],
+    [name, category, html, editingId, refresh],
   );
 
   const onDelete = useCallback(
@@ -133,7 +185,8 @@ export function DashboardViewerPage() {
         <h1>Visualizador de dashboards</h1>
         <p>
           Los dashboards se guardan solo en este navegador. Filtra por categoría y abre una miniatura para ver el HTML
-          embebido a pantalla completa. Si necesitas crear uno nuevo, usa el botón «Añadir dashboard».
+          embebido a pantalla completa. Puedes editar nombre, categoría y HTML desde «Editar» en cada tarjeta, o crear
+          uno nuevo con «Añadir dashboard».
         </p>
       </header>
 
@@ -145,7 +198,7 @@ export function DashboardViewerPage() {
             className="dash-view__btn-toggle"
             aria-expanded={showAddForm}
             aria-controls="dash-add-form"
-            onClick={() => setShowAddForm((v) => !v)}
+            onClick={toggleFormPanel}
           >
             {showAddForm ? "Ocultar formulario" : "Añadir dashboard"}
           </button>
@@ -188,14 +241,24 @@ export function DashboardViewerPage() {
                 <h3 className="dash-view__card-title">{d.name}</h3>
                 <div className="dash-view__card-meta">
                   <span className="dash-view__cat">{d.category}</span>
-                  <button
-                    type="button"
-                    className="dash-view__del"
-                    onClick={(e) => onDelete(d.id, d.name, e)}
-                    aria-label={`Eliminar ${d.name}`}
-                  >
-                    Eliminar
-                  </button>
+                  <span className="dash-view__card-actions">
+                    <button
+                      type="button"
+                      className="dash-view__edit"
+                      onClick={(e) => startEdit(d, e)}
+                      aria-label={`Editar ${d.name}`}
+                    >
+                      Editar
+                    </button>
+                    <button
+                      type="button"
+                      className="dash-view__del"
+                      onClick={(e) => onDelete(d.id, d.name, e)}
+                      aria-label={`Eliminar ${d.name}`}
+                    >
+                      Eliminar
+                    </button>
+                  </span>
                 </div>
               </div>
             </button>
@@ -204,8 +267,15 @@ export function DashboardViewerPage() {
       )}
 
       <div id="dash-add-form" className="dash-view__add-panel" hidden={!showAddForm}>
-        <form className="dash-view__form" onSubmit={onAdd}>
-          <h2 className="dash-view__form-title">Nuevo dashboard</h2>
+        <form className="dash-view__form" onSubmit={onSubmitForm}>
+          <div className="dash-view__form-head">
+            <h2 className="dash-view__form-title">{editingId ? "Editar dashboard" : "Nuevo dashboard"}</h2>
+            {editingId ? (
+              <button type="button" className="dash-view__btn-cancel" onClick={cancelEdit}>
+                Cancelar edición
+              </button>
+            ) : null}
+          </div>
           <div className="dash-view__field">
             <label htmlFor="dash-name">Nombre</label>
             <input
@@ -238,7 +308,7 @@ export function DashboardViewerPage() {
           </div>
           <div className="dash-view__actions">
             <button type="submit" className="dash-view__btn">
-              Guardar dashboard
+              {editingId ? "Guardar cambios" : "Guardar dashboard"}
             </button>
             {formMsg ? (
               <p className={`dash-view__msg${formMsg.includes("Completa") ? " dash-view__msg--error" : ""}`}>

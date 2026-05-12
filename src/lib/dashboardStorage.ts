@@ -59,6 +59,26 @@ export function deleteDashboard(id: string): void {
   saveDashboards(list);
 }
 
+export function updateDashboard(
+  id: string,
+  input: { name: string; category: string; html: string },
+): SavedDashboard | null {
+  const list = loadDashboards();
+  const i = list.findIndex((d) => d.id === id);
+  if (i === -1) return null;
+  const prev = list[i]!;
+  const updated: SavedDashboard = {
+    ...prev,
+    name: input.name.trim(),
+    category: input.category.trim(),
+    html: input.html,
+  };
+  const next = [...list];
+  next[i] = updated;
+  saveDashboards(next);
+  return updated;
+}
+
 export function uniqueCategories(dashboards: SavedDashboard[]): string[] {
   const set = new Set<string>();
   for (const d of dashboards) {
