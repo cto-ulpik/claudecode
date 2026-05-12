@@ -23,6 +23,7 @@ export function DashboardViewerPage() {
   const [html, setHtml] = useState("");
   const [filterCat, setFilterCat] = useState<string | null>(null);
   const [formMsg, setFormMsg] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false);
 
   const refresh = useCallback(() => {
     setList(loadDashboards());
@@ -123,55 +124,24 @@ export function DashboardViewerPage() {
         <p className="dash-view__tag">Herramienta local</p>
         <h1>Visualizador de dashboards</h1>
         <p>
-          Añade dashboards con nombre, categoría y HTML. Se guardan solo en este navegador. Filtra por categoría y
-          abre una miniatura para ver el HTML embebido a pantalla completa.
+          Los dashboards se guardan solo en este navegador. Filtra por categoría y abre una miniatura para ver el HTML
+          embebido a pantalla completa. Si necesitas crear uno nuevo, usa el botón «Añadir dashboard».
         </p>
       </header>
 
-      <form className="dash-view__form" onSubmit={onAdd}>
-        <h2>Añadir dashboard</h2>
-        <div className="dash-view__field">
-          <label htmlFor="dash-name">Nombre</label>
-          <input
-            id="dash-name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            autoComplete="off"
-            placeholder="Ej. Ventas Q1"
-          />
-        </div>
-        <div className="dash-view__field">
-          <label htmlFor="dash-cat">Categoría</label>
-          <input
-            id="dash-cat"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            autoComplete="off"
-            placeholder="Ej. Finanzas, Operaciones…"
-          />
-        </div>
-        <div className="dash-view__field">
-          <label htmlFor="dash-html">HTML</label>
-          <textarea
-            id="dash-html"
-            value={html}
-            onChange={(e) => setHtml(e.target.value)}
-            placeholder="Pega un fragmento o documento HTML completo."
-            spellCheck={false}
-          />
-        </div>
-        <div className="dash-view__actions">
-          <button type="submit" className="dash-view__btn">
-            Guardar dashboard
-          </button>
-          {formMsg ? (
-            <p className={`dash-view__msg${formMsg.includes("Completa") ? " dash-view__msg--error" : ""}`}>{formMsg}</p>
-          ) : null}
-        </div>
-      </form>
-
       <section className="dash-view__toolbar" aria-labelledby="dash-grid-title">
-        <h2 id="dash-grid-title">Dashboards guardados</h2>
+        <div className="dash-view__toolbar-head">
+          <h2 id="dash-grid-title">Dashboards guardados</h2>
+          <button
+            type="button"
+            className="dash-view__btn-toggle"
+            aria-expanded={showAddForm}
+            aria-controls="dash-add-form"
+            onClick={() => setShowAddForm((v) => !v)}
+          >
+            {showAddForm ? "Ocultar formulario" : "Añadir dashboard"}
+          </button>
+        </div>
         <div className="dash-view__filters" role="group" aria-label="Filtrar por categoría">
           <button
             type="button"
@@ -196,7 +166,7 @@ export function DashboardViewerPage() {
       {filtered.length === 0 ? (
         <p className="dash-view__empty">
           {list.length === 0
-            ? "Aún no hay dashboards. Usa el formulario de arriba para crear el primero."
+            ? "Aún no hay dashboards. Pulsa «Añadir dashboard» para crear el primero."
             : "Ningún dashboard en esta categoría."}
         </p>
       ) : (
@@ -224,6 +194,52 @@ export function DashboardViewerPage() {
           ))}
         </div>
       )}
+
+      <div id="dash-add-form" className="dash-view__add-panel" hidden={!showAddForm}>
+        <form className="dash-view__form" onSubmit={onAdd}>
+          <h2 className="dash-view__form-title">Nuevo dashboard</h2>
+          <div className="dash-view__field">
+            <label htmlFor="dash-name">Nombre</label>
+            <input
+              id="dash-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoComplete="off"
+              placeholder="Ej. Ventas Q1"
+            />
+          </div>
+          <div className="dash-view__field">
+            <label htmlFor="dash-cat">Categoría</label>
+            <input
+              id="dash-cat"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              autoComplete="off"
+              placeholder="Ej. Finanzas, Operaciones…"
+            />
+          </div>
+          <div className="dash-view__field">
+            <label htmlFor="dash-html">HTML</label>
+            <textarea
+              id="dash-html"
+              value={html}
+              onChange={(e) => setHtml(e.target.value)}
+              placeholder="Pega un fragmento o documento HTML completo."
+              spellCheck={false}
+            />
+          </div>
+          <div className="dash-view__actions">
+            <button type="submit" className="dash-view__btn">
+              Guardar dashboard
+            </button>
+            {formMsg ? (
+              <p className={`dash-view__msg${formMsg.includes("Completa") ? " dash-view__msg--error" : ""}`}>
+                {formMsg}
+              </p>
+            ) : null}
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

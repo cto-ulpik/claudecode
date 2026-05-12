@@ -57,10 +57,9 @@
   background: var(--bg-elevated);
   border: 1px solid var(--card-border);
   border-radius: var(--radius);
-  margin-bottom: 2rem;
 }
 
-.dash-view__form h2 {
+.dash-view__form-title {
   margin: 0;
   font-size: 1.05rem;
   font-weight: 600;
@@ -139,10 +138,50 @@
   margin-bottom: 1.5rem;
 }
 
+.dash-view__toolbar-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+}
+
 .dash-view__toolbar h2 {
   margin: 0;
   font-size: 1rem;
   font-weight: 600;
+}
+
+.dash-view__btn-toggle {
+  padding: 0.5rem 1rem;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--bg-elevated);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.dash-view__btn-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.dash-view__btn-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.dash-view__add-panel {
+  margin-top: 2rem;
+  padding-top: 0.25rem;
+}
+
+.dash-view__add-panel[hidden] {
+  display: none;
 }
 
 .dash-view__filters {
