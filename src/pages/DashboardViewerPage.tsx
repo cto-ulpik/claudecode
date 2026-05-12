@@ -65,8 +65,16 @@ export function DashboardViewerPage() {
   );
 
   const onDelete = useCallback(
-    (id: string, e: MouseEvent) => {
+    (id: string, displayName: string, e: MouseEvent) => {
       e.stopPropagation();
+      const label = displayName.trim() || "este dashboard";
+      if (
+        !window.confirm(
+          `¿Estás seguro de que quieres eliminar «${label}»? Se borrará del almacenamiento de este navegador.`,
+        )
+      ) {
+        return;
+      }
       deleteDashboard(id);
       if (viewId === id) closeEmbed();
       refresh();
@@ -183,7 +191,7 @@ export function DashboardViewerPage() {
                   <button
                     type="button"
                     className="dash-view__del"
-                    onClick={(e) => onDelete(d.id, e)}
+                    onClick={(e) => onDelete(d.id, d.name, e)}
                     aria-label={`Eliminar ${d.name}`}
                   >
                     Eliminar
