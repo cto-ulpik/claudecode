@@ -43,6 +43,16 @@ export function HomePage() {
             Guía al asesor con unos datos y obtén un borrador de correo claro, cercano y listo para revisar.
           </p>
         </Link>
+
+        <Link className="home__card" to="/visualizador-dashboards" role="listitem">
+          <span className="home__card-icon" aria-hidden="true">
+            ▣
+          </span>
+          <h2 className="home__card-title">Visualizador de dashboards</h2>
+          <p className="home__card-desc">
+            Guarda HTML por nombre y categoría, filtra miniaturas y ábrelos en vista embebida a pantalla completa.
+          </p>
+        </Link>
       </div>
 
       <footer className="home__footer">
