@@ -3,6 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { getDb } from "./db.js";
 import { dashboardRouter } from "./routes/dashboards.js";
+import { sheetsRouter } from "./routes/sheets.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 3001;
@@ -19,6 +20,7 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api/dashboards", dashboardRouter);
+app.use("/api/sheets", sheetsRouter);
 
 if (serveStatic) {
   app.use(express.static(distDir));

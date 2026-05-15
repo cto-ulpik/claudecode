@@ -6,6 +6,7 @@ import {
   fetchDashboards,
   updateDashboardApi,
 } from "../lib/dashboardApi";
+import { transformDashboardHtml } from "../lib/dashboardHtmlSheets";
 import {
   clearLegacyDashboards,
   loadLegacyDashboards,
@@ -17,6 +18,10 @@ import "../styles/dashboard-viewer.css";
 const EMBED_SANDBOX =
   "allow-scripts allow-forms allow-popups allow-modals allow-downloads allow-presentation";
 const THUMB_SANDBOX = "allow-scripts allow-downloads allow-presentation";
+
+function htmlForEmbed(source: string): string {
+  return transformDashboardHtml(source).html;
+}
 
 export function DashboardViewerPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -137,13 +142,17 @@ export function DashboardViewerPage() {
       setFormMsg("");
       const n = name.trim();
       const c = category.trim();
-      const h = html.trim();
-      if (!n || !c || !h) {
+      const rawHtml = html.trim();
+      if (!n || !c || !rawHtml) {
         setFormMsg("Completa nombre, categoría y HTML.");
         return;
       }
+      const { html: h, transformed, sheetTab } = transformDashboardHtml(rawHtml);
       setSaving(true);
       try {
+        const sheetsNote = transformed
+          ? ` Google Sheets (${sheetTab ?? "hoja"}) vía servidor; se actualiza cada 60 s.`
+          : "";
         if (editingId) {
           await updateDashboardApi(editingId, { name: n, category: c, html: h });
           setEditingId(null);
@@ -151,14 +160,14 @@ export function DashboardViewerPage() {
           setCategory("");
           setHtml("");
           await refresh();
-          setFormMsg("Cambios guardados en el servidor.");
+          setFormMsg(`Cambios guardados en el servidor.${sheetsNote}`);
         } else {
           await createDashboard({ name: n, category: c, html: h });
           setName("");
           setCategory("");
           setHtml("");
           await refresh();
-          setFormMsg("Dashboard guardado. Lo verán todos los usuarios de esta app.");
+          setFormMsg(`Dashboard guardado. Lo verán todos los usuarios de esta app.${sheetsNote}`);
         }
       } catch (err) {
         setFormMsg(err instanceof Error ? err.message : "No se pudo guardar.");
@@ -210,7 +219,7 @@ export function DashboardViewerPage() {
         <iframe
           className="dash-view__embed-frame"
           title={viewing.name}
-          srcDoc={viewing.html}
+          srcDoc={htmlForEmbed(viewing.html)}
           sandbox={EMBED_SANDBOX}
         />
       </div>
@@ -244,7 +253,8 @@ export function DashboardViewerPage() {
         <h1>Visualizador de dashboards</h1>
         <p>
           Los dashboards se guardan en una base SQLite del servidor: cualquier persona con acceso a esta app los ve en
-          cualquier navegador. Filtra por categoría, abre una miniatura en pantalla completa o edita desde cada tarjeta.
+          cualquier navegador. Si el HTML usa Google Sheets, al guardar se adapta al proxy del servidor y se refresca cada
+          60 segundos. Filtra por categoría, abre una miniatura o edita desde cada tarjeta.
         </p>
       </header>
 
@@ -304,7 +314,7 @@ export function DashboardViewerPage() {
           {filtered.map((d) => (
             <button key={d.id} type="button" className="dash-view__card" onClick={() => openEmbed(d.id)}>
               <div className="dash-view__thumb-wrap" aria-hidden="true">
-                <iframe title={`Vista previa: ${d.name}`} srcDoc={d.html} sandbox={THUMB_SANDBOX} />
+                <iframe title={`Vista previa: ${d.name}`} srcDoc={htmlForEmbed(d.html)} sandbox={THUMB_SANDBOX} />
               </div>
               <div className="dash-view__card-body">
                 <h3 className="dash-view__card-title">{d.name}</h3>
