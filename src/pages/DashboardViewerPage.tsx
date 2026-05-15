@@ -1,10 +1,14 @@
-import { FormEvent, type MouseEvent, useCallback, useMemo, useState } from "react";
+import { FormEvent, type MouseEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
-  addDashboard,
-  deleteDashboard,
-  loadDashboards,
-  updateDashboard,
+  createDashboard,
+  deleteDashboardApi,
+  fetchDashboards,
+  updateDashboardApi,
+} from "../lib/dashboardApi";
+import {
+  clearLegacyDashboards,
+  loadLegacyDashboards,
   uniqueCategories,
   type SavedDashboard,
 } from "../lib/dashboardStorage";
@@ -18,7 +22,11 @@ export function DashboardViewerPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const viewId = searchParams.get("v");
 
-  const [list, setList] = useState<SavedDashboard[]>(() => loadDashboards());
+  const [list, setList] = useState<SavedDashboard[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [saving, setSaving] = useState(false);
+
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
   const [html, setHtml] = useState("");
@@ -27,8 +35,50 @@ export function DashboardViewerPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
-  const refresh = useCallback(() => {
-    setList(loadDashboards());
+  const refresh = useCallback(async () => {
+    const data = await fetchDashboards();
+    setList(data);
+    return data;
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function init() {
+      setLoading(true);
+      setLoadError("");
+      try {
+        let data = await fetchDashboards();
+        const legacy = loadLegacyDashboards();
+        if (data.length === 0 && legacy.length > 0) {
+          for (const d of legacy) {
+            await createDashboard({
+              name: d.name,
+              category: d.category,
+              html: d.html,
+            });
+          }
+          clearLegacyDashboards();
+          data = await fetchDashboards();
+        }
+        if (!cancelled) setList(data);
+      } catch (err) {
+        if (!cancelled) {
+          setLoadError(
+            err instanceof Error
+              ? err.message
+              : "No se pudo conectar con el servidor. Ejecuta «npm run dev» (incluye la API con SQLite).",
+          );
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    void init();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const viewing = useMemo(() => list.find((d) => d.id === viewId) ?? null, [list, viewId]);
@@ -82,7 +132,7 @@ export function DashboardViewerPage() {
   }, []);
 
   const onSubmitForm = useCallback(
-    (e: FormEvent) => {
+    async (e: FormEvent) => {
       e.preventDefault();
       setFormMsg("");
       const n = name.trim();
@@ -92,44 +142,51 @@ export function DashboardViewerPage() {
         setFormMsg("Completa nombre, categoría y HTML.");
         return;
       }
-      if (editingId) {
-        const updated = updateDashboard(editingId, { name: n, category: c, html: h });
-        if (!updated) {
-          setFormMsg("No se encontró el dashboard a editar.");
-          return;
+      setSaving(true);
+      try {
+        if (editingId) {
+          await updateDashboardApi(editingId, { name: n, category: c, html: h });
+          setEditingId(null);
+          setName("");
+          setCategory("");
+          setHtml("");
+          await refresh();
+          setFormMsg("Cambios guardados en el servidor.");
+        } else {
+          await createDashboard({ name: n, category: c, html: h });
+          setName("");
+          setCategory("");
+          setHtml("");
+          await refresh();
+          setFormMsg("Dashboard guardado. Lo verán todos los usuarios de esta app.");
         }
-        setEditingId(null);
-        setName("");
-        setCategory("");
-        setHtml("");
-        refresh();
-        setFormMsg("Cambios guardados en este navegador.");
-        return;
+      } catch (err) {
+        setFormMsg(err instanceof Error ? err.message : "No se pudo guardar.");
+      } finally {
+        setSaving(false);
       }
-      addDashboard({ name: n, category: c, html: h });
-      setName("");
-      setCategory("");
-      setHtml("");
-      refresh();
-      setFormMsg("Dashboard guardado en este navegador.");
     },
     [name, category, html, editingId, refresh],
   );
 
   const onDelete = useCallback(
-    (id: string, displayName: string, e: MouseEvent) => {
+    async (id: string, displayName: string, e: MouseEvent) => {
       e.stopPropagation();
       const label = displayName.trim() || "este dashboard";
       if (
         !window.confirm(
-          `¿Estás seguro de que quieres eliminar «${label}»? Se borrará del almacenamiento de este navegador.`,
+          `¿Estás seguro de que quieres eliminar «${label}»? Se borrará del servidor para todos los usuarios.`,
         )
       ) {
         return;
       }
-      deleteDashboard(id);
-      if (viewId === id) closeEmbed();
-      refresh();
+      try {
+        await deleteDashboardApi(id);
+        if (viewId === id) closeEmbed();
+        await refresh();
+      } catch (err) {
+        window.alert(err instanceof Error ? err.message : "No se pudo eliminar.");
+      }
     },
     [viewId, closeEmbed, refresh],
   );
@@ -144,7 +201,7 @@ export function DashboardViewerPage() {
   if (viewId && viewing) {
     return (
       <div className="dash-view dash-view--embed">
-        <div className="dash-view__embed-bar">
+          <div className="dash-view__embed-bar">
           <h2>{viewing.name}</h2>
           <button type="button" className="dash-view__embed-back" onClick={closeEmbed}>
             Volver al listado
@@ -160,13 +217,15 @@ export function DashboardViewerPage() {
     );
   }
 
-  if (viewId && !viewing) {
+  if (viewId && !viewing && !loading) {
     return (
       <div className="dash-view">
         <p className="dash-view__back">
           <Link to="/visualizador-dashboards">← Inicio visualizador</Link>
         </p>
-        <p className="dash-view__msg dash-view__msg--error">No se encontró ese dashboard. Puede haber sido eliminado.</p>
+        <p className="dash-view__msg dash-view__msg--error">
+          No se encontró ese dashboard. Puede haber sido eliminado.
+        </p>
         <button type="button" className="dash-view__btn" onClick={closeEmbed}>
           Volver al listado
         </button>
@@ -181,14 +240,19 @@ export function DashboardViewerPage() {
       </p>
 
       <header className="dash-view__hero">
-        <p className="dash-view__tag">Herramienta local</p>
+        <p className="dash-view__tag">Servidor compartido</p>
         <h1>Visualizador de dashboards</h1>
         <p>
-          Los dashboards se guardan solo en este navegador. Filtra por categoría y abre una miniatura para ver el HTML
-          embebido a pantalla completa. Puedes editar nombre, categoría y HTML desde «Editar» en cada tarjeta, o crear
-          uno nuevo con «Añadir dashboard».
+          Los dashboards se guardan en una base SQLite del servidor: cualquier persona con acceso a esta app los ve en
+          cualquier navegador. Filtra por categoría, abre una miniatura en pantalla completa o edita desde cada tarjeta.
         </p>
       </header>
+
+      {loadError ? (
+        <p className="dash-view__banner dash-view__banner--error" role="alert">
+          {loadError}
+        </p>
+      ) : null}
 
       <section className="dash-view__toolbar" aria-labelledby="dash-grid-title">
         <div className="dash-view__toolbar-head">
@@ -199,6 +263,7 @@ export function DashboardViewerPage() {
             aria-expanded={showAddForm}
             aria-controls="dash-add-form"
             onClick={toggleFormPanel}
+            disabled={!!loadError || loading}
           >
             {showAddForm ? "Ocultar formulario" : "Añadir dashboard"}
           </button>
@@ -208,6 +273,7 @@ export function DashboardViewerPage() {
             type="button"
             className={`dash-view__filter${filterCat === null ? " dash-view__filter--active" : ""}`}
             onClick={() => setFilterCat(null)}
+            disabled={loading}
           >
             Todas
           </button>
@@ -217,6 +283,7 @@ export function DashboardViewerPage() {
               type="button"
               className={`dash-view__filter${filterCat === c ? " dash-view__filter--active" : ""}`}
               onClick={() => setFilterCat(c)}
+              disabled={loading}
             >
               {c}
             </button>
@@ -224,7 +291,9 @@ export function DashboardViewerPage() {
         </div>
       </section>
 
-      {filtered.length === 0 ? (
+      {loading ? (
+        <p className="dash-view__empty">Cargando dashboards…</p>
+      ) : filtered.length === 0 ? (
         <p className="dash-view__empty">
           {list.length === 0
             ? "Aún no hay dashboards. Pulsa «Añadir dashboard» para crear el primero."
@@ -253,7 +322,7 @@ export function DashboardViewerPage() {
                     <button
                       type="button"
                       className="dash-view__del"
-                      onClick={(e) => onDelete(d.id, d.name, e)}
+                      onClick={(e) => void onDelete(d.id, d.name, e)}
                       aria-label={`Eliminar ${d.name}`}
                     >
                       Eliminar
@@ -267,7 +336,7 @@ export function DashboardViewerPage() {
       )}
 
       <div id="dash-add-form" className="dash-view__add-panel" hidden={!showAddForm}>
-        <form className="dash-view__form" onSubmit={onSubmitForm}>
+        <form className="dash-view__form" onSubmit={(e) => void onSubmitForm(e)}>
           <div className="dash-view__form-head">
             <h2 className="dash-view__form-title">{editingId ? "Editar dashboard" : "Nuevo dashboard"}</h2>
             {editingId ? (
@@ -284,6 +353,7 @@ export function DashboardViewerPage() {
               onChange={(e) => setName(e.target.value)}
               autoComplete="off"
               placeholder="Ej. Ventas Q1"
+              disabled={saving}
             />
           </div>
           <div className="dash-view__field">
@@ -294,6 +364,7 @@ export function DashboardViewerPage() {
               onChange={(e) => setCategory(e.target.value)}
               autoComplete="off"
               placeholder="Ej. Finanzas, Operaciones…"
+              disabled={saving}
             />
           </div>
           <div className="dash-view__field">
@@ -304,11 +375,12 @@ export function DashboardViewerPage() {
               onChange={(e) => setHtml(e.target.value)}
               placeholder="Pega un fragmento o documento HTML completo."
               spellCheck={false}
+              disabled={saving}
             />
           </div>
           <div className="dash-view__actions">
-            <button type="submit" className="dash-view__btn">
-              {editingId ? "Guardar cambios" : "Guardar dashboard"}
+            <button type="submit" className="dash-view__btn" disabled={saving}>
+              {saving ? "Guardando…" : editingId ? "Guardar cambios" : "Guardar dashboard"}
             </button>
             {formMsg ? (
               <p className={`dash-view__msg${formMsg.includes("Completa") ? " dash-view__msg--error" : ""}`}>

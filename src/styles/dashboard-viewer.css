@@ -156,6 +156,22 @@
   color: #e07a5f;
 }
 
+.dash-view__banner {
+  margin: 0 0 1.25rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  border-radius: 10px;
+  border: 1px solid var(--card-border);
+  background: var(--bg-elevated);
+  color: var(--muted);
+}
+
+.dash-view__banner--error {
+  color: #e07a5f;
+  border-color: rgba(224, 122, 95, 0.35);
+}
+
 .dash-view__toolbar {
   display: flex;
   flex-direction: column;

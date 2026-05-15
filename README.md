@@ -12,22 +12,26 @@ npm install
 npm run dev
 ```
 
+Arranca Vite (frontend) y la API con SQLite en el puerto `3001`. Los dashboards del visualizador se guardan en `data/dashboards.db` (compartidos entre navegadores y usuarios con acceso a la app).
+
 ## Build de produccion
 
 ```bash
 npm run build
+npm start
 ```
 
-El artefacto final se genera en `dist/`.
+- `dist/` — frontend estático.
+- `data/dashboards.db` — base SQLite (no se sube a git; persiste en el servidor).
+- `npm start` sirve API + SPA en el puerto `3001` (`PORT` opcional).
 
 ## Deploy con Nginx
 
 Config de ejemplo: `deploy/nginx-claudecode.conf.example`.
 
-Puntos clave:
+**Opción A — todo por Node** (`npm start` en `3001`, Nginx hace proxy al puerto):
 
-- `root /var/www/html/claudecode/dist;`
-- `try_files $uri $uri/ /index.html;` para soportar rutas SPA como `/agentes`.
+**Opción B — Nginx sirve `dist/`** y solo hace proxy de `/api` a la API en `3001` (`npm run dev:api` o `tsx server/index.ts` sin `NODE_ENV=production`).
 
 Flujo recomendado en servidor:
 
@@ -36,5 +40,6 @@ cd /var/www/html/claudecode
 git pull
 npm install
 npm run build
+# systemd o pm2: npm start  (o dev:api si Nginx sirve dist)
 sudo nginx -t && sudo systemctl reload nginx
 ```

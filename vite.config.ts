@@ -7,24 +7,29 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const openaiKey = env.OPENAI_API_KEY?.trim() ?? "";
 
-  const proxy: Record<string, ProxyOptions> | undefined =
-    openaiKey.length > 0
-      ? {
-          "/openai-proxy": {
-            target: "https://api.openai.com",
-            changeOrigin: true,
-            rewrite: (path: string) => path.replace(/^\/openai-proxy/, ""),
-            configure(proxy) {
-              proxy.on("proxyReq", (proxyReq: ClientRequest) => {
-                proxyReq.setHeader("Authorization", `Bearer ${openaiKey}`);
-              });
-            },
-          },
-        }
-      : undefined;
+  const proxy: Record<string, ProxyOptions> = {
+    "/api": {
+      target: "http://127.0.0.1:3001",
+      changeOrigin: true,
+    },
+  };
+
+  if (openaiKey.length > 0) {
+    proxy["/openai-proxy"] = {
+      target: "https://api.openai.com",
+      changeOrigin: true,
+      rewrite: (path: string) => path.replace(/^\/openai-proxy/, ""),
+      configure(proxy) {
+        proxy.on("proxyReq", (proxyReq: ClientRequest) => {
+          proxyReq.setHeader("Authorization", `Bearer ${openaiKey}`);
+        });
+      },
+    };
+  }
 
   return {
     plugins: [react()],
-    ...(proxy ? { server: { proxy }, preview: { proxy } } : {}),
+    server: { proxy },
+    preview: { proxy },
   };
 });

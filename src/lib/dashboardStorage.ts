@@ -1,5 +1,3 @@
-const STORAGE_KEY = "claudecode-dashboards-v1";
-
 export type SavedDashboard = {
   id: string;
   name: string;
@@ -8,18 +6,32 @@ export type SavedDashboard = {
   createdAt: number;
 };
 
-function parseList(raw: string | null): SavedDashboard[] {
-  if (!raw) return [];
+const LEGACY_STORAGE_KEY = "claudecode-dashboards-v1";
+
+export function uniqueCategories(dashboards: SavedDashboard[]): string[] {
+  const set = new Set<string>();
+  for (const d of dashboards) {
+    const c = d.category.trim();
+    if (c) set.add(c);
+  }
+  return [...set].sort((a, b) => a.localeCompare(b, "es"));
+}
+
+/** Datos antiguos guardados solo en el navegador (antes de SQLite). */
+export function loadLegacyDashboards(): SavedDashboard[] {
+  if (typeof localStorage === "undefined") return [];
   try {
+    const raw = localStorage.getItem(LEGACY_STORAGE_KEY);
+    if (!raw) return [];
     const data = JSON.parse(raw) as unknown;
     if (!Array.isArray(data)) return [];
-    return data.filter(isSavedDashboard);
+    return data.filter(isLegacyRow);
   } catch {
     return [];
   }
 }
 
-function isSavedDashboard(x: unknown): x is SavedDashboard {
+function isLegacyRow(x: unknown): x is SavedDashboard {
   if (!x || typeof x !== "object") return false;
   const o = x as Record<string, unknown>;
   return (
@@ -31,59 +43,7 @@ function isSavedDashboard(x: unknown): x is SavedDashboard {
   );
 }
 
-export function loadDashboards(): SavedDashboard[] {
-  if (typeof localStorage === "undefined") return [];
-  return parseList(localStorage.getItem(STORAGE_KEY));
-}
-
-export function saveDashboards(list: SavedDashboard[]): void {
+export function clearLegacyDashboards(): void {
   if (typeof localStorage === "undefined") return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
-}
-
-export function addDashboard(input: { name: string; category: string; html: string }): SavedDashboard {
-  const list = loadDashboards();
-  const row: SavedDashboard = {
-    id: typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `d-${Date.now()}`,
-    name: input.name.trim(),
-    category: input.category.trim(),
-    html: input.html,
-    createdAt: Date.now(),
-  };
-  saveDashboards([row, ...list]);
-  return row;
-}
-
-export function deleteDashboard(id: string): void {
-  const list = loadDashboards().filter((d) => d.id !== id);
-  saveDashboards(list);
-}
-
-export function updateDashboard(
-  id: string,
-  input: { name: string; category: string; html: string },
-): SavedDashboard | null {
-  const list = loadDashboards();
-  const i = list.findIndex((d) => d.id === id);
-  if (i === -1) return null;
-  const prev = list[i]!;
-  const updated: SavedDashboard = {
-    ...prev,
-    name: input.name.trim(),
-    category: input.category.trim(),
-    html: input.html,
-  };
-  const next = [...list];
-  next[i] = updated;
-  saveDashboards(next);
-  return updated;
-}
-
-export function uniqueCategories(dashboards: SavedDashboard[]): string[] {
-  const set = new Set<string>();
-  for (const d of dashboards) {
-    const c = d.category.trim();
-    if (c) set.add(c);
-  }
-  return [...set].sort((a, b) => a.localeCompare(b, "es"));
+  localStorage.removeItem(LEGACY_STORAGE_KEY);
 }
