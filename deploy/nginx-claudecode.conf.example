@@ -56,6 +56,11 @@ server {
         try_files $uri $uri/ /index.html;
     }
 
+    location /satisfaccion/ {
+        expires 1h;
+        add_header Cache-Control "public, must-revalidate";
+    }
+
     location ~* \.(css|js|woff2?|ico|svg)$ {
         expires 7d;
         add_header Cache-Control "public, immutable";
