@@ -1,0 +1,19 @@
+/** PM2 — copiar a ecosystem.config.cjs y ajustar rutas si cambian. */
+module.exports = {
+  apps: [
+    {
+      name: "claudecode-api",
+      cwd: "/var/www/html/claudecode",
+      script: "npx",
+      args: "tsx server/index.ts",
+      env: {
+        NODE_ENV: "production",
+        PORT: 3004,
+        SERVE_STATIC: "0",
+        GOOGLE_SHEETS_NPS_WEBAPP_URL:
+          "https://script.google.com/macros/s/AKfycbx5kXSF9lLxcV2ucFGZMejRjVZj_BK0j_ELO-ey1bQlBxAKOONe6ZwHMm2fBxU2QKV7/exec",
+        GOOGLE_SHEETS_NPS_WEBHOOK_SECRET: "",
+      },
+    },
+  ],
+};

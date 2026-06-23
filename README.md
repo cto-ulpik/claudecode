@@ -27,7 +27,8 @@ npm start
 
 ## Deploy con Nginx
 
-Config de ejemplo: `deploy/nginx-claudecode.conf.example`.
+Config de ejemplo: `deploy/nginx-claudecode.conf.example`.  
+PM2 / variables de entorno: `deploy/ecosystem.config.cjs.example` (incluye URL del Apps Script NPS → Google Sheet).
 
 **Opción A — todo por Node** (`npm start` en `3001`, Nginx hace proxy al puerto):
 

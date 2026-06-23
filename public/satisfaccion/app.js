@@ -165,7 +165,6 @@ async function submitForm(){
   spin.style.display='none';
   btnTxt.textContent='Enviar mi calificación →';
   window.scrollTo({top:0,behavior:'smooth'});
-  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function sendNotif(e,tUrl){
