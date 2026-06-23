@@ -1,15 +1,8 @@
-const LOGO="data:image/svg+xml,"+encodeURIComponent(`<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 120 40\"><rect width=\"120\" height=\"40\" fill=\"transparent\"/><text x=\"60\" y=\"28\" text-anchor=\"middle\" font-family=\"Inter,Arial,sans-serif\" font-size=\"22\" font-weight=\"700\" fill=\"#E8431A\">ULPIK</text></svg>`);
-['nav-logo','hero-logo'].forEach(id=>{const el=document.getElementById(id);if(el)el.src=LOGO;});
-
-const NOTIFY='legal5@ulpik.com';
-const TK='ulpik_titulo_v6';
-const SCALES=['nps','claridad','velocidad','calidad','satisfaccion'];
 const LOCAL_SK='ulpik_nps_local';
-
-const sel={asesor:null,servicio:null};
-const scv={nps:null,claridad:null,velocidad:null,calidad:null,satisfaccion:null};
-
-const SMSG={1:'😞 Muy malo',2:'😟 Malo',3:'😕 Por debajo de lo esperado',4:'😐 Regular',5:'🤔 Podría mejorar',6:'🙂 Aceptable',7:'😊 Bien',8:'😄 Muy bien',9:'🌟 Excelente',10:'🏆 ¡Superó todas las expectativas!'};
+const SK_CLIENT='ulpik_nps_v6';
+const TK_CLIENT='ulpik_titulo_v6';
+const NOTIFY='legal5@ulpik.com';
+const SCALES=['nps','claridad','velocidad','calidad','satisfaccion'];
 
 async function saveSurvey(entry){
   try{
@@ -25,34 +18,35 @@ async function saveSurvey(entry){
 }
 
 function getTituloUrl(){
-  try{return localStorage.getItem(TK)||'';}catch(e){return'';}
+  try{return localStorage.getItem(TK_CLIENT)||'';}catch(e){return'';}
 }
 
-window.addEventListener('load',()=>{
-  buildScales();
-  buildOpts();
+const sel={asesor:null,servicio:null};
+const scv={nps:null,claridad:null,velocidad:null,calidad:null,satisfaccion:null};
+
+const SMSG={1:'😞 Muy malo',2:'😟 Malo',3:'😕 Por debajo de lo esperado',4:'😐 Regular',5:'🤔 Podría mejorar',6:'🙂 Aceptable',7:'😊 Bien',8:'😄 Muy bien',9:'🌟 Excelente',10:'🏆 ¡Superó todas las expectativas!'};
+
+window.addEventListener('load',()=>{buildScales();buildOpts();
+  const wm=document.querySelector('.hero-watermark img'),sw=document.querySelector('.succ-watermark');
+  if(wm&&sw)sw.appendChild(wm.cloneNode(true));
 });
 
 function buildOpts(){
   document.querySelectorAll('.opt[data-group]').forEach(opt=>{
     opt.addEventListener('click',()=>selectOpt(opt));
     opt.setAttribute('tabindex','0');
-    opt.setAttribute('role','radio');
-    opt.setAttribute('aria-checked','false');
     opt.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();selectOpt(opt);}});
   });
 }
-
 function selectOpt(opt){
-  const group=opt.dataset.group,val=opt.dataset.val;
-  document.querySelectorAll('.opt[data-group="'+group+'"]').forEach(o=>{o.classList.remove('sel');o.setAttribute('aria-checked','false');});
-  opt.classList.add('sel');opt.setAttribute('aria-checked','true');
-  sel[group]=val;
+  const g=opt.dataset.group,v=opt.dataset.val;
+  document.querySelectorAll('.opt[data-group="'+g+'"]').forEach(o=>o.classList.remove('sel'));
+  opt.classList.add('sel');
+  sel[g]=v;
   const stp=opt.closest('.stp');
   if(stp){stp.classList.remove('bad');stp.classList.add('done');markDone(stp);}
   updateProgress();
 }
-
 function buildScales(){
   SCALES.forEach(id=>{
     const wrap=document.getElementById('sc-'+id);
@@ -60,14 +54,14 @@ function buildScales(){
     for(let i=1;i<=10;i++){
       const b=document.createElement('button');
       b.type='button';b.className='sbtn';b.textContent=String(i);
-      (function(val,scaleId,wrapper,btn){
-        btn.addEventListener('click',function(e){
+      (function(val,sid,w,btn){
+        btn.addEventListener('click',e=>{
           e.preventDefault();e.stopPropagation();
-          scv[scaleId]=val;
-          wrapper.querySelectorAll('.sbtn').forEach((x,j)=>x.classList.toggle('sel',j+1===val));
-          const stp=document.getElementById('s-'+scaleId);
+          scv[sid]=val;
+          w.querySelectorAll('.sbtn').forEach((x,j)=>x.classList.toggle('sel',j+1===val));
+          const stp=document.getElementById('s-'+sid);
           stp.classList.remove('bad');stp.classList.add('done');markDone(stp);
-          const sm=document.getElementById('sm-'+scaleId);
+          const sm=document.getElementById('sm-'+sid);
           sm.textContent=SMSG[val]||val+'/10';sm.className='score-msg set';
           updateProgress();
         });
@@ -76,9 +70,7 @@ function buildScales(){
     }
   });
 }
-
 function markDone(stp){const n=stp.querySelector('.stp-num');if(n&&stp.classList.contains('done'))n.textContent='✓';}
-
 function onEmailInput(){
   const v=document.getElementById('f-email').value.trim();
   const ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
@@ -86,7 +78,6 @@ function onEmailInput(){
   if(ok){stp.classList.remove('bad');stp.classList.add('done');markDone(stp);}
   updateProgress();
 }
-
 function onComentInput(){
   const v=document.getElementById('f-comentario').value;
   document.getElementById('char-n').textContent=v.length;
@@ -94,7 +85,6 @@ function onComentInput(){
   if(v.trim().length>=5){stp.classList.remove('bad');stp.classList.add('done');markDone(stp);}
   updateProgress();
 }
-
 function updateProgress(){
   let done=0;
   if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('f-email').value.trim()))done++;
@@ -107,7 +97,6 @@ function updateProgress(){
   document.getElementById('prog-pct').textContent=pct+'%';
   document.getElementById('prog-lbl').textContent=done+' de '+total+' completadas';
 }
-
 function showToast(msg,t='ok'){
   const el=document.getElementById('toast');
   el.textContent=(t==='ok'?'✓  ':t==='er'?'✗  ':'ℹ  ')+msg;
@@ -129,8 +118,11 @@ async function submitForm(){
     setTimeout(()=>document.querySelector('.stp.bad')?.scrollIntoView({behavior:'smooth',block:'center'}),80);
     return;
   }
-  const btn=document.getElementById('btn-sub'),spin=document.getElementById('spin'),btnTxt=document.getElementById('btn-txt');
+  const btn=document.getElementById('btn-sub');
+  const btnTxt=document.getElementById('btn-txt');
+  const spin=document.getElementById('spin');
   btn.disabled=true;spin.style.display='block';btnTxt.textContent='Enviando...';
+
   const now=new Date();
   const mes=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
   const entry={
@@ -144,9 +136,12 @@ async function submitForm(){
     instagram:document.getElementById('f-instagram').value.trim(),
     ts:Date.now()
   };
+
   try{await saveSurvey(entry);}catch(e){console.warn('storage',e);}
   const tituloUrl=getTituloUrl();
   sendNotif(entry,tituloUrl);
+
+  document.querySelector('.hero').style.display='none';
   document.getElementById('survey-form').style.display='none';
   document.getElementById('prog-wrap').style.display='none';
   document.getElementById('succ').classList.add('show');
@@ -162,6 +157,7 @@ Promedio: ${avg5}/10 | NPS:${e.nps} Claridad:${e.claridad} Velocidad:${e.velocid
 Comentario: "${e.comentario}"
 ${critico?'⚠️ CRÍTICO — contacto en 24h':''}
 ${tUrl?'Título: '+tUrl:'Sin título configurado'}`;
-  console.log('%c📧 NOTIFICACIÓN → '+NOTIFY,'color:#22C97A;font-weight:bold');
+  console.log('%c📧 NOTIFICACIÓN → '+NOTIFY,'color:#E8431A;font-weight:bold');
   console.log(txt);
 }
+
