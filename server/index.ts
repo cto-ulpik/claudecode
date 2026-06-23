@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { getDb } from "./db.js";
 import { dashboardRouter } from "./routes/dashboards.js";
 import { sheetsRouter } from "./routes/sheets.js";
+import { surveysRouter } from "./routes/surveys.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 3001;
@@ -21,6 +22,7 @@ app.get("/api/health", (_req, res) => {
 
 app.use("/api/dashboards", dashboardRouter);
 app.use("/api/sheets", sheetsRouter);
+app.use("/api/surveys", surveysRouter);
 
 if (serveStatic) {
   app.use(express.static(distDir));

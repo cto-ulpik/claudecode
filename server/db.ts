@@ -35,6 +35,13 @@ export function getDb(): Database.Database {
     );
     CREATE INDEX IF NOT EXISTS idx_dashboards_category ON dashboards(category);
     CREATE INDEX IF NOT EXISTS idx_dashboards_created ON dashboards(created_at DESC);
+
+    CREATE TABLE IF NOT EXISTS survey_responses (
+      id TEXT PRIMARY KEY,
+      data TEXT NOT NULL,
+      created_at INTEGER NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_survey_responses_created ON survey_responses(created_at DESC);
   `);
   return db;
 }

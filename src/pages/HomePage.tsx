@@ -53,6 +53,16 @@ export function HomePage() {
             Guarda HTML por nombre y categoría, filtra miniaturas y ábrelos en vista embebida a pantalla completa.
           </p>
         </Link>
+
+        <a className="home__card" href="/satisfaccion" role="listitem">
+          <span className="home__card-icon" aria-hidden="true">
+            ★
+          </span>
+          <h2 className="home__card-title">Satisfacción de clientes</h2>
+          <p className="home__card-desc">
+            Encuesta NPS pública, dashboard en vivo y generador de mensajes para envío de título. Acceso libre, sin contraseña.
+          </p>
+        </a>
       </div>
 
       <footer className="home__footer">
