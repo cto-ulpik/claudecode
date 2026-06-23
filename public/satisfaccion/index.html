@@ -4,25 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ulpik · Satisfacción de Clientes</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- ═══════════════ NAV GLOBAL ═══════════════ -->
-<nav class="gnav">
+<nav class="gnav gnav--solo">
   <img class="gnav-logo" id="nav-logo" src="" alt="Ulpik">
-  <div class="gnav-tabs">
-    <button class="gtab on"  id="tab-form"   onclick="switchTab('form')">📋 Encuesta</button>
-    <button class="gtab"     id="tab-admin"  onclick="switchTab('admin')">📊 Dashboard</button>
-    <button class="gtab"     id="tab-titulo" onclick="switchTab('titulo')">📨 Envío de Título</button>
-  </div>
-  <div class="gnav-live"><span class="pulse"></span>En vivo</div>
 </nav>
 
-<!-- ═══════════════ ENCUESTA ═══════════════ -->
 <div id="pg-form" class="pg show">
   <div class="fw">
     <div class="hero">
@@ -125,134 +115,6 @@
   </div>
 </div>
 
-<!-- ═══════════════ DASHBOARD ═══════════════ -->
-<div id="pg-admin" class="pg">
-  <div id="a-dash">
-  <div class="aw">
-    <div class="dhead">
-      <h2>Dashboard NPS · 2026</h2>
-      <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap">
-        <div class="live-badge"><span class="pulse"></span>Actualizando cada 30 seg</div>
-        <button onclick="refrDash()" style="background:rgba(255,255,255,.06);border:1px solid var(--ln);padding:7px 13px;border-radius:8px;color:var(--txt2);font-family:inherit;font-size:12px;cursor:pointer">↻ Actualizar</button>
-      </div>
-    </div>
-    <div class="kgrid" id="d-kpis"></div>
-    <div class="dtabs">
-      <button class="dtab on" onclick="goDtab('overview',this)">📊 Resumen</button>
-      <button class="dtab" onclick="goDtab('preguntas',this)">📈 Por pregunta</button>
-      <button class="dtab" onclick="goDtab('asesores',this)">👤 Por asesor</button>
-      <button class="dtab" onclick="goDtab('meses',this)">📅 Por mes</button>
-      <button class="dtab" onclick="goDtab('comentarios',this)">💬 Comentarios</button>
-    </div>
-    <div id="dt-overview"></div>
-    <div id="dt-preguntas" style="display:none"></div>
-    <div id="dt-asesores" style="display:none"></div>
-    <div id="dt-meses" style="display:none"></div>
-    <div id="dt-comentarios" style="display:none"></div>
-  </div>
-  </div>
-</div>
-
-<!-- ═══════════════ ENVÍO DE TÍTULO (nueva pestaña) ═══════════════ -->
-<div id="pg-titulo" class="pg">
-
-  <div id="t-content">
-  <div class="tw">
-
-    <div class="tw-header">
-      <img id="tw-logo" src="" alt="Ulpik">
-      <div>
-        <h2>Envío de Título de Concesión</h2>
-        <p>Genera el mensaje personalizado para enviar al cliente vía Bitrix</p>
-      </div>
-    </div>
-
-    <div class="alert-info">
-      <span style="font-size:20px;flex-shrink:0">💡</span>
-      <div><strong>¿Cómo funciona?</strong> Completa los datos del cliente, sube el PDF del título o pega el enlace, selecciona el saludo según la hora, y el sistema generará el mensaje listo para copiar y pegar en Bitrix24.</div>
-    </div>
-
-    <!-- 1. DATOS DEL CLIENTE -->
-    <div class="card" style="margin-bottom:18px">
-      <h3 style="margin-bottom:4px">1 · Datos del cliente</h3>
-      <p class="csub">Información básica para personalizar el mensaje</p>
-      <div class="tfield">
-        <label>Nombre del cliente <span class="req">*</span></label>
-        <input type="text" id="t-nombre" placeholder="Ej: María García" oninput="buildMsg()">
-      </div>
-      <div class="tfield">
-        <label>Correo del cliente</label>
-        <input type="email" id="t-email" placeholder="cliente@correo.com" oninput="buildMsg()">
-      </div>
-      <div class="tfield">
-        <label>Nombre de la marca registrada <span class="req">*</span></label>
-        <input type="text" id="t-marca" placeholder="Ej: MiMarca™" oninput="buildMsg()">
-      </div>
-    </div>
-
-    <!-- 2. SALUDO SEGÚN HORA -->
-    <div class="card" style="margin-bottom:18px">
-      <h3 style="margin-bottom:4px">2 · Saludo del mensaje</h3>
-      <p class="csub">Selecciona según la hora del día en que envías el mensaje</p>
-      <div class="hora-chips">
-        <button class="chip on" id="chip-am" onclick="setChip('am')">☀️ Buenos días</button>
-        <button class="chip" id="chip-pm" onclick="setChip('pm')">🌤 Buenas tardes</button>
-        <button class="chip" id="chip-night" onclick="setChip('night')">🌙 Buenas noches</button>
-      </div>
-    </div>
-
-    <!-- 3. TITULO PDF -->
-    <div class="card" style="margin-bottom:18px">
-      <h3 style="margin-bottom:4px">3 · Título de concesión (PDF)</h3>
-      <p class="csub">Sube el archivo PDF o pega el enlace de Google Drive / Dropbox</p>
-
-      <!-- Upload -->
-      <div class="pdf-upload" id="pdf-drop" onclick="document.getElementById('pdf-file').click()">
-        <input type="file" id="pdf-file" accept=".pdf,application/pdf" style="display:none" onchange="onPdfChange(this)">
-        <div class="pdf-icon">📄</div>
-        <div class="pdf-upload-title" id="pdf-title">Arrastra el PDF aquí o haz clic para seleccionar</div>
-        <div class="pdf-upload-sub" id="pdf-sub">Solo archivos PDF · Máx. 20 MB</div>
-        <div class="pdf-name" id="pdf-name" style="display:none"></div>
-      </div>
-
-      <div class="or-divider"><span>— o pega un enlace —</span></div>
-
-      <div class="tfield" style="margin-bottom:0">
-        <label>Enlace del título (Google Drive, Dropbox, etc.)</label>
-        <input type="text" id="t-link" placeholder="https://drive.google.com/file/d/..." oninput="buildMsg()">
-      </div>
-      <p style="font-size:11.5px;color:var(--txt2);margin-top:8px;line-height:1.55">💡 <strong style="color:var(--txt)">Google Drive:</strong> Abre el PDF → Compartir → "Cualquier persona con el enlace puede ver" → copia el enlace.</p>
-    </div>
-
-    <!-- 4. PREVIEW DEL MENSAJE -->
-    <div class="msg-box" id="msg-box">
-      <div class="msg-box-head">
-        <div>
-          <h4>💬 Mensaje generado — listo para Bitrix</h4>
-          <p>Copia el mensaje completo y pégalo directamente en el chat de Bitrix24</p>
-        </div>
-        <button class="btn-regen" onclick="buildMsg()">↺ Regenerar</button>
-      </div>
-      <div class="msg-body">
-        <div class="msg-text" id="msg-preview-text">Completa los datos del cliente para generar el mensaje...</div>
-      </div>
-      <div class="msg-footer">
-        <div class="msg-footer-note">
-          <span class="pulse"></span>
-          <span id="msg-status">Esperando datos</span>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn-copy-msg" id="btn-copy-msg" onclick="copyMsgFull()">
-            <span class="copy-icon">📋</span>
-            <span id="copy-txt">Copiar mensaje completo</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
-  </div><!-- /tw -->
-  </div><!-- /t-content -->
-</div><!-- /pg-titulo -->
 <script src="app.js"></script>
 </body>
 </html>

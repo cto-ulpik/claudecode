@@ -11,6 +11,7 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
 
 /* ═══ NAV ═══ */
 .gnav{position:fixed;top:0;left:0;right:0;z-index:300;height:64px;background:rgba(8,8,8,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--ln);display:flex;align-items:center;justify-content:space-between;padding:0 18px;gap:12px}
+.gnav--solo{justify-content:center}
 .gnav-logo{height:26px;object-fit:contain;flex-shrink:0}
 .gnav-tabs{display:flex;gap:3px;background:rgba(255,255,255,.05);border-radius:12px;padding:4px}
 .gtab{border:none;background:none;padding:7px 14px;border-radius:9px;font-family:inherit;font-size:13px;font-weight:600;color:var(--txt2);cursor:pointer;transition:.18s;white-space:nowrap;display:flex;align-items:center;gap:6px}

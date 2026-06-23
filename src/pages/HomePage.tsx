@@ -60,7 +60,7 @@ export function HomePage() {
           </span>
           <h2 className="home__card-title">Satisfacción de clientes</h2>
           <p className="home__card-desc">
-            Encuesta NPS pública, dashboard en vivo y generador de mensajes para envío de título. Acceso libre, sin contraseña.
+            Encuesta NPS pública para clientes. Acceso libre, sin contraseña.
           </p>
         </a>
       </div>
