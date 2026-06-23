@@ -27,10 +27,19 @@ function doPost(e) {
 }
 
 function parsePayload(e) {
-  if (!e || !e.postData || !e.postData.contents) {
+  var data = null;
+  if (e && e.postData && e.postData.contents) {
+    try {
+      data = JSON.parse(e.postData.contents);
+    } catch (err) {
+      throw new Error('JSON inválido en POST');
+    }
+  } else if (e && e.parameter && e.parameter.payload) {
+    data = JSON.parse(e.parameter.payload);
+  }
+  if (!data) {
     throw new Error('Cuerpo POST vacío');
   }
-  var data = JSON.parse(e.postData.contents);
   var secret = PropertiesService.getScriptProperties().getProperty('WEBHOOK_SECRET');
   if (secret && data.token !== secret) {
     throw new Error('Token inválido');

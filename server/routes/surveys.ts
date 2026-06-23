@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { Router } from "express";
+import { postToAppsScript } from "../lib/appsScriptPost.js";
 import { getDb } from "../db.js";
 
 export const surveysRouter = Router();
@@ -14,35 +15,29 @@ function parseEntry(body: unknown): Record<string, unknown> | null {
   return o;
 }
 
-async function appendToGoogleSheet(entry: Record<string, unknown>): Promise<void> {
+async function appendToGoogleSheet(entry: Record<string, unknown>): Promise<"ok" | "skipped"> {
   const url = process.env.GOOGLE_SHEETS_NPS_WEBAPP_URL?.trim();
-  if (!url) return;
+  if (!url) return "skipped";
 
   const payload: Record<string, unknown> = { ...entry };
   const secret = process.env.GOOGLE_SHEETS_NPS_WEBHOOK_SECRET?.trim();
   if (secret) payload.token = secret;
 
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-    redirect: "follow",
-  });
-
-  const text = await res.text();
-  if (!res.ok) {
-    throw new Error(`Google Sheets webhook HTTP ${res.status}: ${text.slice(0, 200)}`);
-  }
+  const text = await postToAppsScript(url, payload);
 
   try {
     const data = JSON.parse(text) as { ok?: boolean; error?: string };
     if (data.ok === false) {
       throw new Error(data.error ?? "Google Sheets webhook rechazó la fila");
     }
+    if (data.ok === true) return "ok";
   } catch (err) {
-    if (err instanceof SyntaxError) return;
+    if (err instanceof SyntaxError) {
+      throw new Error(`Apps Script respondió HTML/no JSON: ${text.slice(0, 120)}`);
+    }
     throw err;
   }
+  return "ok";
 }
 
 surveysRouter.get("/", (_req, res) => {
@@ -73,11 +68,13 @@ surveysRouter.post("/", async (req, res) => {
     .prepare("INSERT INTO survey_responses (id, data, created_at) VALUES (?, ?, ?)")
     .run(id, JSON.stringify(entry), now);
 
+  let sheets: "ok" | "skipped" | "error" = "skipped";
   try {
-    await appendToGoogleSheet(entry);
+    sheets = await appendToGoogleSheet(entry);
   } catch (err) {
+    sheets = "error";
     console.warn("[surveys] Google Sheets:", err instanceof Error ? err.message : err);
   }
 
-  res.status(201).json({ id, createdAt: now });
+  res.status(201).json({ id, createdAt: now, sheets });
 });
