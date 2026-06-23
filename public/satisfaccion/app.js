@@ -23,6 +23,7 @@ function getTituloUrl(){
 
 const sel={asesor:null,servicio:null};
 const scv={nps:null,claridad:null,velocidad:null,calidad:null,satisfaccion:null};
+
 const SMSG={1:'😞 Muy malo',2:'😟 Malo',3:'😕 Por debajo de lo esperado',4:'😐 Regular',5:'🤔 Podría mejorar',6:'🙂 Aceptable',7:'😊 Bien',8:'😄 Muy bien',9:'🌟 Excelente',10:'🏆 ¡Superó todas las expectativas!'};
 
 window.addEventListener('load',()=>{buildScales();buildOpts();
@@ -76,7 +77,6 @@ function resetStp(stp, num){
   const n=stp.querySelector('.stp-num');
   if(n&&num!=null)n.textContent=String(num);
 }
-
 function onEmailInput(){
   const v=document.getElementById('f-email').value.trim();
   const ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
@@ -153,6 +153,7 @@ async function submitForm(){
   const tituloUrl=getTituloUrl();
   sendNotif(entry,tituloUrl);
 
+  // 4. Pantalla de éxito
   document.querySelector('.hero').style.display='none';
   document.getElementById('survey-form').style.display='none';
   document.getElementById('prog-wrap').style.display='none';
