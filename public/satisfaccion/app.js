@@ -71,11 +71,18 @@ function buildScales(){
   });
 }
 function markDone(stp){const n=stp.querySelector('.stp-num');if(n&&stp.classList.contains('done'))n.textContent='✓';}
+function resetStp(stp, num){
+  if(!stp)return;
+  stp.classList.remove('done','bad');
+  const n=stp.querySelector('.stp-num');
+  if(n&&num!=null)n.textContent=String(num);
+}
 function onEmailInput(){
   const v=document.getElementById('f-email').value.trim();
   const ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
   const stp=document.getElementById('s-email');
   if(ok){stp.classList.remove('bad');stp.classList.add('done');markDone(stp);}
+  else resetStp(stp,1);
   updateProgress();
 }
 function onComentInput(){
@@ -83,6 +90,7 @@ function onComentInput(){
   document.getElementById('char-n').textContent=v.length;
   const stp=document.getElementById('s-comentario');
   if(v.trim().length>=5){stp.classList.remove('bad');stp.classList.add('done');markDone(stp);}
+  else resetStp(stp,9);
   updateProgress();
 }
 function updateProgress(){
@@ -107,6 +115,7 @@ function showToast(msg,t='ok'){
 
 async function submitForm(){
   let valid=true;
+  document.querySelectorAll('.stp.bad').forEach(s=>s.classList.remove('bad'));
   const email=document.getElementById('f-email').value.trim();
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){document.getElementById('s-email').classList.add('bad');valid=false;}
   if(!sel.asesor){document.getElementById('s-asesor').classList.add('bad');valid=false;}
@@ -121,7 +130,10 @@ async function submitForm(){
   const btn=document.getElementById('btn-sub');
   const btnTxt=document.getElementById('btn-txt');
   const spin=document.getElementById('spin');
-  btn.disabled=true;spin.style.display='block';btnTxt.textContent='Enviando...';
+  btn.disabled=true;
+  btn.classList.add('loading');
+  spin.style.display='block';
+  btnTxt.textContent='Enviando...';
 
   const now=new Date();
   const mes=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
@@ -144,9 +156,14 @@ async function submitForm(){
   document.querySelector('.hero').style.display='none';
   document.getElementById('survey-form').style.display='none';
   document.getElementById('prog-wrap').style.display='none';
+  document.querySelector('.foot')?.style.setProperty('display','none');
   document.getElementById('succ').classList.add('show');
   if(tituloUrl){const dl=document.getElementById('dl-btn');dl.href=tituloUrl;dl.style.display='inline-flex';}
-  btn.disabled=false;spin.style.display='none';btnTxt.textContent='Enviar mi calificación →';
+  btn.disabled=false;
+  btn.classList.remove('loading');
+  spin.style.display='none';
+  btnTxt.textContent='Enviar mi calificación →';
+  window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function sendNotif(e,tUrl){
@@ -160,4 +177,3 @@ ${tUrl?'Título: '+tUrl:'Sin título configurado'}`;
   console.log('%c📧 NOTIFICACIÓN → '+NOTIFY,'color:#E8431A;font-weight:bold');
   console.log(txt);
 }
-
