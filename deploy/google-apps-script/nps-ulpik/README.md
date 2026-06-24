@@ -43,7 +43,7 @@ Guarda las respuestas de [ia.ulpik.com/satisfaccion](https://ia.ulpik.com/satisf
 En el servidor (`/var/www/html/claudecode`), configura la variable de entorno (o usa `deploy/ecosystem.config.cjs.example`):
 
 ```bash
-GOOGLE_SHEETS_NPS_WEBAPP_URL=https://script.google.com/macros/s/AKfycby3R196MIaxlG8UYbkTOdHT5a99yF5GeEVGvR7J3-Bm7prbHDz6AY0D5MQehw-h6D03/exec
+GOOGLE_SHEETS_NPS_WEBAPP_URL=https://script.google.com/macros/s/AKfycbx4xY5ANQUvjEO4wJEoufvJ5c9-s6COttYfHQlebekqxnDpRSuq8dvnz5O6KgTPPgY/exec
 GOOGLE_SHEETS_NPS_WEBHOOK_SECRET=
 ```
 
@@ -57,7 +57,7 @@ La encuesta envía a `POST /api/surveys`; el backend guarda en SQLite **y** reen
 
 Al guardar cada respuesta, el script envía un correo a **churchill@ulpik.com** con el email del respondiente y un resumen de la encuesta (vía `MailApp.sendEmail`, cuenta que ejecuta el script: cto@ulpik.com).
 
-Webhook activo: [verificar GET](https://script.google.com/macros/s/AKfycby3R196MIaxlG8UYbkTOdHT5a99yF5GeEVGvR7J3-Bm7prbHDz6AY0D5MQehw-h6D03/exec) → `{"ok":true,"message":"Webhook NPS ULPIK activo"}`.
+Webhook activo: [verificar GET](https://script.google.com/macros/s/AKfycbx4xY5ANQUvjEO4wJEoufvJ5c9-s6COttYfHQlebekqxnDpRSuq8dvnz5O6KgTPPgY/exec) → `{"ok":true,"message":"Webhook NPS ULPIK activo"}`.
 
 ## Probar el webhook
 
