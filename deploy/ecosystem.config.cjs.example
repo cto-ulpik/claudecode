@@ -11,7 +11,7 @@ module.exports = {
         PORT: 3004,
         SERVE_STATIC: "0",
         GOOGLE_SHEETS_NPS_WEBAPP_URL:
-          "https://script.google.com/macros/s/AKfycbx5kXSF9lLxcV2ucFGZMejRjVZj_BK0j_ELO-ey1bQlBxAKOONe6ZwHMm2fBxU2QKV7/exec",
+          "https://script.google.com/macros/s/AKfycbzMWWAF5hxkS3MgTCaX51EoCWIpfVFMI4uBekLnwIJGXn2NL54wAi6UgvwI7QF_CFGr/exec",
         GOOGLE_SHEETS_NPS_WEBHOOK_SECRET: "",
       },
     },
