@@ -17,6 +17,7 @@ function applyQueryParams() {
   }
 }
 
+function setChip(tipo) {
   horaChip = tipo;
   ['am', 'pm', 'night'].forEach((c) => {
     document.getElementById('chip-' + c).classList.toggle('on', c === tipo);
