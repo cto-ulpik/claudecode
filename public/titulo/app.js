@@ -1,6 +1,3 @@
-const SESSION_KEY = 'ulpik_titulo_ok';
-const PASS = 'ulpik2026';
-
 let horaChip = 'am';
 let pdfDataUrl = '';
 
@@ -10,26 +7,6 @@ function showToast(msg, t = 'ok') {
   el.className = 'toast show ' + t;
   clearTimeout(el._t);
   el._t = setTimeout(() => el.classList.remove('show'), 5000);
-}
-
-function chkSession() {
-  if (sessionStorage.getItem(SESSION_KEY) === '1') {
-    document.getElementById('t-login').classList.add('hidden');
-    document.getElementById('t-content').classList.remove('hidden');
-    buildMsg();
-  }
-}
-
-function doLogin() {
-  if (document.getElementById('t-pass').value === PASS) {
-    sessionStorage.setItem(SESSION_KEY, '1');
-    document.getElementById('t-login').classList.add('hidden');
-    document.getElementById('t-content').classList.remove('hidden');
-    buildMsg();
-    showToast('Acceso correcto', 'info');
-  } else {
-    showToast('Contraseña incorrecta', 'er');
-  }
 }
 
 function setChip(tipo) {
@@ -133,11 +110,6 @@ function copyMsgFull() {
   });
 }
 
-document.getElementById('btn-login').addEventListener('click', doLogin);
-document.getElementById('t-pass').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') doLogin();
-});
-
 document.querySelectorAll('[data-chip]').forEach((btn) => {
   btn.addEventListener('click', () => setChip(btn.dataset.chip));
 });
@@ -161,5 +133,5 @@ window.addEventListener('load', () => {
   if (h >= 12 && h < 18) setChip('pm');
   else if (h >= 18) setChip('night');
   else setChip('am');
-  chkSession();
+  buildMsg();
 });
