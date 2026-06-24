@@ -45,5 +45,5 @@ npm run build
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
-**Páginas públicas** (`/satisfaccion`, `/titulo`): no usan login de la app. Tras `npm run build` deben existir `dist/satisfaccion/` y `dist/titulo/`. Si ves el login de “Acceso”, falta el build o Nginx no tiene el bloque `location ^~ /titulo/` (ver `deploy/nginx-claudecode.conf.example`).
+**Páginas públicas** (`/satisfaccion/`, `/titulo/`): son carpetas estáticas en `public/` que Vite copia a `dist/` con `npm run build`. Nginx solo necesita `try_files $uri $uri/ /index.html` — igual que satisfacción, sin bloques extra. Si `/titulo` muestra el login de “Acceso”, ejecuta `npm run build` y comprueba que exista `dist/titulo/index.html`.
 

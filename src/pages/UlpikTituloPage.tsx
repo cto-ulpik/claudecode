@@ -1,13 +1,17 @@
-import { useEffect } from "react";
-
-/** Redirige a la página estática (sin iframe ni login de la SPA). */
+/** Página pública a pantalla completa (sin login de claudecode). */
 export function UlpikTituloPage() {
-  useEffect(() => {
-    const target = "/titulo/";
-    if (window.location.pathname !== "/titulo/" && !window.location.pathname.endsWith("/titulo/index.html")) {
-      window.location.replace(target);
-    }
-  }, []);
-
-  return null;
+  return (
+    <iframe
+      title="Ulpik · Envío de Título"
+      src="/titulo/index.html"
+      style={{
+        position: "fixed",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        border: 0,
+        display: "block",
+      }}
+    />
+  );
 }
