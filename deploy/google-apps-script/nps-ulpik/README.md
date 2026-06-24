@@ -26,12 +26,17 @@ Guarda las respuestas de [ia.ulpik.com/satisfaccion](https://ia.ulpik.com/satisf
 4. Guarda el proyecto (nombre sugerido: `NPS ULPIK Webhook`).
 5. (Opcional) En **Configuración del proyecto → Propiedades del script**, añade:
    - `WEBHOOK_SECRET` = una clave larga aleatoria (misma que en el servidor).
-6. Ejecuta `testAppendRow` una vez y autoriza permisos.
-7. **Implementar → Nueva implementación**:
+6. Ejecuta **`authorizeMail`** (no `testAppendRow` primero):
+   - Menú desplegable de funciones → elige **`authorizeMail`**
+   - Pulsa **Ejecutar** ▶
+   - Debe aparecer **Revisar permisos** → elige tu cuenta → **Permitir**
+   - Si no aparece: **Ejecutar → Revisar permisos** o borra autorizaciones en [myaccount.google.com/permissions](https://myaccount.google.com/permissions) y vuelve a ejecutar
+7. Ejecuta **`testAppendRow`** para probar fila + correo.
+8. **Implementar → Nueva implementación** (obligatorio tras nuevos permisos):
    - Tipo: **Aplicación web**
    - Ejecutar como: **Yo**
    - Quién tiene acceso: **Cualquier persona**
-8. Copia la URL que termina en `/exec`.
+9. Copia la URL que termina en `/exec`.
 
 ## Conectar con ia.ulpik.com
 

@@ -147,6 +147,17 @@ function jsonOutput(obj) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
+/** Ejecutar PRIMERO: fuerza el diálogo de permisos para enviar correo. */
+function authorizeMail() {
+  MailApp.sendEmail({
+    to: NOTIFY_EMAIL,
+    subject: 'Autorización — Encuesta Ulpik',
+    body: 'Si recibes este correo, el script ya puede notificar nuevas encuestas.',
+    name: 'Encuesta Ulpik'
+  });
+  Logger.log('Correo de autorización enviado a ' + NOTIFY_EMAIL);
+}
+
 /** Ejecutar manualmente en el editor para probar una fila de prueba. */
 function testAppendRow() {
   appendSurveyRow({
