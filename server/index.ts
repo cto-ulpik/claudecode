@@ -9,7 +9,9 @@ import { surveysRouter } from "./routes/surveys.js";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 3001;
 const distDir = path.join(__dirname, "..", "dist");
-const serveStatic = process.env.SERVE_STATIC === "1" || process.env.NODE_ENV === "production";
+const serveStatic =
+  process.env.SERVE_STATIC === "1" ||
+  (process.env.NODE_ENV === "production" && process.env.SERVE_STATIC !== "0");
 
 getDb();
 

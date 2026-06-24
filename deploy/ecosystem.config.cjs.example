@@ -4,9 +4,8 @@ module.exports = {
     {
       name: "claudecode-api",
       cwd: "/var/www/html/claudecode",
-      script: "./node_modules/.bin/tsx",
-      args: "server/index.ts",
-      interpreter: "none",
+      script: "npm",
+      args: "run start",
       env: {
         NODE_ENV: "production",
         PORT: 3004,
