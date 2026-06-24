@@ -1,11 +1,12 @@
-/** PM2 — copiar a ecosystem.config.cjs y ajustar rutas si cambian. */
+/** PM2 — copiar a ecosystem.config.cjs en el servidor. */
 module.exports = {
   apps: [
     {
       name: "claudecode-api",
       cwd: "/var/www/html/claudecode",
-      script: "npx",
-      args: "tsx server/index.ts",
+      script: "./node_modules/.bin/tsx",
+      args: "server/index.ts",
+      interpreter: "none",
       env: {
         NODE_ENV: "production",
         PORT: 3004,
