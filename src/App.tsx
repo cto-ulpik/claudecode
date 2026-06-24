@@ -7,6 +7,7 @@ import { KpiCtoPage } from "./pages/KpiCtoPage";
 import { EmpathicEmailPage } from "./pages/EmpathicEmailPage";
 import { DashboardViewerPage } from "./pages/DashboardViewerPage";
 import { UlpikSatisfaccionPage } from "./pages/UlpikSatisfaccionPage";
+import { UlpikTituloPage } from "./pages/UlpikTituloPage";
 import { LoginPage } from "./pages/LoginPage";
 
 export function App() {
@@ -15,6 +16,8 @@ export function App() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/satisfaccion" element={<UlpikSatisfaccionPage />} />
       <Route path="/satisfaccion/" element={<UlpikSatisfaccionPage />} />
+      <Route path="/titulo" element={<UlpikTituloPage />} />
+      <Route path="/titulo/" element={<UlpikTituloPage />} />
       <Route element={<RequireAuth />}>
         <Route element={<AppShell />}>
           <Route path="/" element={<HomePage />} />
