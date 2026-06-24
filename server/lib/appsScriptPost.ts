@@ -11,14 +11,18 @@ function parseAppsScriptResponse(text: string, status: number): void {
   }
 }
 
-async function tryPost(url: string, body: string): Promise<string | null> {
+/**
+ * POST a GAS: el primer POST ya ejecuta doPost; si hay 302, seguir con GET
+ * (un segundo POST al redirect vuelve a ejecutar el script → fila duplicada).
+ */
+async function tryPostOnce(url: string, body: string): Promise<string | null> {
   const headers = { "Content-Type": "application/json" };
   try {
     let res = await fetch(url, { method: "POST", headers, body, redirect: "manual" });
     if (res.status >= 300 && res.status < 400) {
       const location = res.headers.get("location");
       if (!location) return null;
-      res = await fetch(location, { method: "POST", headers, body, redirect: "follow" });
+      res = await fetch(location, { method: "GET", redirect: "follow" });
     }
     const text = await res.text();
     if (!res.ok) return null;
@@ -29,17 +33,25 @@ async function tryPost(url: string, body: string): Promise<string | null> {
   }
 }
 
-/** Envía datos al webhook GAS. POST primero; si falla (405 habitual), usa GET ?data=. */
+/** Envía datos al webhook GAS. GET ?data= primero (una sola ejecución); POST solo si falla. */
 export async function postToAppsScript(url: string, payload: Record<string, unknown>): Promise<string> {
   const body = JSON.stringify(payload);
-
-  const posted = await tryPost(url, body);
-  if (posted) return posted;
-
   const sep = url.includes("?") ? "&" : "?";
   const getUrl = `${url}${sep}data=${encodeURIComponent(body)}`;
-  const res = await fetch(getUrl, { redirect: "follow" });
-  const text = await res.text();
-  parseAppsScriptResponse(text, res.status);
-  return text;
+
+  try {
+    const res = await fetch(getUrl, { redirect: "follow" });
+    const text = await res.text();
+    if (res.ok) {
+      parseAppsScriptResponse(text, res.status);
+      return text;
+    }
+  } catch {
+    // fallback POST
+  }
+
+  const posted = await tryPostOnce(url, body);
+  if (posted) return posted;
+
+  throw new Error("Apps Script no respondió por GET ni POST");
 }
