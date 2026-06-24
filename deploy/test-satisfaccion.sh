@@ -29,14 +29,20 @@ echo "=== 4. GET Apps Script (webhook activo?) ==="
 curl -sL "$APPS_SCRIPT_URL" | head -c 200
 echo -e "\n"
 
-echo "=== 5. POST Apps Script directo (debe devolver {\"ok\":true}) ==="
+echo "=== 5. GET Apps Script con data= (fallback, debe devolver {\"ok\":true}) ==="
+ENC=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$PAYLOAD")
+curl -sL -w "\nHTTP:%{http_code}\n" "${APPS_SCRIPT_URL}?data=${ENC}" | tail -3
+
+echo ""
+echo "=== 6. POST Apps Script directo (puede fallar 405; el servidor usa GET fallback) ==="
 curl -sL -w "\nHTTP:%{http_code}\n" -X POST "$APPS_SCRIPT_URL" \
   -H 'Content-Type: application/json' \
-  -d "$PAYLOAD" | tail -5
+  -d "$PAYLOAD" | tail -3
 
 echo ""
 echo "Interpretación:"
 echo "  - POST /api/surveys → sheets:\"ok\"     = guardado en Google Sheet"
 echo "  - POST /api/surveys → sheets:\"skipped\" = falta GOOGLE_SHEETS_NPS_WEBAPP_URL en PM2"
 echo "  - POST /api/surveys → sheets:\"error\"  = webhook falló (revisa pm2 logs)"
-echo "  - POST Apps Script HTTP 405 o HTML      = redeploy Apps Script (doPost + Cualquier persona)"
+echo "  - Paso 5 GET ?data= → {\"ok\":true}     = Apps Script listo (actualiza Code.gs y reimplementa)"
+echo "  - Paso 6 POST 405                     = normal; el servidor usa GET fallback"

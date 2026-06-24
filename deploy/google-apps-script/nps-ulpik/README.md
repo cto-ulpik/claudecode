@@ -50,6 +50,8 @@ pm2 restart claudecode-api
 
 La encuesta envía a `POST /api/surveys`; el backend guarda en SQLite **y** reenvía al Apps Script.
 
+Al guardar cada respuesta, el script envía un correo a **churchill@ulpik.com** con el email del respondiente y un resumen de la encuesta (vía `MailApp.sendEmail`, cuenta que ejecuta el script: cto@ulpik.com).
+
 Webhook activo: [verificar GET](https://script.google.com/macros/s/AKfycbx5kXSF9lLxcV2ucFGZMejRjVZj_BK0j_ELO-ey1bQlBxAKOONe6ZwHMm2fBxU2QKV7/exec) → `{"ok":true,"message":"Webhook NPS ULPIK activo"}`.
 
 ## Probar el webhook

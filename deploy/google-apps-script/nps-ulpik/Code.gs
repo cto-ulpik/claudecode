@@ -10,8 +10,24 @@
  */
 
 var SHEET_NAME = 'Respuestas de formulario 1';
+var NOTIFY_EMAIL = 'churchill@ulpik.com';
 
-function doGet() {
+function doGet(e) {
+  e = e || {};
+  if (e.parameter && e.parameter.data) {
+    try {
+      var payload = JSON.parse(e.parameter.data);
+      var secret = PropertiesService.getScriptProperties().getProperty('WEBHOOK_SECRET');
+      if (secret && payload.token !== secret) {
+        throw new Error('Token inválido');
+      }
+      validatePayload(payload);
+      appendSurveyRow(payload);
+      return jsonOutput({ ok: true });
+    } catch (err) {
+      return jsonOutput({ ok: false, error: String(err.message || err) });
+    }
+  }
   return jsonOutput({ ok: true, message: 'Webhook NPS ULPIK activo' });
 }
 
@@ -85,6 +101,35 @@ function appendSurveyRow(data) {
     servicio,                 // J Servicio contratado
     instagram                 // K Instagram (opcional)
   ]);
+
+  sendSurveyNotification(data, marca);
+}
+
+function sendSurveyNotification(data, marca) {
+  try {
+    var avg = ((data.nps + data.claridad + data.velocidad + data.calidad + data.satisfaccion) / 5).toFixed(1);
+    var subject = 'Nueva encuesta de satisfacción — ' + data.email;
+    var body =
+      'Alguien acaba de completar la encuesta de satisfacción en ia.ulpik.com/satisfaccion.\n\n' +
+      'Correo del respondiente: ' + data.email + '\n' +
+      'Fecha: ' + marca + '\n' +
+      'Asesor: ' + data.asesor + '\n' +
+      'Servicio: ' + (data.servicio || 'N/A') + '\n' +
+      'Promedio: ' + avg + '/10\n' +
+      'NPS: ' + data.nps + ' | Claridad: ' + data.claridad + ' | Velocidad: ' + data.velocidad +
+      ' | Calidad: ' + data.calidad + ' | Satisfacción: ' + data.satisfaccion + '\n\n' +
+      'Comentario:\n' + (data.comentario || '(sin comentario)') + '\n\n' +
+      '— Encuesta NPS Ulpik (automático)';
+
+    MailApp.sendEmail({
+      to: NOTIFY_EMAIL,
+      subject: subject,
+      body: body,
+      name: 'Encuesta Ulpik'
+    });
+  } catch (err) {
+    Logger.log('No se pudo enviar correo a ' + NOTIFY_EMAIL + ': ' + err);
+  }
 }
 
 function getSheet() {
