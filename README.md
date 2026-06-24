@@ -44,3 +44,6 @@ npm run build
 # systemd o pm2: npm start  (o dev:api si Nginx sirve dist)
 sudo nginx -t && sudo systemctl reload nginx
 ```
+
+**Páginas públicas** (`/satisfaccion`, `/titulo`): no usan login de la app. Tras `npm run build` deben existir `dist/satisfaccion/` y `dist/titulo/`. Si ves el login de “Acceso”, falta el build o Nginx no tiene el bloque `location ^~ /titulo/` (ver `deploy/nginx-claudecode.conf.example`).
+

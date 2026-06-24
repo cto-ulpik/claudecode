@@ -61,6 +61,17 @@ server {
         add_header Cache-Control "public, must-revalidate";
     }
 
+    # Envío de título — estático en dist/titulo/ (sin pasar por login de la SPA)
+    location = /titulo {
+        return 301 https://$host/titulo/;
+    }
+
+    location ^~ /titulo/ {
+        try_files $uri $uri/ /titulo/index.html;
+        expires 1h;
+        add_header Cache-Control "public, must-revalidate";
+    }
+
     location ~* \.(css|js|woff2?|ico|svg)$ {
         expires 7d;
         add_header Cache-Control "public, immutable";
