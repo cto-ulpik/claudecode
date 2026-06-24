@@ -9,7 +9,14 @@ function showToast(msg, t = 'ok') {
   el._t = setTimeout(() => el.classList.remove('show'), 5000);
 }
 
-function setChip(tipo) {
+function applyQueryParams() {
+  const params = new URLSearchParams(window.location.search);
+  const email = (params.get('email') || params.get('correo') || '').trim();
+  if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    document.getElementById('t-email').value = email;
+  }
+}
+
   horaChip = tipo;
   ['am', 'pm', 'night'].forEach((c) => {
     document.getElementById('chip-' + c).classList.toggle('on', c === tipo);
@@ -133,5 +140,6 @@ window.addEventListener('load', () => {
   if (h >= 12 && h < 18) setChip('pm');
   else if (h >= 18) setChip('night');
   else setChip('am');
+  applyQueryParams();
   buildMsg();
 });

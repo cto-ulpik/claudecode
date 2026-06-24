@@ -108,6 +108,7 @@ function appendSurveyRow(data) {
 function sendSurveyNotification(data, marca) {
   try {
     var avg = ((data.nps + data.claridad + data.velocidad + data.calidad + data.satisfaccion) / 5).toFixed(1);
+    var tituloUrl = 'https://ia.ulpik.com/titulo/?email=' + encodeURIComponent(data.email || '');
     var subject = 'Nueva encuesta de satisfacción — ' + data.email;
     var body =
       'Alguien acaba de completar la encuesta de satisfacción en ia.ulpik.com/satisfaccion.\n\n' +
@@ -119,6 +120,7 @@ function sendSurveyNotification(data, marca) {
       'NPS: ' + data.nps + ' | Claridad: ' + data.claridad + ' | Velocidad: ' + data.velocidad +
       ' | Calidad: ' + data.calidad + ' | Satisfacción: ' + data.satisfaccion + '\n\n' +
       'Comentario:\n' + (data.comentario || '(sin comentario)') + '\n\n' +
+      'Enviar título de concesión (correo precargado):\n' + tituloUrl + '\n\n' +
       '— Encuesta NPS Ulpik (automático)';
 
     MailApp.sendEmail({

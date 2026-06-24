@@ -170,11 +170,13 @@ async function submitForm(){
 function sendNotif(e,tUrl){
   const critico=e.nps<=6||e.velocidad<=5||e.calidad<=5;
   const avg5=((e.nps+e.claridad+e.velocidad+e.calidad+e.satisfaccion)/5).toFixed(1);
+  const tituloLink='https://ia.ulpik.com/titulo/?email='+encodeURIComponent(e.email||'');
   const txt=`Nueva encuesta NPS — ${e.fecha_str} ${e.hora} | ${e.email} | Asesor: ${e.asesor} | Servicio: ${e.servicio}
 Promedio: ${avg5}/10 | NPS:${e.nps} Claridad:${e.claridad} Velocidad:${e.velocidad} Calidad:${e.calidad} Satisfacción:${e.satisfaccion}
 Comentario: "${e.comentario}"
 ${critico?'⚠️ CRÍTICO — contacto en 24h':''}
-${tUrl?'Título: '+tUrl:'Sin título configurado'}`;
+Enviar título: ${tituloLink}
+${tUrl?'PDF título cliente: '+tUrl:'Sin PDF de título en storage'}`;
   console.log('%c📧 NOTIFICACIÓN → '+NOTIFY,'color:#E8431A;font-weight:bold');
   console.log(txt);
 }
