@@ -1,5 +1,6 @@
 let horaChip = 'am';
 let pdfDataUrl = '';
+let msgVisible = false;
 
 function showToast(msg, t = 'ok') {
   const el = document.getElementById('toast');
@@ -176,6 +177,48 @@ function buildMsg() {
   statusEl.style.color = hayDatos && hayPdf ? 'var(--ok)' : 'var(--txt2)';
 }
 
+function toggleMsgBox() {
+  msgVisible = !msgVisible;
+  const box = document.getElementById('msg-box');
+  const btn = document.getElementById('btn-toggle-msg');
+  box.classList.toggle('hidden', !msgVisible);
+  btn.classList.toggle('on', msgVisible);
+  btn.textContent = msgVisible ? '💬 Ocultar mensaje' : '💬 Mensaje generado';
+  if (msgVisible) {
+    buildMsg();
+    box.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function sendMail() {
+  const email = (document.getElementById('t-email')?.value || '').trim();
+  const nombre = (document.getElementById('t-nombre')?.value || '').trim();
+  const marca = (document.getElementById('t-marca')?.value || '').trim();
+  const msg = document.getElementById('msg-preview-text').textContent;
+
+  if (!email) {
+    showToast('Selecciona el correo del cliente', 'er');
+    return;
+  }
+  if (!nombre || !marca) {
+    showToast('Completa titular y denominación', 'er');
+    return;
+  }
+  if (!pdfDataUrl) {
+    showToast('Sube el PDF del título antes de enviar', 'er');
+    return;
+  }
+  if (!msg || msg.includes('Completa los datos')) {
+    showToast('Genera el mensaje antes de enviar', 'er');
+    return;
+  }
+
+  const subject = `Tu título de concesión — ${marca}`;
+  const mailto = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(msg)}`;
+  window.location.href = mailto;
+  showToast('Abriendo tu cliente de correo — adjunta el PDF manualmente', 'info');
+}
+
 function copyMsgFull() {
   const txt = document.getElementById('msg-preview-text').textContent;
   if (!txt || txt.includes('Completa los datos')) {
@@ -225,6 +268,8 @@ document.getElementById('pdf-file').addEventListener('change', function () {
 
 document.getElementById('btn-regen').addEventListener('click', buildMsg);
 document.getElementById('btn-copy-msg').addEventListener('click', copyMsgFull);
+document.getElementById('btn-toggle-msg').addEventListener('click', toggleMsgBox);
+document.getElementById('btn-send-mail').addEventListener('click', sendMail);
 
 window.addEventListener('load', async () => {
   const h = new Date().getHours();

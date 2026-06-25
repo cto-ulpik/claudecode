@@ -82,6 +82,14 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
 .chip:hover{border-color:rgba(232,67,26,.4);color:var(--txt)}
 .chip.on{border-color:var(--acc);background:rgba(232,67,26,.1);color:var(--acc2)}
 
+.action-row{display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.btn-action{flex:1;min-width:200px;height:50px;border-radius:12px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:.2s;border:1.5px solid var(--ln)}
+.btn-action--mail{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn-action--mail:hover{background:var(--acc2);border-color:var(--acc2)}
+.btn-action--msg{background:var(--inp);color:var(--txt)}
+.btn-action--msg:hover{border-color:rgba(232,67,26,.4)}
+.btn-action--msg.on{border-color:var(--acc);background:rgba(232,67,26,.1);color:var(--acc2)}
+
 .alert-info{background:rgba(34,201,122,.06);border:1px solid rgba(34,201,122,.18);border-radius:12px;padding:14px 16px;font-size:13px;color:var(--txt2);line-height:1.6;margin-bottom:18px;display:flex;gap:10px;align-items:flex-start}
 .alert-info strong{color:var(--txt)}
 
