@@ -14,6 +14,14 @@ var NOTIFY_EMAIL = 'churchill@ulpik.com';
 
 function doGet(e) {
   e = e || {};
+  if (e.parameter && e.parameter.action === 'recent-emails') {
+    try {
+      var limit = parseInt(e.parameter.limit, 10) || 5;
+      return jsonOutput({ ok: true, emails: getRecentSurveyEmails(limit) });
+    } catch (err) {
+      return jsonOutput({ ok: false, error: String(err.message || err) });
+    }
+  }
   if (e.parameter && e.parameter.data) {
     try {
       var payload = JSON.parse(e.parameter.data);
@@ -143,6 +151,30 @@ function getSheet() {
   return sheet;
 }
 
+/** Últimos correos únicos de la encuesta (columna B), más recientes primero. */
+function getRecentSurveyEmails(limit) {
+  limit = Math.max(1, Math.min(20, limit || 5));
+  var sheet = getSheet();
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return [];
+
+  var scan = Math.min(lastRow - 1, 500);
+  var startRow = Math.max(2, lastRow - scan + 1);
+  var values = sheet.getRange(startRow, 2, lastRow, 2).getValues();
+  var seen = {};
+  var out = [];
+  for (var i = values.length - 1; i >= 0; i--) {
+    var raw = String(values[i][0] || '').trim();
+    if (!raw || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(raw)) continue;
+    var key = raw.toLowerCase();
+    if (seen[key]) continue;
+    seen[key] = true;
+    out.push(raw);
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
 function jsonOutput(obj) {
   return ContentService
     .createTextOutput(JSON.stringify(obj))
@@ -158,6 +190,11 @@ function authorizeMail() {
     name: 'Encuesta Ulpik'
   });
   Logger.log('Correo de autorización enviado a ' + NOTIFY_EMAIL);
+}
+
+/** Probar lectura de últimos correos (editor Apps Script). */
+function testRecentEmails() {
+  Logger.log(JSON.stringify(getRecentSurveyEmails(5)));
 }
 
 /** Ejecutar manualmente en el editor para probar una fila de prueba. */

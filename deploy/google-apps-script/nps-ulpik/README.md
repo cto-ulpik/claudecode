@@ -59,6 +59,8 @@ Al guardar cada respuesta, el script envía un correo a **churchill@ulpik.com** 
 
 Webhook activo: [verificar GET](https://script.google.com/macros/s/AKfycbx4xY5ANQUvjEO4wJEoufvJ5c9-s6COttYfHQlebekqxnDpRSuq8dvnz5O6KgTPPgY/exec) → `{"ok":true,"message":"Webhook NPS ULPIK activo"}`.
 
+Últimos correos para `/titulo` (vía API): `GET ?action=recent-emails&limit=5` → `{"ok":true,"emails":["..."]}`.
+
 ## Probar el webhook
 
 ```bash

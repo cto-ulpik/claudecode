@@ -12,8 +12,50 @@ function showToast(msg, t = 'ok') {
 function applyQueryParams() {
   const params = new URLSearchParams(window.location.search);
   const email = (params.get('email') || params.get('correo') || '').trim();
-  if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    document.getElementById('t-email').value = email;
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return;
+
+  const select = document.getElementById('t-email');
+  let found = false;
+  for (const opt of select.options) {
+    if (opt.value.toLowerCase() === email.toLowerCase()) {
+      select.value = opt.value;
+      found = true;
+      break;
+    }
+  }
+  if (!found) {
+    const opt = document.createElement('option');
+    opt.value = email;
+    opt.textContent = email + ' (del enlace)';
+    select.appendChild(opt);
+    select.value = email;
+  }
+}
+
+function populateEmailSelect(emails) {
+  const select = document.getElementById('t-email');
+  select.innerHTML = '';
+  const placeholder = document.createElement('option');
+  placeholder.value = '';
+  placeholder.textContent = emails.length ? 'Selecciona un correo…' : 'Sin correos recientes en la encuesta';
+  select.appendChild(placeholder);
+  emails.forEach((email) => {
+    const opt = document.createElement('option');
+    opt.value = email;
+    opt.textContent = email;
+    select.appendChild(opt);
+  });
+  applyQueryParams();
+}
+
+async function loadRecentEmails() {
+  try {
+    const res = await fetch('/api/surveys/recent-emails?limit=5');
+    if (!res.ok) throw new Error('api');
+    const data = await res.json();
+    populateEmailSelect(Array.isArray(data.emails) ? data.emails : []);
+  } catch {
+    populateEmailSelect([]);
   }
 }
 
@@ -175,9 +217,10 @@ document.querySelectorAll('[data-chip]').forEach((btn) => {
   btn.addEventListener('click', () => setChip(btn.dataset.chip));
 });
 
-['t-nombre', 't-email', 't-marca', 't-link'].forEach((id) => {
+['t-nombre', 't-marca', 't-link'].forEach((id) => {
   document.getElementById(id).addEventListener('input', buildMsg);
 });
+document.getElementById('t-email').addEventListener('change', buildMsg);
 
 document.getElementById('pdf-drop').addEventListener('click', () => {
   document.getElementById('pdf-file').click();
@@ -189,11 +232,11 @@ document.getElementById('pdf-file').addEventListener('change', function () {
 document.getElementById('btn-regen').addEventListener('click', buildMsg);
 document.getElementById('btn-copy-msg').addEventListener('click', copyMsgFull);
 
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
   const h = new Date().getHours();
   if (h >= 12 && h < 18) setChip('pm');
   else if (h >= 18) setChip('night');
   else setChip('am');
-  applyQueryParams();
+  await loadRecentEmails();
   buildMsg();
 });
