@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ulpik · Envío de Título</title>
-<link rel="stylesheet" href="styles.css?v=20250628">
+<link rel="stylesheet" href="styles.css?v=20250629">
 </head>
 <body>
 <div class="toast" id="toast"></div>
 
 <nav class="nav">
-  <img src="logo.png?v=20250628" alt="Ulpik">
+  <img src="logo.png?v=20250629" alt="Ulpik">
   <div class="nav-badge"><span class="pulse"></span>Envío de título</div>
 </nav>
 
@@ -18,7 +18,7 @@
   <div id="t-content">
     <div class="tw">
       <div class="tw-header">
-        <img src="logo.png?v=20250628" alt="Ulpik">
+        <img src="logo.png?v=20250629" alt="Ulpik">
         <div>
           <h2>Envío de Título de Concesión</h2>
           <p>Genera el mensaje personalizado para enviar al cliente vía Bitrix</p>
@@ -32,7 +32,7 @@
 
       <div class="card">
         <h3>1 · Título de concesión (PDF)</h3>
-        <p class="csub">Sube el PDF oficial SENADI o pega el enlace de Google Drive / Dropbox</p>
+        <p class="csub">Sube el PDF oficial SENADI</p>
         <div class="pdf-upload" id="pdf-drop">
           <input type="file" id="pdf-file" accept=".pdf,application/pdf" hidden>
           <div class="pdf-icon">📄</div>
@@ -40,12 +40,6 @@
           <div class="pdf-upload-sub" id="pdf-sub">Solo archivos PDF · Máx. 20 MB · Extrae denominación y titular</div>
           <div class="pdf-name hidden" id="pdf-name"></div>
         </div>
-        <div class="or-divider"><span>— o pega un enlace —</span></div>
-        <div class="tfield" style="margin-bottom:0">
-          <label for="t-link">Enlace del título (Google Drive, Dropbox, etc.)</label>
-          <input type="url" id="t-link" placeholder="https://drive.google.com/file/d/...">
-        </div>
-        <p style="font-size:11.5px;color:var(--txt2);margin-top:8px;line-height:1.55">💡 <strong style="color:var(--txt)">Google Drive:</strong> Abre el PDF → Compartir → "Cualquier persona con el enlace puede ver" → copia el enlace.</p>
       </div>
 
       <div class="card">
@@ -109,6 +103,6 @@
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   }
 </script>
-<script src="app.js?v=20250628"></script>
+<script src="app.js?v=20250629"></script>
 </body>
 </html>

@@ -144,21 +144,15 @@ async function onPdfChange(input) {
 function buildMsg() {
   const nombre = (document.getElementById('t-nombre')?.value || '').trim();
   const marca = (document.getElementById('t-marca')?.value || '').trim();
-  const link = (document.getElementById('t-link')?.value || '').trim();
 
   const saludos = { am: 'Buenos días', pm: 'Buenas tardes', night: 'Buenas noches' };
   const saludo = saludos[horaChip] || 'Buenos días';
   const nombreMostrar = nombre || '[Nombre del cliente]';
   const marcaMostrar = marca || '[Nombre de la marca]';
 
-  let enlaceLinea = '';
-  if (link && link.startsWith('http')) {
-    enlaceLinea = '\n\n🔗 Aquí tienes el acceso a tu título oficial:\n' + link;
-  } else if (pdfDataUrl) {
-    enlaceLinea = '\n\n📎 Te adjunto el título oficial en PDF.';
-  } else {
-    enlaceLinea = '\n\n📎 [Adjunta el PDF del título aquí]';
-  }
+  const enlaceLinea = pdfDataUrl
+    ? '\n\n📎 Te adjunto el título oficial en PDF.'
+    : '\n\n📎 [Adjunta el PDF del título aquí]';
 
   const msg =
     `Hola ${nombreMostrar} ${saludo}, excelente jornada, viene cargada de buenas noticias 🥳\n\n` +
@@ -169,17 +163,17 @@ function buildMsg() {
   document.getElementById('msg-preview-text').textContent = msg;
 
   const hayDatos = nombre && marca;
-  const hayEnlace = link || pdfDataUrl;
+  const hayPdf = !!pdfDataUrl;
   let status = '';
   if (!nombre && !marca) status = 'Sube el PDF o completa titular y denominación';
   else if (!nombre) status = 'Falta el titular (nombre del cliente)';
   else if (!marca) status = 'Falta la denominación de la marca';
-  else if (!hayEnlace) status = 'Listo — agrega el enlace o PDF del título';
+  else if (!hayPdf) status = 'Listo — sube el PDF del título';
   else status = '✓ Mensaje listo para copiar';
 
   const statusEl = document.getElementById('msg-status');
   statusEl.textContent = status;
-  statusEl.style.color = hayDatos && hayEnlace ? 'var(--ok)' : 'var(--txt2)';
+  statusEl.style.color = hayDatos && hayPdf ? 'var(--ok)' : 'var(--txt2)';
 }
 
 function copyMsgFull() {
@@ -217,7 +211,7 @@ document.querySelectorAll('[data-chip]').forEach((btn) => {
   btn.addEventListener('click', () => setChip(btn.dataset.chip));
 });
 
-['t-nombre', 't-marca', 't-link'].forEach((id) => {
+['t-nombre', 't-marca'].forEach((id) => {
   document.getElementById(id).addEventListener('input', buildMsg);
 });
 document.getElementById('t-email').addEventListener('change', buildMsg);
