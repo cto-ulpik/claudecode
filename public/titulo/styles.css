@@ -34,13 +34,18 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
 .btn-login{width:100%;height:50px;background:var(--acc);border:none;border-radius:12px;color:#fff;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:.2s}
 .btn-login:hover{background:var(--acc2)}
 
-.tw{max-width:680px;margin:0 auto;padding:32px 20px 100px}
+.tw{max-width:960px;margin:0 auto;padding:32px 20px 100px}
 .tw-header{display:flex;align-items:center;gap:14px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--ln)}
 .tw-header img{height:36px;object-fit:contain}
 .tw-header h2{font-size:20px;font-weight:700;margin-bottom:2px}
 .tw-header p{font-size:12.5px;color:var(--txt2)}
 
 .card{background:var(--card);border:1px solid var(--ln);border-radius:var(--r);padding:20px;margin-bottom:18px}
+.card-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;align-items:stretch}
+.card-row .card{margin-bottom:0;display:flex;flex-direction:column}
+.card-row .card .pdf-upload{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:220px}
+.card-row .card .tfield:last-child{margin-bottom:0}
+@media(max-width:720px){.card-row{grid-template-columns:1fr}}
 .card h3{font-size:15px;font-weight:600;margin-bottom:4px}
 .csub{font-size:12px;color:var(--txt2);margin-bottom:16px}
 

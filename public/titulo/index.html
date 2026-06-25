@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ulpik · Envío de Título</title>
-<link rel="stylesheet" href="styles.css?v=20250629">
+<link rel="stylesheet" href="styles.css?v=20250630">
 </head>
 <body>
 <div class="toast" id="toast"></div>
 
 <nav class="nav">
-  <img src="logo.png?v=20250629" alt="Ulpik">
+  <img src="logo.png?v=20250630" alt="Ulpik">
   <div class="nav-badge"><span class="pulse"></span>Envío de título</div>
 </nav>
 
@@ -18,7 +18,7 @@
   <div id="t-content">
     <div class="tw">
       <div class="tw-header">
-        <img src="logo.png?v=20250629" alt="Ulpik">
+        <img src="logo.png?v=20250630" alt="Ulpik">
         <div>
           <h2>Envío de Título de Concesión</h2>
           <p>Genera el mensaje personalizado para enviar al cliente vía Bitrix</p>
@@ -30,35 +30,37 @@
         <div><strong>¿Cómo funciona?</strong> Sube el PDF del título (se extraen denominación y titular automáticamente), revisa los datos del cliente, selecciona el saludo y copia el mensaje en Bitrix24.</div>
       </div>
 
-      <div class="card">
-        <h3>1 · Título de concesión (PDF)</h3>
-        <p class="csub">Sube el PDF oficial SENADI</p>
-        <div class="pdf-upload" id="pdf-drop">
-          <input type="file" id="pdf-file" accept=".pdf,application/pdf" hidden>
-          <div class="pdf-icon">📄</div>
-          <div class="pdf-upload-title" id="pdf-title">Arrastra el PDF aquí o haz clic para seleccionar</div>
-          <div class="pdf-upload-sub" id="pdf-sub">Solo archivos PDF · Máx. 20 MB · Extrae denominación y titular</div>
-          <div class="pdf-name hidden" id="pdf-name"></div>
+      <div class="card-row">
+        <div class="card">
+          <h3>1 · Título de concesión (PDF)</h3>
+          <p class="csub">Sube el PDF oficial SENADI</p>
+          <div class="pdf-upload" id="pdf-drop">
+            <input type="file" id="pdf-file" accept=".pdf,application/pdf" hidden>
+            <div class="pdf-icon">📄</div>
+            <div class="pdf-upload-title" id="pdf-title">Arrastra el PDF aquí o haz clic para seleccionar</div>
+            <div class="pdf-upload-sub" id="pdf-sub">Solo archivos PDF · Máx. 20 MB · Extrae denominación y titular</div>
+            <div class="pdf-name hidden" id="pdf-name"></div>
+          </div>
         </div>
-      </div>
 
-      <div class="card">
-        <h3>2 · Datos del cliente</h3>
-        <p class="csub">Se completan al subir el PDF; puedes editarlos si hace falta</p>
-        <div class="tfield">
-          <label for="t-nombre">Titular (nombre del cliente) <span class="req">*</span></label>
-          <input type="text" id="t-nombre" placeholder="Ej: José Daniel Vivar Espinosa">
-        </div>
-        <div class="tfield">
-          <label for="t-email">Correo del cliente</label>
-          <select id="t-email">
-            <option value="">Cargando correos recientes…</option>
-          </select>
-          <p class="field-hint">Últimos 5 correos de la encuesta de satisfacción</p>
-        </div>
-        <div class="tfield">
-          <label for="t-marca">Denominación (marca registrada) <span class="req">*</span></label>
-          <input type="text" id="t-marca" placeholder="Ej: chariqchachay morocho más logotipo">
+        <div class="card">
+          <h3>2 · Datos del cliente</h3>
+          <p class="csub">Se completan al subir el PDF; puedes editarlos si hace falta</p>
+          <div class="tfield">
+            <label for="t-nombre">Titular (nombre del cliente) <span class="req">*</span></label>
+            <input type="text" id="t-nombre" placeholder="Ej: José Daniel Vivar Espinosa">
+          </div>
+          <div class="tfield">
+            <label for="t-email">Correo del cliente</label>
+            <select id="t-email">
+              <option value="">Cargando correos recientes…</option>
+            </select>
+            <p class="field-hint">Últimos 5 correos de la encuesta de satisfacción</p>
+          </div>
+          <div class="tfield">
+            <label for="t-marca">Denominación (marca registrada) <span class="req">*</span></label>
+            <input type="text" id="t-marca" placeholder="Ej: chariqchachay morocho más logotipo">
+          </div>
         </div>
       </div>
 
