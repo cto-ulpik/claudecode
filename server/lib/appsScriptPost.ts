@@ -15,19 +15,27 @@ function parseAppsScriptResponse(text: string, status: number): void {
  * POST a GAS: el primer POST ya ejecuta doPost; si hay 302, seguir con GET
  * (un segundo POST al redirect vuelve a ejecutar el script → fila duplicada).
  */
-async function tryPostOnce(url: string, body: string): Promise<string | null> {
+async function postJsonToAppsScript(url: string, body: string): Promise<string> {
   const headers = { "Content-Type": "application/json" };
-  try {
-    let res = await fetch(url, { method: "POST", headers, body, redirect: "manual" });
-    if (res.status >= 300 && res.status < 400) {
-      const location = res.headers.get("location");
-      if (!location) return null;
-      res = await fetch(location, { method: "GET", redirect: "follow" });
+  let res = await fetch(url, { method: "POST", headers, body, redirect: "manual" });
+  if (res.status >= 300 && res.status < 400) {
+    const location = res.headers.get("location");
+    if (!location) {
+      throw new Error(`Apps Script redirigió sin Location (HTTP ${res.status})`);
     }
-    const text = await res.text();
-    if (!res.ok) return null;
-    parseAppsScriptResponse(text, res.status);
-    return text;
+    res = await fetch(location, { method: "GET", redirect: "follow" });
+  }
+  const text = await res.text();
+  if (!res.ok) {
+    throw new Error(`Apps Script HTTP ${res.status}: ${text.slice(0, 200)}`);
+  }
+  parseAppsScriptResponse(text, res.status);
+  return text;
+}
+
+async function tryPostOnce(url: string, body: string): Promise<string | null> {
+  try {
+    return await postJsonToAppsScript(url, body);
   } catch {
     return null;
   }
@@ -62,7 +70,5 @@ export async function postToAppsScriptPostOnly(
   payload: Record<string, unknown>
 ): Promise<string> {
   const body = JSON.stringify(payload);
-  const posted = await tryPostOnce(url, body);
-  if (posted) return posted;
-  throw new Error("Apps Script no respondió al envío POST");
+  return postJsonToAppsScript(url, body);
 }

@@ -247,7 +247,10 @@ function sendMail() {
   })
     .then(async (res) => {
       const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || 'No se pudo enviar el correo');
+      if (!res.ok) {
+        const detail = data.error || (res.status === 502 ? 'Error del servidor al contactar Apps Script' : 'No se pudo enviar el correo');
+        throw new Error(detail);
+      }
       showToast(`Correo enviado a ${email}`);
     })
     .catch((err) => {
