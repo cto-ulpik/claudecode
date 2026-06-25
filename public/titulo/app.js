@@ -120,8 +120,8 @@ function applyExtractedFields(fields) {
 async function onPdfChange(input) {
   const file = input.files[0];
   if (!file) return;
-  if (file.size > 20 * 1024 * 1024) {
-    showToast('El PDF supera los 20 MB', 'er');
+  if (file.size > 2 * 1024 * 1024) {
+    showToast('El PDF supera los 2 MB', 'er');
     return;
   }
 
