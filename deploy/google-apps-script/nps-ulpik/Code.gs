@@ -29,6 +29,10 @@ function doGet(e) {
       if (secret && payload.token !== secret) {
         throw new Error('Token inválido');
       }
+      if (payload.action === 'send-titulo') {
+        sendTituloEmail(payload);
+        return jsonOutput({ ok: true });
+      }
       validatePayload(payload);
       appendSurveyRow(payload);
       return jsonOutput({ ok: true });
@@ -42,6 +46,10 @@ function doGet(e) {
 function doPost(e) {
   try {
     var payload = parsePayload(e);
+    if (payload.action === 'send-titulo') {
+      sendTituloEmail(payload);
+      return jsonOutput({ ok: true });
+    }
     validatePayload(payload);
     appendSurveyRow(payload);
     return jsonOutput({ ok: true });
@@ -111,6 +119,40 @@ function appendSurveyRow(data) {
   ]);
 
   sendSurveyNotification(data, marca);
+}
+
+function validateTituloPayload(data) {
+  if (!data.to || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.to)) {
+    throw new Error('Correo destinatario inválido');
+  }
+  if (!data.titular || typeof data.titular !== 'string') {
+    throw new Error('Falta titular');
+  }
+  if (!data.denominacion || typeof data.denominacion !== 'string') {
+    throw new Error('Falta denominación');
+  }
+  if (!data.body || typeof data.body !== 'string') {
+    throw new Error('Falta mensaje');
+  }
+  if (!data.pdfBase64 || typeof data.pdfBase64 !== 'string') {
+    throw new Error('Falta PDF del título');
+  }
+}
+
+function sendTituloEmail(data) {
+  validateTituloPayload(data);
+  var bytes = Utilities.base64Decode(data.pdfBase64);
+  var filename = data.pdfFilename || 'titulo-concesion.pdf';
+  var blob = Utilities.newBlob(bytes, 'application/pdf', filename);
+  var subject = data.subject || ('Tu título de concesión — ' + data.denominacion);
+
+  MailApp.sendEmail({
+    to: data.to,
+    subject: subject,
+    body: data.body,
+    name: 'Ulpik',
+    attachments: [blob]
+  });
 }
 
 function sendSurveyNotification(data, marca) {

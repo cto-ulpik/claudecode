@@ -1,6 +1,15 @@
 let horaChip = 'am';
 let pdfDataUrl = '';
+let pdfFileName = '';
 let msgVisible = false;
+
+function getFormData() {
+  return {
+    titular: (document.getElementById('t-nombre')?.value || '').trim(),
+    denominacion: (document.getElementById('t-marca')?.value || '').trim(),
+    email: (document.getElementById('t-email')?.value || '').trim(),
+  };
+}
 
 function showToast(msg, t = 'ok') {
   const el = document.getElementById('toast');
@@ -119,6 +128,7 @@ async function onPdfChange(input) {
   const reader = new FileReader();
   reader.onload = async function (e) {
     pdfDataUrl = e.target.result;
+    pdfFileName = file.name;
     document.getElementById('pdf-title').textContent = 'PDF seleccionado';
     document.getElementById('pdf-sub').textContent = file.name + ' · ' + Math.round(file.size / 1024) + ' KB';
     const nameEl = document.getElementById('pdf-name');
@@ -142,33 +152,36 @@ async function onPdfChange(input) {
   reader.readAsDataURL(file);
 }
 
+function buildMessageText({ titular, denominacion, saludo }) {
+  const titularMostrar = titular || '[Titular]';
+  const denominacionMostrar = denominacion || '[Denominación]';
+  const adjuntoLinea = pdfDataUrl
+    ? `\n\n📎 Te adjunto el título oficial en PDF${pdfFileName ? ': ' + pdfFileName : ''}.`
+    : '\n\n📎 [Sube el PDF del título de concesión en la sección 1]';
+
+  return (
+    `Hola ${titularMostrar} ${saludo}, excelente jornada, viene cargada de buenas noticias 🥳\n\n` +
+    `La espera POR FIN terminó, nos acaba de llegar el título oficial de tu marca *${denominacionMostrar}*, ahora sí hemos culminado satisfactoriamente el trámite. ¡Qué felicidad haberte podido servir durante este tiempo! Tu marca se encuentra protegida durante *10 años* y todo ha salido satisfactoriamente. Un abrazo grande y gracias por confiar en nosotros 🥳👏👏\n\n` +
+    `Qué alegría haberte podido ayudar durante todo este tiempo, y qué mejor que haber confiado en nosotros. Estamos para servirte y ahora sí, con toda la emoción, *oficialmente tu marca está protegida*. No lo cargues hasta que estés el 95% seguro. Igualmente recuerda que el título tiene toda la validez legal como documento oficial de protección de tu marca.${adjuntoLinea}\n\n` +
+    `_Si necesitas algo más, aquí estamos. ¡Mucho éxito con tu emprendimiento!_ 🚀`
+  );
+}
+
 function buildMsg() {
-  const nombre = (document.getElementById('t-nombre')?.value || '').trim();
-  const marca = (document.getElementById('t-marca')?.value || '').trim();
+  const { titular, denominacion } = getFormData();
 
   const saludos = { am: 'Buenos días', pm: 'Buenas tardes', night: 'Buenas noches' };
   const saludo = saludos[horaChip] || 'Buenos días';
-  const nombreMostrar = nombre || '[Nombre del cliente]';
-  const marcaMostrar = marca || '[Nombre de la marca]';
 
-  const enlaceLinea = pdfDataUrl
-    ? '\n\n📎 Te adjunto el título oficial en PDF.'
-    : '\n\n📎 [Adjunta el PDF del título aquí]';
-
-  const msg =
-    `Hola ${nombreMostrar} ${saludo}, excelente jornada, viene cargada de buenas noticias 🥳\n\n` +
-    `La espera POR FIN terminó, nos acaba de llegar el título oficial de tu marca *${marcaMostrar}*, ahora sí hemos culminado satisfactoriamente el trámite. ¡Qué felicidad haberte podido servir durante este tiempo! Tu marca se encuentra protegida durante *10 años* y todo ha salido satisfactoriamente. Un abrazo grande y gracias por confiar en nosotros 🥳👏👏\n\n` +
-    `Qué alegría haberte podido ayudar durante todo este tiempo, y qué mejor que haber confiado en nosotros. Estamos para servirte y ahora sí, con toda la emoción, *oficialmente tu marca está protegida*. No lo cargues hasta que estés el 95% seguro. Igualmente recuerda que el título tiene toda la validez legal como documento oficial de protección de tu marca.${enlaceLinea}\n\n` +
-    `_Si necesitas algo más, aquí estamos. ¡Mucho éxito con tu emprendimiento!_ 🚀`;
-
+  const msg = buildMessageText({ titular, denominacion, saludo });
   document.getElementById('msg-preview-text').textContent = msg;
 
-  const hayDatos = nombre && marca;
+  const hayDatos = titular && denominacion;
   const hayPdf = !!pdfDataUrl;
   let status = '';
-  if (!nombre && !marca) status = 'Sube el PDF o completa titular y denominación';
-  else if (!nombre) status = 'Falta el titular (nombre del cliente)';
-  else if (!marca) status = 'Falta la denominación de la marca';
+  if (!titular && !denominacion) status = 'Sube el PDF o completa titular y denominación';
+  else if (!titular) status = 'Falta el titular (nombre del cliente)';
+  else if (!denominacion) status = 'Falta la denominación de la marca';
   else if (!hayPdf) status = 'Listo — sube el PDF del título';
   else status = '✓ Mensaje listo para copiar';
 
@@ -191,16 +204,15 @@ function toggleMsgBox() {
 }
 
 function sendMail() {
-  const email = (document.getElementById('t-email')?.value || '').trim();
-  const nombre = (document.getElementById('t-nombre')?.value || '').trim();
-  const marca = (document.getElementById('t-marca')?.value || '').trim();
+  const { titular, denominacion, email } = getFormData();
+  buildMsg();
   const msg = document.getElementById('msg-preview-text').textContent;
 
   if (!email) {
     showToast('Selecciona el correo del cliente', 'er');
     return;
   }
-  if (!nombre || !marca) {
+  if (!titular || !denominacion) {
     showToast('Completa titular y denominación', 'er');
     return;
   }
@@ -208,21 +220,50 @@ function sendMail() {
     showToast('Sube el PDF del título antes de enviar', 'er');
     return;
   }
-  if (!msg || msg.includes('Completa los datos')) {
-    showToast('Genera el mensaje antes de enviar', 'er');
+
+  const pdfBase64 = pdfDataUrl.includes(',') ? pdfDataUrl.split(',')[1] : '';
+  if (!pdfBase64) {
+    showToast('No se pudo leer el PDF adjunto', 'er');
     return;
   }
 
-  const subject = `Tu título de concesión — ${marca}`;
-  const mailto = `mailto:${encodeURIComponent(email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(msg)}`;
-  window.location.href = mailto;
-  showToast('Abriendo tu cliente de correo — adjunta el PDF manualmente', 'info');
+  const btn = document.getElementById('btn-send-mail');
+  const prevLabel = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Enviando…';
+
+  fetch('/api/titulo/send-email', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      to: email,
+      titular,
+      denominacion,
+      subject: `Tu título de concesión — ${denominacion}`,
+      body: msg,
+      pdfBase64,
+      pdfFilename: pdfFileName || 'titulo-concesion.pdf',
+    }),
+  })
+    .then(async (res) => {
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'No se pudo enviar el correo');
+      showToast(`Correo enviado a ${email}`);
+    })
+    .catch((err) => {
+      showToast(err.message || 'Error al enviar el correo', 'er');
+    })
+    .finally(() => {
+      btn.disabled = false;
+      btn.textContent = prevLabel;
+    });
 }
 
 function copyMsgFull() {
+  const { titular, denominacion } = getFormData();
   const txt = document.getElementById('msg-preview-text').textContent;
-  if (!txt || txt.includes('Completa los datos')) {
-    showToast('Primero completa los datos del cliente', 'er');
+  if (!titular || !denominacion || !txt) {
+    showToast('Primero completa titular y denominación', 'er');
     return;
   }
   navigator.clipboard.writeText(txt).then(() => {
