@@ -4,103 +4,120 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ulpik · Envío de Título</title>
-<link rel="stylesheet" href="styles.css?v=20250702">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=20250706">
 </head>
 <body>
 <div class="toast" id="toast"></div>
 
 <nav class="nav">
-  <img src="logo.png?v=20250702" alt="Ulpik">
-  <div class="nav-badge"><span class="pulse"></span>Envío de título</div>
+  <img src="logo.png?v=20250706" alt="Ulpik">
 </nav>
 
-<div class="main">
-  <div id="t-content">
-    <div class="tw">
-      <div class="tw-header">
-        <img src="logo.png?v=20250702" alt="Ulpik">
-        <div>
-          <h2>Envío de Título de Concesión</h2>
-          <p>Genera el mensaje personalizado para enviar al cliente vía Bitrix</p>
-        </div>
+<div class="fw" id="t-content">
+  <div class="hero">
+    <div class="hero-watermark"><img src="logo.png?v=20250706" alt=""></div>
+    <div class="hero-inner">
+      <div class="hero-logo-wrap">
+        <div class="hero-logo-ring"></div>
+        <img src="logo.png?v=20250706" alt="Ulpik" class="hero-logo-main">
       </div>
+      <div class="hero-pre">Envío de título</div>
+      <h1>Envío de Título de Concesión</h1>
+      <p>Sube el PDF, revisa los datos del cliente, selecciona el saludo y envía el correo o copia el mensaje en Bitrix24.</p>
+      <div class="hero-badge">💡 El PDF extrae automáticamente titular y denominación del título SENADI</div>
+    </div>
+  </div>
 
-      <div class="alert-info">
-        <span style="font-size:20px;flex-shrink:0">💡</span>
-        <div><strong>¿Cómo funciona?</strong> Sube el PDF del título (se extraen denominación y titular automáticamente), revisa los datos del cliente, selecciona el saludo y copia el mensaje en Bitrix24.</div>
+  <div class="card-row">
+    <div class="stp">
+      <div class="stp-top">
+        <div class="stp-num">1</div>
+        <span class="stp-tag">PDF</span>
       </div>
-
-      <div class="card-row">
-        <div class="card">
-          <h3>1 · Título de concesión (PDF)</h3>
-          <p class="csub">Sube el PDF oficial SENADI</p>
-          <div class="pdf-upload" id="pdf-drop">
-            <input type="file" id="pdf-file" accept=".pdf,application/pdf" hidden>
-            <div class="pdf-icon">📄</div>
-            <div class="pdf-upload-title" id="pdf-title">Arrastra el PDF aquí o haz clic para seleccionar</div>
-            <div class="pdf-upload-sub" id="pdf-sub">Solo archivos PDF · Máx. 2 MB · Extrae denominación y titular</div>
-            <div class="pdf-name hidden" id="pdf-name"></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>2 · Datos del cliente</h3>
-          <p class="csub">Se completan al subir el PDF; puedes editarlos si hace falta</p>
-          <div class="tfield">
-            <label for="t-nombre">Titular (nombre del cliente) <span class="req">*</span></label>
-            <input type="text" id="t-nombre" placeholder="Ej: José Daniel Vivar Espinosa">
-          </div>
-          <div class="tfield">
-            <label for="t-email">Correo del cliente</label>
-            <select id="t-email">
-              <option value="">Cargando correos recientes…</option>
-            </select>
-            <p class="field-hint">Últimos 5 correos de la encuesta de satisfacción</p>
-          </div>
-          <div class="tfield">
-            <label for="t-marca">Denominación (marca registrada) <span class="req">*</span></label>
-            <input type="text" id="t-marca" placeholder="Ej: chariqchachay morocho más logotipo">
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>3 · Saludo del mensaje</h3>
-        <p class="csub">Selecciona según la hora del día en que envías el mensaje</p>
-        <div class="hora-chips">
-          <button type="button" class="chip on" id="chip-am" data-chip="am">☀️ Buenos días</button>
-          <button type="button" class="chip" id="chip-pm" data-chip="pm">🌤 Buenas tardes</button>
-          <button type="button" class="chip" id="chip-night" data-chip="night">🌙 Buenas noches</button>
-        </div>
-      </div>
-
-      <div class="action-row">
-        <button type="button" class="btn-action btn-action--mail" id="btn-send-mail">✉️ Enviar mail</button>
-        <button type="button" class="btn-action btn-action--msg" id="btn-toggle-msg">💬 Mensaje generado</button>
-      </div>
-
-      <div class="msg-box hidden" id="msg-box">
-        <div class="msg-box-head">
-          <div>
-            <h4>💬 Mensaje generado — listo para Bitrix</h4>
-            <p>Copia el mensaje completo y pégalo directamente en el chat de Bitrix24</p>
-          </div>
-          <button type="button" class="btn-regen" id="btn-regen">↺ Regenerar</button>
-        </div>
-        <div class="msg-body">
-          <div class="msg-text" id="msg-preview-text">Completa los datos del cliente para generar el mensaje...</div>
-        </div>
-        <div class="msg-footer">
-          <div class="msg-footer-note">
-            <span class="pulse"></span>
-            <span id="msg-status">Esperando datos</span>
-          </div>
-          <button type="button" class="btn-copy-msg" id="btn-copy-msg">
-            <span id="copy-txt">Copiar mensaje completo</span>
-          </button>
-        </div>
+      <h3>Título de concesión</h3>
+      <p class="hint">Sube el PDF oficial SENADI</p>
+      <div class="pdf-upload" id="pdf-drop">
+        <input type="file" id="pdf-file" accept=".pdf,application/pdf" hidden>
+        <div class="pdf-icon">📄</div>
+        <div class="pdf-upload-title" id="pdf-title">Arrastra el PDF aquí o haz clic para seleccionar</div>
+        <div class="pdf-upload-sub" id="pdf-sub">Solo archivos PDF · Máx. 2 MB · Extrae denominación y titular</div>
+        <div class="pdf-name hidden" id="pdf-name"></div>
       </div>
     </div>
+
+    <div class="stp">
+      <div class="stp-top">
+        <div class="stp-num">2</div>
+        <span class="stp-tag">Cliente</span>
+        <span class="req-star">*</span>
+      </div>
+      <h3>Datos del cliente</h3>
+      <p class="hint">Se completan al subir el PDF; puedes editarlos si hace falta</p>
+      <div class="tfield">
+        <label for="t-nombre">Titular (nombre del cliente) <span class="req">*</span></label>
+        <input type="text" class="tinp einp" id="t-nombre" placeholder="Ej: José Daniel Vivar Espinosa">
+      </div>
+      <div class="tfield">
+        <label for="t-email">Correo del cliente</label>
+        <select class="tinp einp" id="t-email">
+          <option value="">Cargando correos recientes…</option>
+        </select>
+        <p class="field-hint">Últimos 5 correos de la encuesta de satisfacción</p>
+      </div>
+      <div class="tfield">
+        <label for="t-marca">Denominación (marca registrada) <span class="req">*</span></label>
+        <input type="text" class="tinp einp" id="t-marca" placeholder="Ej: chariqchachay morocho más logotipo">
+      </div>
+    </div>
+  </div>
+
+  <div class="stp">
+    <div class="stp-top">
+      <div class="stp-num">3</div>
+      <span class="stp-tag">Saludo</span>
+    </div>
+    <h3>Saludo del mensaje</h3>
+    <p class="hint">Selecciona según la hora del día en que envías el mensaje</p>
+    <div class="hora-chips">
+      <button type="button" class="chip on" id="chip-am" data-chip="am">☀️ Buenos días</button>
+      <button type="button" class="chip" id="chip-pm" data-chip="pm">🌤 Buenas tardes</button>
+      <button type="button" class="chip" id="chip-night" data-chip="night">🌙 Buenas noches</button>
+    </div>
+  </div>
+
+  <div class="action-row">
+    <button type="button" class="btn-action btn-action--mail" id="btn-send-mail">✉️ Enviar mail</button>
+    <button type="button" class="btn-action btn-action--msg" id="btn-toggle-msg">💬 Mensaje generado</button>
+  </div>
+
+  <div class="msg-box hidden" id="msg-box">
+    <div class="msg-box-head">
+      <div>
+        <h4>💬 Mensaje generado — listo para Bitrix</h4>
+        <p>Copia el mensaje completo y pégalo directamente en el chat de Bitrix24</p>
+      </div>
+      <button type="button" class="btn-regen" id="btn-regen">↺ Regenerar</button>
+    </div>
+    <div class="msg-body">
+      <div class="msg-text" id="msg-preview-text">Completa los datos del cliente para generar el mensaje...</div>
+    </div>
+    <div class="msg-footer">
+      <div class="msg-footer-note">
+        <span class="pulse"></span>
+        <span id="msg-status">Esperando datos</span>
+      </div>
+      <button type="button" class="btn-copy-msg" id="btn-copy-msg">
+        <span id="copy-txt">Copiar mensaje completo</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="foot">
+    <img src="logo.png?v=20250706" alt="Ulpik">
+    <p>© Ulpik Business Tech · Registro de marcas y constitución de empresas en Ecuador</p>
   </div>
 </div>
 
@@ -110,6 +127,6 @@
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
   }
 </script>
-<script src="app.js?v=20250705"></script>
+<script src="app.js?v=20250707"></script>
 </body>
 </html>

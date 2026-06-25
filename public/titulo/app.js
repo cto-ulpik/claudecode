@@ -152,19 +152,38 @@ async function onPdfChange(input) {
   reader.readAsDataURL(file);
 }
 
-function buildMessageText({ titular, denominacion, saludo }) {
-  const titularMostrar = titular || '[Titular]';
-  const denominacionMostrar = denominacion || '[Denominación]';
-  const adjuntoLinea = pdfDataUrl
-    ? `\n\n📎 Te adjunto el título oficial en PDF${pdfFileName ? ': ' + pdfFileName : ''}.`
-    : '\n\n📎 [Sube el PDF del título de concesión en la sección 1]';
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
 
-  return (
-    `Hola ${titularMostrar} ${saludo}, excelente jornada, viene cargada de buenas noticias 🥳\n\n` +
-    `La espera POR FIN terminó, nos acaba de llegar el título oficial de tu marca *${denominacionMostrar}*, ahora sí hemos culminado satisfactoriamente el trámite. ¡Qué felicidad haberte podido servir durante este tiempo! Tu marca se encuentra protegida durante *10 años* y todo ha salido satisfactoriamente. Un abrazo grande y gracias por confiar en nosotros 🥳👏👏\n\n` +
-    `Qué alegría haberte podido ayudar durante todo este tiempo, y qué mejor que haber confiado en nosotros. Estamos para servirte y ahora sí, con toda la emoción, *oficialmente tu marca está protegida*. No lo cargues hasta que estés el 95% seguro. Igualmente recuerda que el título tiene toda la validez legal como documento oficial de protección de tu marca.${adjuntoLinea}\n\n` +
-    `_Si necesitas algo más, aquí estamos. ¡Mucho éxito con tu emprendimiento!_ 🚀`
-  );
+function buildMessages({ titular, denominacion, saludo }) {
+  const nombre = titular || '[Titular]';
+  const denom = denominacion || '[Denominación]';
+  const pdf = pdfFileName || (pdfDataUrl ? 'titulo-concesion.pdf' : '[PDF del título]');
+
+  const plain =
+    `Hola ${nombre}, ${saludo}.\n\n` +
+    `¡Por fin llegó el momento! 🎉\n\n` +
+    `Nos acaba de llegar el título oficial de tu marca ${denom}, y la verdad es que siempre da mucha alegría poder dar esta noticia.\n\n` +
+    `Tu marca está protegida durante 10 años. Todo salió bien, el trámite cerró de manera satisfactoria, y ahora ese nombre que construiste tiene respaldo legal completo.\n\n` +
+    `Te adjunto el título en PDF: ${pdf}\n\n` +
+    `Guárdalo bien, tiene plena validez como documento oficial de protección de tu marca.\n\n` +
+    `Gracias por confiar en nosotros. Fue un gusto acompañarte. ¡Mucho éxito con tu emprendimiento! 🤝`;
+
+  const html =
+    `Hola ${escapeHtml(nombre)}, ${escapeHtml(saludo)}.<br><br>` +
+    `¡Por fin llegó el momento! 🎉<br><br>` +
+    `Nos acaba de llegar el título oficial de tu marca <b>${escapeHtml(denom)}</b>, y la verdad es que siempre da mucha alegría poder dar esta noticia.<br><br>` +
+    `Tu marca está protegida durante <b>10 años</b>. Todo salió bien, el trámite cerró de manera satisfactoria, y ahora ese nombre que construiste tiene <b>respaldo legal completo</b>.<br><br>` +
+    `Te adjunto el título en PDF: <b>${escapeHtml(pdf)}</b><br><br>` +
+    `Guárdalo bien, tiene plena validez como <b>documento oficial de protección de tu marca</b>.<br><br>` +
+    `Gracias por confiar en nosotros. Fue un gusto acompañarte. ¡Mucho éxito con tu emprendimiento! 🤝`;
+
+  return { plain, html };
 }
 
 function buildMsg() {
@@ -173,7 +192,7 @@ function buildMsg() {
   const saludos = { am: 'Buenos días', pm: 'Buenas tardes', night: 'Buenas noches' };
   const saludo = saludos[horaChip] || 'Buenos días';
 
-  const msg = buildMessageText({ titular, denominacion, saludo });
+  const msg = buildMessages({ titular, denominacion, saludo }).plain;
   document.getElementById('msg-preview-text').textContent = msg;
 
   const hayDatos = titular && denominacion;
@@ -206,7 +225,11 @@ function toggleMsgBox() {
 function sendMail() {
   const { titular, denominacion, email } = getFormData();
   buildMsg();
-  const msg = document.getElementById('msg-preview-text').textContent;
+  const { plain, html } = buildMessages({
+    titular,
+    denominacion,
+    saludo: ({ am: 'Buenos días', pm: 'Buenas tardes', night: 'Buenas noches' })[horaChip] || 'Buenos días',
+  });
 
   if (!email) {
     showToast('Selecciona el correo del cliente', 'er');
@@ -240,7 +263,8 @@ function sendMail() {
       titular,
       denominacion,
       subject: `Tu título de concesión — ${denominacion}`,
-      body: msg,
+      body: plain,
+      htmlBody: html,
       pdfBase64,
       pdfFilename: pdfFileName || 'titulo-concesion.pdf',
     }),

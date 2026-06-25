@@ -150,6 +150,7 @@ function sendTituloEmail(data) {
     to: data.to,
     subject: subject,
     body: data.body,
+    htmlBody: data.htmlBody || '',
     name: 'Ulpik',
     attachments: [blob]
   });

@@ -9,6 +9,7 @@ type TituloEmailBody = {
   denominacion?: string;
   subject?: string;
   body?: string;
+  htmlBody?: string;
   pdfBase64?: string;
   pdfFilename?: string;
 };
@@ -49,6 +50,7 @@ tituloRouter.post("/send-email", async (req, res) => {
     denominacion,
     subject: input.subject?.trim() || `Tu título de concesión — ${denominacion}`,
     body,
+    htmlBody: input.htmlBody?.trim() || undefined,
     pdfBase64,
     pdfFilename: input.pdfFilename?.trim() || "titulo-concesion.pdf",
   };
