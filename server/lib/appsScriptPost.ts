@@ -55,3 +55,14 @@ export async function postToAppsScript(url: string, payload: Record<string, unkn
 
   throw new Error("Apps Script no respondió por GET ni POST");
 }
+
+/** POST grande a GAS (p. ej. PDF en base64). No usar GET ?data= por límite de URL. */
+export async function postToAppsScriptPostOnly(
+  url: string,
+  payload: Record<string, unknown>
+): Promise<string> {
+  const body = JSON.stringify(payload);
+  const posted = await tryPostOnce(url, body);
+  if (posted) return posted;
+  throw new Error("Apps Script no respondió al envío POST");
+}

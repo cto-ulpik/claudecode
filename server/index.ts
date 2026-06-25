@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import { getDb } from "./db.js";
 import { dashboardRouter } from "./routes/dashboards.js";
 import { sheetsRouter } from "./routes/sheets.js";
+import { surveysRouter } from "./routes/surveys.js";
 import { tituloRouter } from "./routes/titulo.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

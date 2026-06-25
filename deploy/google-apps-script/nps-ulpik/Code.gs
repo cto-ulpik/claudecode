@@ -10,7 +10,7 @@
  */
 
 var SHEET_NAME = 'Respuestas de formulario 1';
-var NOTIFY_EMAIL = 'churchill@ulpik.com';
+var NOTIFY_EMAIL = 'churchill@ulpik.com,legal5@ulpik.com';
 
 function doGet(e) {
   e = e || {};

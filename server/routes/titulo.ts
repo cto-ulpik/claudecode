@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { postToAppsScriptPostOnly } from "../lib/appsScriptPost.js";
 
 export const tituloRouter = Router();
 
@@ -11,30 +12,6 @@ type TituloEmailBody = {
   pdfBase64?: string;
   pdfFilename?: string;
 };
-
-async function postTituloEmail(payload: Record<string, unknown>): Promise<void> {
-  const url = process.env.GOOGLE_SHEETS_NPS_WEBAPP_URL?.trim();
-  if (!url) throw new Error("Webhook de Apps Script no configurado");
-
-  const body = JSON.stringify(payload);
-  let res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body,
-    redirect: "manual",
-  });
-  if (res.status >= 300 && res.status < 400) {
-    const location = res.headers.get("location");
-    if (location) res = await fetch(location, { method: "GET", redirect: "follow" });
-  }
-  const text = await res.text();
-  if (!text.trim().startsWith("{")) {
-    throw new Error(`Apps Script no devolvió JSON: ${text.slice(0, 120)}`);
-  }
-  const data = JSON.parse(text) as { ok?: boolean; error?: string };
-  if (data.ok === false) throw new Error(data.error ?? "Apps Script rechazó el envío");
-  if (data.ok !== true) throw new Error("Respuesta inesperada de Apps Script");
-}
 
 tituloRouter.post("/send-email", async (req, res) => {
   const input = req.body as TituloEmailBody;
@@ -79,7 +56,9 @@ tituloRouter.post("/send-email", async (req, res) => {
   if (secret) payload.token = secret;
 
   try {
-    await postTituloEmail(payload);
+    const url = process.env.GOOGLE_SHEETS_NPS_WEBAPP_URL?.trim();
+    if (!url) throw new Error("Webhook de Apps Script no configurado");
+    await postToAppsScriptPostOnly(url, payload);
     res.json({ ok: true });
   } catch (err) {
     console.warn("[titulo] send-email:", err instanceof Error ? err.message : err);
