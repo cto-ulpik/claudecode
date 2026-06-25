@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ulpik · Envío de Título</title>
-<link rel="stylesheet" href="styles.css?v=20250624">
+<link rel="stylesheet" href="styles.css?v=20250626">
 </head>
 <body>
 <div class="toast" id="toast"></div>
 
 <nav class="nav">
-  <img src="logo.png?v=20250624" alt="Ulpik">
+  <img src="logo.png?v=20250626" alt="Ulpik">
   <div class="nav-badge"><span class="pulse"></span>Envío de título</div>
 </nav>
 
@@ -18,7 +18,7 @@
   <div id="t-content">
     <div class="tw">
       <div class="tw-header">
-        <img src="logo.png?v=20250624" alt="Ulpik">
+        <img src="logo.png?v=20250626" alt="Ulpik">
         <div>
           <h2>Envío de Título de Concesión</h2>
           <p>Genera el mensaje personalizado para enviar al cliente vía Bitrix</p>
@@ -27,44 +27,17 @@
 
       <div class="alert-info">
         <span style="font-size:20px;flex-shrink:0">💡</span>
-        <div><strong>¿Cómo funciona?</strong> Completa los datos del cliente, sube el PDF del título o pega el enlace, selecciona el saludo según la hora, y el sistema generará el mensaje listo para copiar y pegar en Bitrix24.</div>
+        <div><strong>¿Cómo funciona?</strong> Sube el PDF del título (se extraen denominación y titular automáticamente), revisa los datos del cliente, selecciona el saludo y copia el mensaje en Bitrix24.</div>
       </div>
 
       <div class="card">
-        <h3>1 · Datos del cliente</h3>
-        <p class="csub">Información básica para personalizar el mensaje</p>
-        <div class="tfield">
-          <label for="t-nombre">Nombre del cliente <span class="req">*</span></label>
-          <input type="text" id="t-nombre" placeholder="Ej: María García">
-        </div>
-        <div class="tfield">
-          <label for="t-email">Correo del cliente</label>
-          <input type="email" id="t-email" placeholder="cliente@correo.com">
-        </div>
-        <div class="tfield">
-          <label for="t-marca">Nombre de la marca registrada <span class="req">*</span></label>
-          <input type="text" id="t-marca" placeholder="Ej: MiMarca™">
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>2 · Saludo del mensaje</h3>
-        <p class="csub">Selecciona según la hora del día en que envías el mensaje</p>
-        <div class="hora-chips">
-          <button type="button" class="chip on" id="chip-am" data-chip="am">☀️ Buenos días</button>
-          <button type="button" class="chip" id="chip-pm" data-chip="pm">🌤 Buenas tardes</button>
-          <button type="button" class="chip" id="chip-night" data-chip="night">🌙 Buenas noches</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <h3>3 · Título de concesión (PDF)</h3>
-        <p class="csub">Sube el archivo PDF o pega el enlace de Google Drive / Dropbox</p>
+        <h3>1 · Título de concesión (PDF)</h3>
+        <p class="csub">Sube el PDF oficial SENADI o pega el enlace de Google Drive / Dropbox</p>
         <div class="pdf-upload" id="pdf-drop">
           <input type="file" id="pdf-file" accept=".pdf,application/pdf" hidden>
           <div class="pdf-icon">📄</div>
           <div class="pdf-upload-title" id="pdf-title">Arrastra el PDF aquí o haz clic para seleccionar</div>
-          <div class="pdf-upload-sub" id="pdf-sub">Solo archivos PDF · Máx. 20 MB</div>
+          <div class="pdf-upload-sub" id="pdf-sub">Solo archivos PDF · Máx. 20 MB · Extrae denominación y titular</div>
           <div class="pdf-name hidden" id="pdf-name"></div>
         </div>
         <div class="or-divider"><span>— o pega un enlace —</span></div>
@@ -73,6 +46,33 @@
           <input type="url" id="t-link" placeholder="https://drive.google.com/file/d/...">
         </div>
         <p style="font-size:11.5px;color:var(--txt2);margin-top:8px;line-height:1.55">💡 <strong style="color:var(--txt)">Google Drive:</strong> Abre el PDF → Compartir → "Cualquier persona con el enlace puede ver" → copia el enlace.</p>
+      </div>
+
+      <div class="card">
+        <h3>2 · Datos del cliente</h3>
+        <p class="csub">Se completan al subir el PDF; puedes editarlos si hace falta</p>
+        <div class="tfield">
+          <label for="t-nombre">Titular (nombre del cliente) <span class="req">*</span></label>
+          <input type="text" id="t-nombre" placeholder="Ej: José Daniel Vivar Espinosa">
+        </div>
+        <div class="tfield">
+          <label for="t-email">Correo del cliente</label>
+          <input type="email" id="t-email" placeholder="cliente@correo.com">
+        </div>
+        <div class="tfield">
+          <label for="t-marca">Denominación (marca registrada) <span class="req">*</span></label>
+          <input type="text" id="t-marca" placeholder="Ej: chariqchachay morocho más logotipo">
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>3 · Saludo del mensaje</h3>
+        <p class="csub">Selecciona según la hora del día en que envías el mensaje</p>
+        <div class="hora-chips">
+          <button type="button" class="chip on" id="chip-am" data-chip="am">☀️ Buenos días</button>
+          <button type="button" class="chip" id="chip-pm" data-chip="pm">🌤 Buenas tardes</button>
+          <button type="button" class="chip" id="chip-night" data-chip="night">🌙 Buenas noches</button>
+        </div>
       </div>
 
       <div class="msg-box" id="msg-box">
@@ -100,6 +100,12 @@
   </div>
 </div>
 
-<script src="app.js?v=20250625b"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
+</script>
+<script src="app.js?v=20250626"></script>
 </body>
 </html>

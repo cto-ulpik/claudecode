@@ -25,15 +25,56 @@ function setChip(tipo) {
   buildMsg();
 }
 
-function onPdfChange(input) {
+/** Extrae denominación y titular del texto del título SENADI. */
+function parseTituloText(text) {
+  const flat = text.replace(/\s+/g, ' ').trim();
+  const denominacion =
+    flat.match(/DENOMINACI[ÓO]N\s*:\s*(.+?)\s+PRODUCTOS(?:\s+O\s+SERVICIOS)?/i)?.[1]?.trim() ||
+    flat.match(/DENOMINACI[ÓO]N\s*:\s*([^\n]+)/i)?.[1]?.trim() ||
+    '';
+  const titular =
+    flat.match(/TITULAR\s*:\s*(.+?)\s+DOMICILIO/i)?.[1]?.trim() ||
+    flat.match(/TITULAR\s*:\s*([^\n]+)/i)?.[1]?.trim() ||
+    '';
+  return { denominacion, titular };
+}
+
+async function extractPdfFields(file) {
+  if (!window.pdfjsLib) return {};
+  const buf = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+  let text = '';
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const content = await page.getTextContent();
+    text += content.items.map((item) => item.str).join(' ') + '\n';
+  }
+  return parseTituloText(text);
+}
+
+function applyExtractedFields(fields) {
+  let filled = false;
+  if (fields.titular) {
+    document.getElementById('t-nombre').value = fields.titular;
+    filled = true;
+  }
+  if (fields.denominacion) {
+    document.getElementById('t-marca').value = fields.denominacion;
+    filled = true;
+  }
+  return filled;
+}
+
+async function onPdfChange(input) {
   const file = input.files[0];
   if (!file) return;
   if (file.size > 20 * 1024 * 1024) {
     showToast('El PDF supera los 20 MB', 'er');
     return;
   }
+
   const reader = new FileReader();
-  reader.onload = function (e) {
+  reader.onload = async function (e) {
     pdfDataUrl = e.target.result;
     document.getElementById('pdf-title').textContent = 'PDF seleccionado';
     document.getElementById('pdf-sub').textContent = file.name + ' · ' + Math.round(file.size / 1024) + ' KB';
@@ -41,6 +82,18 @@ function onPdfChange(input) {
     nameEl.textContent = '✓ ' + file.name;
     nameEl.classList.remove('hidden');
     document.getElementById('pdf-drop').classList.add('has-file');
+
+    try {
+      const fields = await extractPdfFields(file);
+      if (applyExtractedFields(fields)) {
+        showToast('Titular y denominación extraídos del PDF', 'info');
+      } else {
+        showToast('No se encontraron titular/denominación — complétalos manualmente', 'er');
+      }
+    } catch (err) {
+      console.warn('PDF parse:', err);
+      showToast('No se pudo leer el PDF — complétalos manualmente', 'er');
+    }
     buildMsg();
   };
   reader.readAsDataURL(file);
@@ -76,9 +129,9 @@ function buildMsg() {
   const hayDatos = nombre && marca;
   const hayEnlace = link || pdfDataUrl;
   let status = '';
-  if (!nombre && !marca) status = 'Completa el nombre del cliente y la marca';
-  else if (!nombre) status = 'Falta el nombre del cliente';
-  else if (!marca) status = 'Falta el nombre de la marca';
+  if (!nombre && !marca) status = 'Sube el PDF o completa titular y denominación';
+  else if (!nombre) status = 'Falta el titular (nombre del cliente)';
+  else if (!marca) status = 'Falta la denominación de la marca';
   else if (!hayEnlace) status = 'Listo — agrega el enlace o PDF del título';
   else status = '✓ Mensaje listo para copiar';
 
