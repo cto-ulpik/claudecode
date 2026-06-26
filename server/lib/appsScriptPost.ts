@@ -11,6 +11,27 @@ function parseAppsScriptResponse(text: string, status: number): void {
   }
 }
 
+/** GET ?data= a GAS (preserva query en redirect 302). */
+async function getJsonToAppsScript(url: string, body: string): Promise<string> {
+  const sep = url.includes("?") ? "&" : "?";
+  const getUrl = `${url}${sep}data=${encodeURIComponent(body)}`;
+  let res = await fetch(getUrl, { redirect: "manual" });
+  if (res.status >= 300 && res.status < 400) {
+    const location = res.headers.get("location");
+    if (!location) {
+      throw new Error(`Apps Script redirigió sin Location (HTTP ${res.status})`);
+    }
+    const join = location.includes("?") ? "&" : "?";
+    res = await fetch(`${location}${join}data=${encodeURIComponent(body)}`, { redirect: "follow" });
+  }
+  const text = await res.text();
+  if (!res.ok) {
+    throw new Error(`Apps Script HTTP ${res.status}: ${text.slice(0, 200)}`);
+  }
+  parseAppsScriptResponse(text, res.status);
+  return text;
+}
+
 /**
  * POST a GAS: el primer POST ya ejecuta doPost; si hay 302, seguir con GET
  * (un segundo POST al redirect vuelve a ejecutar el script → fila duplicada).
@@ -44,16 +65,9 @@ async function tryPostOnce(url: string, body: string): Promise<string | null> {
 /** Envía datos al webhook GAS. GET ?data= primero (una sola ejecución); POST solo si falla. */
 export async function postToAppsScript(url: string, payload: Record<string, unknown>): Promise<string> {
   const body = JSON.stringify(payload);
-  const sep = url.includes("?") ? "&" : "?";
-  const getUrl = `${url}${sep}data=${encodeURIComponent(body)}`;
 
   try {
-    const res = await fetch(getUrl, { redirect: "follow" });
-    const text = await res.text();
-    if (res.ok) {
-      parseAppsScriptResponse(text, res.status);
-      return text;
-    }
+    return await getJsonToAppsScript(url, body);
   } catch {
     // fallback POST
   }

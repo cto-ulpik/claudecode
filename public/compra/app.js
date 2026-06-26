@@ -1,15 +1,79 @@
 const LOCAL_SK = 'ulpik_compra_local';
 const STORAGE_KEY = 'ulpik_compra_v1';
-const CF =
-  'https://customer-ovyrjx6190a92qae.cloudflarestream.com/52dc80f8e5baea490cbc57fddfc781ba/iframe?autoplay=1&preload=true&loop=false&startTime=0s&controls=true';
 
-const ASESORES = {
-  'Esteban Maldonado (Estebitan)': ['EM', 'Esteban Maldonado', 'Abogado y Asesor Comercial', 'Estebitan a tu disposición en cada paso del proceso marcario. Cualquier duda que tengas, estoy aquí para ti.'],
-  'Javier España (Javi)': ['JE', 'Javier España', 'Abogado y Asesor Comercial', 'Javi listo para guiarte en todo el proceso. Fue un placer acompañarte en esta decisión.'],
-  'Marianela Espinoza (Nela)': ['ME', 'Marianela Espinoza', 'Abogada y Asesora Comercial', 'Nela de tu lado, asegurándonos de que tu trámite avance sin contratiempos. ¡Gracias por confiar!'],
-  'Martín Coello (Martín)': ['MC', 'Martín Coello', 'Abogado y Asesor Comercial', 'Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.'],
-  'Sebastián Lopez (Sebas)': ['SL', 'Sebastián Lopez', 'Abogado y Asesor Comercial', 'Sebas disponible para resolver cada duda del proceso. Es un honor acompañarte en esto.'],
-};
+const CARGO_FEM = 'Abogada y Asesora Comercial';
+const CARGO_MASC = 'Abogado y Asesor Comercial';
+
+let ASESORES = {};
+
+async function loadAsesores() {
+  try {
+    const res = await fetch('asesores.json?v=20250709');
+    if (!res.ok) throw new Error('json');
+    ASESORES = await res.json();
+  } catch {
+    ASESORES = {
+      'Martín Coello (Martín)': {
+        asesor: 'Martín Coello',
+        foto: 'asesores/martin.jpg',
+        mensaje:
+          'Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.',
+        video:
+          'https://customer-ovyrjx6190a92qae.cloudflarestream.com/52dc80f8e5baea490cbc57fddfc781ba/iframe?autoplay=1&preload=true&loop=false&startTime=0s&controls=true',
+        titulo: 'Mensaje de tu asesor',
+      },
+    };
+  }
+}
+
+function asesorIniciales(nombre) {
+  return String(nombre || '')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0])
+    .join('')
+    .toUpperCase();
+}
+
+function asesorCargo(nombre) {
+  return /marianela/i.test(nombre) ? CARGO_FEM : CARGO_MASC;
+}
+
+function setAsesorAvatar(el, info) {
+  const foto = String(info.foto || '').trim();
+  el.replaceChildren();
+  el.className = 'asesor-avatar';
+  el.style.cursor = '';
+
+  if (!foto) {
+    el.classList.add('initials');
+    el.textContent = asesorIniciales(info.asesor);
+    return;
+  }
+
+  const img = document.createElement('img');
+  img.src = foto;
+  img.alt = info.asesor;
+  img.loading = 'lazy';
+  img.addEventListener('error', () => {
+    el.replaceChildren();
+    el.className = 'asesor-avatar initials';
+    el.textContent = asesorIniciales(info.asesor);
+    el.style.cursor = '';
+  });
+  img.addEventListener('click', () => openLightbox(foto, info.asesor));
+  el.appendChild(img);
+  el.style.cursor = 'pointer';
+  el.title = 'Ver foto de ' + info.asesor;
+}
+
+function openLightbox(src, name) {
+  document.getElementById('lb-img').src = src;
+  document.getElementById('lb-name').textContent = name;
+  document.getElementById('lb').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
 
 const NPS = [
   '',
@@ -168,23 +232,25 @@ function showSuccess() {
   ['survey-form', 'prog-wrap', 'hero-section'].forEach((id) => {
     document.getElementById(id).style.display = 'none';
   });
+  document.querySelector('.fw')?.classList.add('succ-wide');
 
-  const a = fd.asesor;
-  if (a && ASESORES[a]) {
-    const [initials, name, role, msg] = ASESORES[a];
-    const av = document.getElementById('a-avatar');
-    av.className = 'asesor-avatar initials';
-    av.textContent = initials;
-    document.getElementById('a-name').textContent = name;
-    document.getElementById('a-role').textContent = role;
-    document.getElementById('a-quote').textContent = msg;
-    document.getElementById('a-sig').innerHTML = '— <span>' + name + '</span>, Ulpik';
-    document.getElementById('asesor-block').style.display = 'flex';
+  const info = ASESORES[fd.asesor];
+  const block = document.getElementById('asesor-block');
+  if (info) {
+    document.getElementById('a-titulo').textContent = info.titulo || 'Mensaje de tu asesor';
+    setAsesorAvatar(document.getElementById('a-avatar'), info);
+    document.getElementById('a-name').textContent = info.asesor;
+    document.getElementById('a-role').textContent = asesorCargo(info.asesor);
+    document.getElementById('a-quote').textContent = info.mensaje;
+    document.getElementById('a-sig').innerHTML = '— <span>' + info.asesor + '</span>, Ulpik';
+    block.classList.remove('hidden');
+  } else {
+    block.classList.add('hidden');
   }
 
   requestAnimationFrame(() =>
     requestAnimationFrame(() => {
-      document.getElementById('cf-video').src = CF;
+      document.getElementById('cf-video').src = info?.video || '';
     })
   );
   document.getElementById('succ').classList.add('show');
@@ -223,6 +289,7 @@ function closeLightbox() {
 }
 
 window.addEventListener('load', () => {
+  loadAsesores();
   SCALE_FIELDS.forEach((sc) => {
     const wrap = document.getElementById(sc.id);
     if (!wrap) return;

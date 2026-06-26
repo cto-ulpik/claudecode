@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { postToAppsScript } from "../lib/appsScriptPost.js";
+import { postToAppsScriptPostOnly } from "../lib/appsScriptPost.js";
 
 export const compraRouter = Router();
 
@@ -65,7 +65,7 @@ compraRouter.post("/", async (req, res) => {
   }
 
   try {
-    const text = await postToAppsScript(url, payload);
+    const text = await postToAppsScriptPostOnly(url, payload);
     const data = JSON.parse(text) as { ok?: boolean; error?: string; row?: unknown; message?: string };
     if (data.ok === false) {
       throw new Error(data.error ?? "Google Sheets rechazó la fila");
