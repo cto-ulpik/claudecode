@@ -2,15 +2,17 @@
  * ENCUESTA PROCESO DE COMPRA ULPIK
  *
  * Spreadsheet: "Ulpik - ¿Cómo fue tu proceso de compra con Ulpik? (Respuestas)"
- * Pestaña: "Respuestas de formulario 1"
+ * Pestaña: "Respuestas de formulario 1" o "Form_Responses"
  *
- * Pegar en ese spreadsheet → Extensiones → Apps Script.
- * Desplegar: Implementar → Nueva implementación → Aplicación web
+ * IMPORTANTE: Este archivo debe tener el bloque "if (p.data)" en doGet (~línea 42).
+ * Sin eso, /compra NO guarda en el Sheet.
+ *
+ * Desplegar: Implementar → Gestionar implementaciones → Editar (lápiz)
+ *   - Tipo: Aplicación web
  *   - Ejecutar como: Yo
  *   - Quién tiene acceso: Cualquier persona
  *
- * Probar lectura: ?action=read  o  ?action=debug
- * Escritura: POST { "action": "append-compra", ...campos }
+ * Verificar URL /exec → debe incluir "version":"2026-06-26-write"
  */
 
 var SHEET_NAME = 'Respuestas de formulario 1';
