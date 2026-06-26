@@ -222,6 +222,25 @@ function toggleMsgBox() {
   }
 }
 
+async function copyPlainToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+
 function sendMail() {
   const { titular, denominacion, email } = getFormData();
   buildMsg();
@@ -255,6 +274,10 @@ function sendMail() {
   btn.disabled = true;
   btn.textContent = 'Enviando…';
 
+  copyPlainToClipboard(plain).then((copied) => {
+    if (!copied) console.warn('[titulo] clipboard copy failed');
+  });
+
   fetch('/api/titulo/send-email', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -275,7 +298,7 @@ function sendMail() {
         const detail = data.error || (res.status === 502 ? 'Error del servidor al contactar Apps Script' : 'No se pudo enviar el correo');
         throw new Error(detail);
       }
-      showToast(`Correo enviado a ${email}`);
+      showToast(`Correo enviado a ${email} — mensaje copiado al portapapeles`);
     })
     .catch((err) => {
       showToast(err.message || 'Error al enviar el correo', 'er');
@@ -293,7 +316,11 @@ function copyMsgFull() {
     showToast('Primero completa titular y denominación', 'er');
     return;
   }
-  navigator.clipboard.writeText(txt).then(() => {
+  copyPlainToClipboard(txt).then((ok) => {
+    if (!ok) {
+      showToast('No se pudo copiar automáticamente', 'er');
+      return;
+    }
     const btn = document.getElementById('btn-copy-msg');
     const ctxt = document.getElementById('copy-txt');
     btn.classList.add('copied');
@@ -302,19 +329,7 @@ function copyMsgFull() {
       btn.classList.remove('copied');
       ctxt.textContent = 'Copiar mensaje completo';
     }, 3000);
-    showToast('Mensaje copiado — pégalo en Bitrix');
-  }).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = txt;
-    document.body.appendChild(ta);
-    ta.select();
-    try {
-      document.execCommand('copy');
-      showToast('Mensaje copiado');
-    } catch {
-      showToast('No se pudo copiar automáticamente', 'er');
-    }
-    document.body.removeChild(ta);
+    showToast('Mensaje copiado — pégalo en tu CRM');
   });
 }
 
