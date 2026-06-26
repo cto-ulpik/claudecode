@@ -13,7 +13,8 @@ module.exports = {
         GOOGLE_SHEETS_NPS_WEBAPP_URL:
           "https://script.google.com/macros/s/AKfycbzTU-aXouMJcdhu10goVd3RWpNwRDQkgq8jiJC6RNAFJRVGP4pQh6078zMTI925HsCr/exec",
         GOOGLE_SHEETS_NPS_WEBHOOK_SECRET: "",
-        GOOGLE_SHEETS_COMPRA_WEBAPP_URL: "",
+        GOOGLE_SHEETS_COMPRA_WEBAPP_URL:
+          "https://script.google.com/macros/s/AKfycbwAnTCKxLUYJwb4tMNAAGxPsUIYO_FofertmW-FhXlCPGj5FoNw7pmUMmarK5RUJIQA/exec",
         GOOGLE_SHEETS_COMPRA_WEBHOOK_SECRET: "",
       },
     },

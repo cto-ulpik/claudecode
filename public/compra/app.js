@@ -4,11 +4,11 @@ const CF =
   'https://customer-ovyrjx6190a92qae.cloudflarestream.com/52dc80f8e5baea490cbc57fddfc781ba/iframe?autoplay=1&preload=true&loop=false&startTime=0s&controls=true';
 
 const ASESORES = {
-  'Esteban Maldonado': ['EM', 'Esteban Maldonado', 'Abogado y Asesor Comercial', 'Estebitan a tu disposición en cada paso del proceso marcario. Cualquier duda que tengas, estoy aquí para ti.'],
-  'Javier España': ['JE', 'Javier España', 'Abogado y Asesor Comercial', 'Javi listo para guiarte en todo el proceso. Fue un placer acompañarte en esta decisión.'],
-  'Marianela Espinoza': ['ME', 'Marianela Espinoza', 'Abogada y Asesora Comercial', 'Nela de tu lado, asegurándonos de que tu trámite avance sin contratiempos. ¡Gracias por confiar!'],
-  'Martín Coello': ['MC', 'Martín Coello', 'Abogado y Asesor Comercial', 'Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.'],
-  'Sebastián Lopez': ['SL', 'Sebastián Lopez', 'Abogado y Asesor Comercial', 'Sebas disponible para resolver cada duda del proceso. Es un honor acompañarte en esto.'],
+  'Esteban Maldonado (Estebitan)': ['EM', 'Esteban Maldonado', 'Abogado y Asesor Comercial', 'Estebitan a tu disposición en cada paso del proceso marcario. Cualquier duda que tengas, estoy aquí para ti.'],
+  'Javier España (Javi)': ['JE', 'Javier España', 'Abogado y Asesor Comercial', 'Javi listo para guiarte en todo el proceso. Fue un placer acompañarte en esta decisión.'],
+  'Marianela Espinoza (Nela)': ['ME', 'Marianela Espinoza', 'Abogada y Asesora Comercial', 'Nela de tu lado, asegurándonos de que tu trámite avance sin contratiempos. ¡Gracias por confiar!'],
+  'Martín Coello (Martín)': ['MC', 'Martín Coello', 'Abogado y Asesor Comercial', 'Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.'],
+  'Sebastián Lopez (Sebas)': ['SL', 'Sebastián Lopez', 'Abogado y Asesor Comercial', 'Sebas disponible para resolver cada duda del proceso. Es un honor acompañarte en esto.'],
 };
 
 const NPS = [

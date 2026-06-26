@@ -14,7 +14,7 @@ Pestaña: **Respuestas de formulario 1**
 5. Copia la URL `/exec` y configúrala en el servidor:
 
 ```bash
-GOOGLE_SHEETS_COMPRA_WEBAPP_URL=https://script.google.com/macros/s/TU_DEPLOY_ID/exec
+GOOGLE_SHEETS_COMPRA_WEBAPP_URL=https://script.google.com/macros/s/AKfycbwAnTCKxLUYJwb4tMNAAGxPsUIYO_FofertmW-FhXlCPGj5FoNw7pmUMmarK5RUJIQA/exec
 ```
 
 ## Probar

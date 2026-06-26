@@ -38,6 +38,23 @@ function doGet(e) {
     }
   }
 
+  if (p.data) {
+    try {
+      var dataPayload = JSON.parse(p.data);
+      if (dataPayload.secret && WEBHOOK_SECRET && dataPayload.secret !== WEBHOOK_SECRET) {
+        return jsonOutput({ ok: false, error: 'No autorizado' });
+      }
+      var dataAction = String(dataPayload.action || 'append-compra');
+      if (dataAction === 'append-compra' || dataAction === 'append-survey') {
+        var appended = appendCompraRow(dataPayload);
+        return jsonOutput({ ok: true, row: appended });
+      }
+      return jsonOutput({ ok: false, error: 'Acción no reconocida: ' + dataAction });
+    } catch (dataErr) {
+      return jsonOutput({ ok: false, error: String(dataErr.message || dataErr) });
+    }
+  }
+
   if (p.callback) {
     return jsonpOutput(p.callback, { ok: true, message: 'Encuesta proceso de compra ULPIK activa' });
   }
@@ -280,7 +297,7 @@ function testAppendCompra() {
     atencion: 10,
     acomp: 'Sí, totalmente',
     nps: 10,
-    asesor: 'Martín Coello',
+    asesor: 'Martín Coello (Martín)',
     mejora: 'Prueba automática desde Apps Script'
   });
 }
