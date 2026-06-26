@@ -3,9 +3,18 @@ let pdfDataUrl = '';
 let pdfFileName = '';
 let msgVisible = false;
 
+/** SENADI: apellido1 apellido2 nombre1 nombre2 → nombre1 apellido1 */
+function formatTitularNombre(raw) {
+  const parts = String(raw || '').trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 4) {
+    return parts[2] + ' ' + parts[0];
+  }
+  return parts.join(' ');
+}
+
 function getFormData() {
   return {
-    titular: (document.getElementById('t-nombre')?.value || '').trim(),
+    titular: formatTitularNombre(document.getElementById('t-nombre')?.value || ''),
     denominacion: (document.getElementById('t-marca')?.value || '').trim(),
     email: (document.getElementById('t-email')?.value || '').trim(),
   };
@@ -88,7 +97,7 @@ function parseTituloText(text) {
     flat.match(/TITULAR\s*:\s*(.+?)\s+DOMICILIO/i)?.[1]?.trim() ||
     flat.match(/TITULAR\s*:\s*([^\n]+)/i)?.[1]?.trim() ||
     '';
-  return { denominacion, titular };
+  return { denominacion, titular: formatTitularNombre(titular) };
 }
 
 async function extractPdfFields(file) {
@@ -107,7 +116,7 @@ async function extractPdfFields(file) {
 function applyExtractedFields(fields) {
   let filled = false;
   if (fields.titular) {
-    document.getElementById('t-nombre').value = fields.titular;
+    document.getElementById('t-nombre').value = formatTitularNombre(fields.titular);
     filled = true;
   }
   if (fields.denominacion) {
@@ -338,7 +347,15 @@ document.querySelectorAll('[data-chip]').forEach((btn) => {
 });
 
 ['t-nombre', 't-marca'].forEach((id) => {
-  document.getElementById(id).addEventListener('input', buildMsg);
+  const el = document.getElementById(id);
+  el.addEventListener('input', buildMsg);
+  if (id === 't-nombre') {
+    el.addEventListener('blur', () => {
+      const short = formatTitularNombre(el.value);
+      if (short !== el.value.trim()) el.value = short;
+      buildMsg();
+    });
+  }
 });
 document.getElementById('t-email').addEventListener('change', buildMsg);
 
