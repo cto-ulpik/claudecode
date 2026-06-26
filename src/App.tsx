@@ -8,6 +8,7 @@ import { EmpathicEmailPage } from "./pages/EmpathicEmailPage";
 import { DashboardViewerPage } from "./pages/DashboardViewerPage";
 import { UlpikSatisfaccionPage } from "./pages/UlpikSatisfaccionPage";
 import { UlpikTituloPage } from "./pages/UlpikTituloPage";
+import { UlpikCompraPage } from "./pages/UlpikCompraPage";
 import { LoginPage } from "./pages/LoginPage";
 
 export function App() {
@@ -18,6 +19,8 @@ export function App() {
       <Route path="/satisfaccion/" element={<UlpikSatisfaccionPage />} />
       <Route path="/titulo" element={<UlpikTituloPage />} />
       <Route path="/titulo/" element={<UlpikTituloPage />} />
+      <Route path="/compra" element={<UlpikCompraPage />} />
+      <Route path="/compra/" element={<UlpikCompraPage />} />
       <Route element={<RequireAuth />}>
         <Route element={<AppShell />}>
           <Route path="/" element={<HomePage />} />

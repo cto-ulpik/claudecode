@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ulpik · ¿Cómo fue tu proceso de compra?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=20250708">
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<nav class="nav"><img class="nav-logo" src="logo.png?v=20250708" alt="Ulpik"></nav>
+<div class="fw">
+
+<div class="hero" id="hero-section">
+  <div class="hero-wm"><img src="logo.png?v=20250708" alt=""></div>
+  <div class="hero-orbit">
+    <div class="orbit-wrap">
+      <div class="orbit-glow"></div><div class="orbit-ring"></div>
+      <img class="orbit-logo" src="logo.png?v=20250708" alt="Ulpik">
+    </div>
+  </div>
+  <div class="hero-inner">
+    <div class="hero-pre">Proceso de compra · Ulpik</div>
+    <h1>¿Cómo fue tu proceso de compra con nosotros?</h1>
+    <p>Queremos mejorar cómo te acompañamos. Esta encuesta evalúa el proceso de compra — no tomará más de 2 minutos.</p>
+  </div>
+</div>
+
+<div class="prog-wrap" id="prog-wrap">
+  <div class="prog-top"><span id="prog-lbl">0 de 10 completadas</span><span id="prog-pct">0%</span></div>
+  <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+</div>
+
+<div id="survey-form">
+  <div class="sec-label">Datos de contacto</div>
+  <div class="stp" id="s-email">
+    <div class="stp-top"><div class="stp-num">1</div><span class="stp-tag">Identificación</span><span class="req-star">*</span></div>
+    <h3>¿Cuál es tu correo electrónico?</h3>
+    <p class="hint">Usamos tu correo para dar seguimiento a tu trámite.</p>
+    <input type="email" class="tinp einp" id="f-email" placeholder="tucorreo@ejemplo.com">
+    <div class="ferr">⚠ Ingresa un correo válido.</div>
+  </div>
+  <div class="stp" id="s-servicio">
+    <div class="stp-top"><div class="stp-num">2</div><span class="stp-tag">Servicio</span><span class="req-star">*</span></div>
+    <h3>¿Qué servicio contrataste con Ulpik?</h3>
+    <div class="opts">
+      <div class="opt" data-group="servicio" data-val="Registro de marca"><span class="odot"></span><span class="otxt">Registro de marca</span></div>
+      <div class="opt" data-group="servicio" data-val="Constitución de S.A.S"><span class="odot"></span><span class="otxt">Constitución de S.A.S</span></div>
+      <div class="opt" data-group="servicio" data-val="Otro"><span class="odot"></span><span class="otxt">Otro</span></div>
+    </div>
+    <div class="ferr">⚠ Selecciona el servicio.</div>
+  </div>
+  <div class="divider-label">CALIFICACIONES</div>
+  <div class="stp" id="s-facilidad">
+    <div class="stp-top"><div class="stp-num">3</div><span class="stp-tag">Facilidad</span><span class="req-star">*</span></div>
+    <h3>¿Qué tan fácil fue contratar el servicio con Ulpik?</h3>
+    <div class="scale-w"><div class="scale-lbls"><span>Muy difícil</span><span>Muy fácil</span></div><div class="scale-btns" id="sc-facilidad"></div><div class="score-msg" id="sm-facilidad">Selecciona del 1 al 10</div></div>
+    <div class="ferr">⚠ Selecciona una puntuación.</div>
+  </div>
+  <div class="stp" id="s-claridad">
+    <div class="stp-top"><div class="stp-num">4</div><span class="stp-tag">Claridad</span><span class="req-star">*</span></div>
+    <h3>¿Qué tan claro te quedó qué incluía el servicio antes de pagar?</h3>
+    <p class="hint">Alcance, pasos, tiempos y costos.</p>
+    <div class="scale-w"><div class="scale-lbls"><span>Nada claro</span><span>Muy claro</span></div><div class="scale-btns" id="sc-claridad"></div><div class="score-msg" id="sm-claridad">Selecciona del 1 al 10</div></div>
+    <div class="ferr">⚠ Selecciona una puntuación.</div>
+  </div>
+  <div class="stp" id="s-dificultad">
+    <div class="stp-top"><div class="stp-num">5</div><span class="stp-tag">Obstáculos</span><span class="req-star">*</span></div>
+    <h3>¿En qué parte del proceso sentiste mayor dificultad?</h3>
+    <div class="opts">
+      <div class="opt" data-group="dificultad" data-val="Entender el servicio"><span class="odot"></span><span class="otxt">Entender el servicio</span></div>
+      <div class="opt" data-group="dificultad" data-val="Entender el precio"><span class="odot"></span><span class="otxt">Entender el precio</span></div>
+      <div class="opt" data-group="dificultad" data-val="Resolver mis dudas"><span class="odot"></span><span class="otxt">Resolver mis dudas</span></div>
+      <div class="opt" data-group="dificultad" data-val="Tiempo de respuesta"><span class="odot"></span><span class="otxt">Tiempo de respuesta</span></div>
+      <div class="opt" data-group="dificultad" data-val="Ninguna, todo fue claro"><span class="odot"></span><span class="otxt">Ninguna, todo fue claro</span></div>
+    </div>
+    <div class="ferr">⚠ Selecciona una opción.</div>
+  </div>
+  <div class="stp" id="s-atencion">
+    <div class="stp-top"><div class="stp-num">6</div><span class="stp-tag">Atención</span><span class="req-star">*</span></div>
+    <h3>¿Cómo calificarías la atención de la persona que te acompañó?</h3>
+    <p class="hint">Claridad, amabilidad, disposición y seguimiento.</p>
+    <div class="scale-w"><div class="scale-lbls"><span>Muy mala</span><span>Excelente</span></div><div class="scale-btns" id="sc-atencion"></div><div class="score-msg" id="sm-atencion">Selecciona del 1 al 10</div></div>
+    <div class="ferr">⚠ Selecciona una puntuación.</div>
+  </div>
+  <div class="stp" id="s-acomp">
+    <div class="stp-top"><div class="stp-num">7</div><span class="stp-tag">Acompañamiento</span><span class="req-star">*</span></div>
+    <h3>¿Te sentiste acompañado y con espacio para hacer preguntas antes de pagar?</h3>
+    <div class="opts">
+      <div class="opt" data-group="acomp" data-val="Sí, totalmente"><span class="odot"></span><span class="otxt">Sí, totalmente</span></div>
+      <div class="opt" data-group="acomp" data-val="Más o menos"><span class="odot"></span><span class="otxt">Más o menos</span></div>
+      <div class="opt" data-group="acomp" data-val="No, sentí confusión o presión"><span class="odot"></span><span class="otxt">No, sentí confusión o presión</span></div>
+    </div>
+    <div class="ferr">⚠ Selecciona una opción.</div>
+  </div>
+  <div class="stp" id="s-nps">
+    <div class="stp-top"><div class="stp-num">8</div><span class="stp-tag">Recomendación</span><span class="req-star">*</span></div>
+    <h3>¿Qué tan probable es que recomiendes Ulpik a un amigo o colega?</h3>
+    <div class="scale-w"><div class="scale-lbls"><span>Nada probable</span><span>Totalmente probable</span></div><div class="scale-btns" id="sc-nps"></div><div class="score-msg" id="sm-nps">Selecciona del 1 al 10</div></div>
+    <div class="ferr">⚠ Selecciona una puntuación.</div>
+  </div>
+  <div class="stp" id="s-asesor">
+    <div class="stp-top"><div class="stp-num">9</div><span class="stp-tag">Tu asesor</span><span class="req-star">*</span></div>
+    <h3>¿Con quién realizaste el proceso de inicio?</h3>
+    <div class="opts">
+      <div class="opt" data-group="asesor" data-val="Esteban Maldonado"><span class="odot"></span><span class="otxt">Esteban Maldonado (Estebitan)</span></div>
+      <div class="opt" data-group="asesor" data-val="Javier España"><span class="odot"></span><span class="otxt">Javier España (Javi)</span></div>
+      <div class="opt" data-group="asesor" data-val="Marianela Espinoza"><span class="odot"></span><span class="otxt">Marianela Espinoza (Nela)</span></div>
+      <div class="opt" data-group="asesor" data-val="Martín Coello"><span class="odot"></span><span class="otxt">Martín Coello (Martín)</span></div>
+      <div class="opt" data-group="asesor" data-val="Sebastián Lopez"><span class="odot"></span><span class="otxt">Sebastián Lopez (Sebas)</span></div>
+    </div>
+    <div class="ferr">⚠ Selecciona el asesor que te atendió.</div>
+  </div>
+  <div class="divider-label">TU OPINIÓN</div>
+  <div class="stp" id="s-mejora">
+    <div class="stp-top"><div class="stp-num">10</div><span class="stp-tag">Mejoras</span><span class="req-star">*</span></div>
+    <h3>¿Qué podríamos mejorar en el proceso de compra?</h3>
+    <textarea class="tinp" id="f-mejora" placeholder="Escribe tu opinión aquí..." rows="4" maxlength="500"></textarea>
+    <div class="char-c"><span id="char-n">0</span>/500</div>
+    <div class="ferr">⚠ Escribe tu opinión (mínimo 5 caracteres).</div>
+  </div>
+  <button type="button" class="btn-sub" id="btn-sub">
+    <span class="spin" id="spin"></span><span id="btn-txt">Enviar mi calificación →</span>
+  </button>
+  <p class="btn-note">Campos con <span class="acc">*</span> son obligatorios · Tus respuestas son confidenciales</p>
+</div>
+
+<div class="succ" id="succ">
+  <div class="succ-header">
+    <div class="succ-wm"><img src="logo.png?v=20250708" alt=""></div>
+    <div class="succ-z">
+      <h2>¡Muchas gracias!</h2>
+      <p class="succ-sub">Hemos iniciado el primer paso del proceso de registro marcario.<br><strong>Gracias por confiar en nosotros.</strong></p>
+    </div>
+  </div>
+  <div class="succ-bottom">
+    <div id="asesor-block" style="display:none">
+      <div class="asesor-card">
+        <div class="asesor-accent"></div>
+        <div class="asesor-inner">
+          <div class="asesor-meta"><span class="asesor-team-tag">Ulpik Team</span></div>
+          <div class="asesor-label">Mensaje de tu asesor</div>
+          <div class="asesor-profile">
+            <div class="asesor-avatar" id="a-avatar"></div>
+            <div><div class="asesor-name" id="a-name"></div><div class="asesor-role" id="a-role"></div></div>
+          </div>
+          <p class="asesor-quote" id="a-quote"></p>
+          <p class="asesor-sig" id="a-sig"></p>
+        </div>
+      </div>
+    </div>
+    <div class="vid-col">
+      <div class="vid-card">
+        <div class="vid-label"><div class="vid-dot"></div><span class="vid-lbl-text">Bienvenida · Ulpik</span></div>
+        <iframe id="cf-video" src="" allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture" allowfullscreen title="Video bienvenida Ulpik"></iframe>
+      </div>
+    </div>
+  </div>
+  <div class="succ-foot"><p>© 2026 <b>Ulpik</b> · Registro y protección de marcas en Ecuador</p></div>
+</div>
+
+</div>
+
+<div class="lightbox" id="lb">
+  <img class="lightbox-img" id="lb-img" src="" alt="">
+  <div class="lightbox-name" id="lb-name"></div>
+  <button type="button" class="lightbox-close" id="lb-close" aria-label="Cerrar">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="white" stroke-width="2" stroke-linecap="round">
+      <line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/>
+    </svg>
+  </button>
+</div>
+
+<script src="app.js?v=20250708"></script>
+</body>
+</html>

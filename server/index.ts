@@ -6,6 +6,7 @@ import { dashboardRouter } from "./routes/dashboards.js";
 import { sheetsRouter } from "./routes/sheets.js";
 import { surveysRouter } from "./routes/surveys.js";
 import { tituloRouter } from "./routes/titulo.js";
+import { compraRouter } from "./routes/compra.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 3001;
@@ -27,6 +28,7 @@ app.use("/api/dashboards", dashboardRouter);
 app.use("/api/sheets", sheetsRouter);
 app.use("/api/surveys", surveysRouter);
 app.use("/api/titulo", tituloRouter);
+app.use("/api/compra", compraRouter);
 
 if (serveStatic) {
   app.use(express.static(distDir));
