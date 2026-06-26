@@ -16,6 +16,7 @@
 var SHEET_NAME = 'Respuestas de formulario 1';
 var SHEET_NAME_ALT = 'Form_Responses';
 var WEBHOOK_SECRET = '';
+var SCRIPT_VERSION = '2026-06-26-write';
 
 function doGet(e) {
   e = e || {};
@@ -47,7 +48,7 @@ function doGet(e) {
       var dataAction = String(dataPayload.action || 'append-compra');
       if (dataAction === 'append-compra' || dataAction === 'append-survey') {
         var appended = appendCompraRow(dataPayload);
-        return jsonOutput({ ok: true, row: appended });
+        return jsonOutput({ ok: true, row: appended, version: SCRIPT_VERSION });
       }
       return jsonOutput({ ok: false, error: 'Acción no reconocida: ' + dataAction });
     } catch (dataErr) {
@@ -58,7 +59,7 @@ function doGet(e) {
   if (p.callback) {
     return jsonpOutput(p.callback, { ok: true, message: 'Encuesta proceso de compra ULPIK activa' });
   }
-  return jsonOutput({ ok: true, message: 'Encuesta proceso de compra ULPIK activa' });
+  return jsonOutput({ ok: true, message: 'Encuesta proceso de compra ULPIK activa', version: SCRIPT_VERSION });
 }
 
 function doPost(e) {
@@ -71,7 +72,7 @@ function doPost(e) {
     var action = String(payload.action || 'append-compra');
     if (action === 'append-compra' || action === 'append-survey') {
       var row = appendCompraRow(payload);
-      return jsonOutput({ ok: true, row: row });
+      return jsonOutput({ ok: true, row: row, version: SCRIPT_VERSION });
     }
 
     return jsonOutput({ ok: false, error: 'Acción no reconocida: ' + action });
