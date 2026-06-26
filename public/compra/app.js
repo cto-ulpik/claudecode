@@ -207,10 +207,14 @@ async function submitForm() {
 
   try {
     await saveSurvey(payload);
+    showSplashThenSuccess();
   } catch (err) {
     console.warn('[compra] save:', err);
+    showToast(err instanceof Error ? err.message : 'No se pudo guardar la encuesta', 'er');
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    document.getElementById('btn-txt').textContent = 'Enviar mi calificación →';
   }
-  showSplashThenSuccess();
 }
 
 function closeLightbox() {

@@ -66,9 +66,14 @@ compraRouter.post("/", async (req, res) => {
 
   try {
     const text = await postToAppsScript(url, payload);
-    const data = JSON.parse(text) as { ok?: boolean; error?: string };
+    const data = JSON.parse(text) as { ok?: boolean; error?: string; row?: unknown; message?: string };
     if (data.ok === false) {
       throw new Error(data.error ?? "Google Sheets rechazó la fila");
+    }
+    if (!data.row) {
+      throw new Error(
+        "Apps Script no escribió en el Sheet. Redespliega Code.gs como aplicación web (Ejecutar como: Yo, acceso: Cualquier persona)."
+      );
     }
     res.json({ ok: true });
   } catch (e) {

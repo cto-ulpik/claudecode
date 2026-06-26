@@ -7,8 +7,9 @@ Pestaña: **Respuestas de formulario 1**
 
 1. Abre el spreadsheet de respuestas.
 2. **Extensiones → Apps Script**.
-3. Pega `Code.gs`.
-4. **Implementar → Nueva implementación → Aplicación web**
+3. Pega **todo** el contenido de `Code.gs` (debe incluir `doPost` y el bloque `if (p.data)` en `doGet`).
+4. **Implementar → Gestionar implementaciones → Editar** (lápiz) en la implementación activa, o **Nueva implementación**:
+   - Tipo: **Aplicación web**
    - Ejecutar como: **Yo**
    - Quién tiene acceso: **Cualquier persona**
 5. Copia la URL `/exec` y configúrala en el servidor:
@@ -17,11 +18,13 @@ Pestaña: **Respuestas de formulario 1**
 GOOGLE_SHEETS_COMPRA_WEBAPP_URL=https://script.google.com/macros/s/AKfycbwAnTCKxLUYJwb4tMNAAGxPsUIYO_FofertmW-FhXlCPGj5FoNw7pmUMmarK5RUJIQA/exec
 ```
 
-## Probar
+## Verificar escritura
 
-- GET activo: `?` → `{"ok":true,"message":"Encuesta proceso de compra ULPIK activa"}`
-- Lectura: `?action=read` o `?action=debug`
-- Escritura: `POST` con `{ "action": "append-compra", ...campos }`
+```bash
+./deploy/test-compra.sh
+```
+
+La respuesta de `GET ?data=` **debe** incluir `"row":{...}`. Si solo devuelve `"message":"Encuesta proceso de compra ULPIK activa"`, el despliegue está desactualizado y **no guarda filas**.
 
 ## Frontend
 
