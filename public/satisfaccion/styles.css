@@ -126,8 +126,9 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
 .succ{display:none}
 .succ.show{display:flex;align-items:center;justify-content:center;width:100%;min-height:calc(100dvh - 64px - 48px)}
 .fw:has(.succ.show){padding-top:64px;padding-bottom:48px;min-height:100dvh;display:flex;flex-direction:column;justify-content:center}
-.succ-header{position:relative;text-align:center;width:100%;padding:32px 24px;min-height:min(72vh,560px);display:flex;align-items:center;justify-content:center}
-.succ-wm{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80%;max-width:400px;pointer-events:none;z-index:0;animation:wm-pulse 8s ease-in-out infinite}
+.succ-header{position:relative;text-align:center;width:100%;padding:32px 24px;min-height:calc(100dvh - 64px - 48px);display:flex;align-items:center;justify-content:center}
+.succ-wm{position:absolute;top:6%;left:50%;transform:translateX(-50%);width:72%;max-width:360px;pointer-events:none;z-index:0;animation:succ-wm-pulse 8s ease-in-out infinite}
+@keyframes succ-wm-pulse{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.04)}}
 .succ-wm img{display:block;width:100%;height:auto;opacity:.1}
 .succ-z{position:relative;z-index:2;width:100%;max-width:480px;margin:0 auto}
 @keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
