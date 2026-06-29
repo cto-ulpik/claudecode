@@ -26,10 +26,25 @@ const scv={nps:null,claridad:null,velocidad:null,calidad:null,satisfaccion:null}
 
 const SMSG={1:'😞 Muy malo',2:'😟 Malo',3:'😕 Por debajo de lo esperado',4:'😐 Regular',5:'🤔 Podría mejorar',6:'🙂 Aceptable',7:'😊 Bien',8:'😄 Muy bien',9:'🌟 Excelente',10:'🏆 ¡Superó todas las expectativas!'};
 
-window.addEventListener('load',()=>{buildScales();buildOpts();
-  const wm=document.querySelector('.hero-watermark img'),sw=document.querySelector('.succ-watermark');
-  if(wm&&sw)sw.appendChild(wm.cloneNode(true));
-});
+window.addEventListener('load',()=>{buildScales();buildOpts();});
+
+function showSplashThenSuccess(tituloUrl){
+  const sp=document.createElement('div');
+  sp.className='check-splash';
+  sp.innerHTML='<div class="splash-c"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg></div>';
+  document.body.appendChild(sp);
+  setTimeout(()=>{sp.remove();showSuccess(tituloUrl);},2100);
+}
+
+function showSuccess(tituloUrl){
+  document.querySelector('.hero').style.display='none';
+  document.getElementById('survey-form').style.display='none';
+  document.getElementById('prog-wrap').style.display='none';
+  document.querySelector('.foot')?.style.setProperty('display','none');
+  document.getElementById('succ').classList.add('show');
+  if(tituloUrl){const dl=document.getElementById('dl-btn');dl.href=tituloUrl;dl.style.display='inline-flex';}
+  setTimeout(()=>document.getElementById('succ').scrollIntoView({behavior:'smooth',block:'start'}),80);
+}
 
 function buildOpts(){
   document.querySelectorAll('.opt[data-group]').forEach(opt=>{
@@ -153,18 +168,11 @@ async function submitForm(){
   const tituloUrl=getTituloUrl();
   sendNotif(entry,tituloUrl);
 
-  // 4. Pantalla de éxito
-  document.querySelector('.hero').style.display='none';
-  document.getElementById('survey-form').style.display='none';
-  document.getElementById('prog-wrap').style.display='none';
-  document.querySelector('.foot')?.style.setProperty('display','none');
-  document.getElementById('succ').classList.add('show');
-  if(tituloUrl){const dl=document.getElementById('dl-btn');dl.href=tituloUrl;dl.style.display='inline-flex';}
   btn.disabled=false;
   btn.classList.remove('loading');
   spin.style.display='none';
   btnTxt.textContent='Enviar mi calificación →';
-  window.scrollTo({top:0,behavior:'smooth'});
+  showSplashThenSuccess(tituloUrl);
 }
 
 function sendNotif(e,tUrl){
