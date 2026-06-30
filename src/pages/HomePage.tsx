@@ -63,6 +63,16 @@ export function HomePage() {
             Encuesta NPS pública para clientes. Acceso libre, sin contraseña.
           </p>
         </a>
+
+        <a className="home__card" href="/pulso-equipo" role="listitem">
+          <span className="home__card-icon" aria-hidden="true">
+            ◉
+          </span>
+          <h2 className="home__card-title">Pulso del Equipo</h2>
+          <p className="home__card-desc">
+            Check-in semanal interno. Vista equipo sin contraseña; diagnóstico con PIN.
+          </p>
+        </a>
       </div>
 
       <footer className="home__footer">

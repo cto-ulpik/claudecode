@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pulso del Equipo · Ulpik</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="apple-touch-icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=20250717">
+</head>
+<body>
+
+<div class="vista-switcher">
+  <button class="vs-btn active" id="vs-equipo" type="button">📋 Vista Equipo</button>
+  <button class="vs-btn" id="vs-sofia" type="button">📊 Diagnóstico General</button>
+</div>
+
+<div id="app-equipo" style="display:none">
+  <header class="eq-header">
+    <div class="eq-logo">ULPIK <span>Legaltech Ecuador</span></div>
+    <div class="eq-divider-v"></div>
+    <div class="eq-title-bar">Pulso del Equipo</div>
+  </header>
+  <div class="eq-body">
+    <div class="eq-hero" id="eq-hero">
+      <div class="eq-badge">Check-in semanal</div>
+      <h1>¿Cómo estás esta<br><em>semana</em>?</h1>
+      <p>2 minutos · Respuestas anónimas (opcional) · Ayudas al equipo a mejorar</p>
+    </div>
+    <div id="eq-form">
+      <div class="eq-nombre-wrap">
+        <label class="eq-nombre-label" for="inp-nombre">Tu nombre (opcional)</label>
+        <input type="text" id="inp-nombre" class="eq-nombre-input" placeholder="Ej. Andrés, o déjalo vacío para responder anónimo/a">
+      </div>
+      <div class="eq-card">
+        <div class="eq-q-num">01 — Bienestar</div>
+        <div class="eq-q-label">¿Cómo te has sentido esta semana en el trabajo?</div>
+        <div class="score-grid" id="score-grid"></div>
+        <div class="score-labels"><span>Difícil 😓</span><span>Excelente 🌟</span></div>
+      </div>
+      <div class="eq-card">
+        <div class="eq-q-num">02 — Carga de trabajo</div>
+        <div class="eq-q-label">¿Cómo describes tu carga de trabajo esta semana?</div>
+        <div class="option-row" id="carga-group">
+          <button type="button" class="opt-btn" data-val="Manejable" data-group="carga"><span class="opt-icon">😌</span> Manejable — fluí bien con mis tareas</button>
+          <button type="button" class="opt-btn" data-val="Alta pero bien" data-group="carga"><span class="opt-icon">🔥</span> Alta pero bien — intensa pero lo logré</button>
+          <button type="button" class="opt-btn" data-val="Desbordante" data-group="carga"><span class="opt-icon">😰</span> Desbordante — más de lo que puedo manejar</button>
+        </div>
+      </div>
+      <div class="eq-card">
+        <div class="eq-q-num">03 — Claridad de rol</div>
+        <div class="eq-q-label">¿Te sientes claro/a sobre lo que se espera de ti en tu rol?</div>
+        <div class="option-row" id="claridad-group">
+          <button type="button" class="opt-btn" data-val="Sí siempre" data-group="claridad"><span class="opt-icon">✅</span> Sí, siempre — tengo muy claro mi propósito</button>
+          <button type="button" class="opt-btn" data-val="A veces" data-group="claridad"><span class="opt-icon">🤔</span> A veces — hay momentos de duda</button>
+          <button type="button" class="opt-btn" data-val="No del todo" data-group="claridad"><span class="opt-icon">❓</span> No del todo — necesito más claridad</button>
+        </div>
+      </div>
+      <div class="eq-card">
+        <div class="eq-q-num">04 — Motivación</div>
+        <div class="eq-q-label">¿Qué tan motivado/a llegas al trabajo esta semana?</div>
+        <div class="option-row opt-row-horizontal" id="mot-group">
+          <button type="button" class="opt-btn horizontal" data-val="Muy motivado/a" data-group="mot"><span class="opt-icon">🚀</span>Muy motivado/a</button>
+          <button type="button" class="opt-btn horizontal" data-val="Motivado/a" data-group="mot"><span class="opt-icon">😊</span>Motivado/a</button>
+          <button type="button" class="opt-btn horizontal" data-val="Regular" data-group="mot"><span class="opt-icon">😐</span>Regular</button>
+          <button type="button" class="opt-btn horizontal" data-val="Desmotivado/a" data-group="mot"><span class="opt-icon">😔</span>Desmotivado/a</button>
+        </div>
+      </div>
+      <div class="eq-card">
+        <div class="eq-q-num">05 — Sugerencia (opcional)</div>
+        <div class="eq-q-label">¿Hay algo que te gustaría que mejore en el equipo?</div>
+        <textarea id="inp-sugerencia" class="eq-textarea" rows="4" placeholder="Comparte libremente — procesos, comunicación, ambiente, lo que quieras…"></textarea>
+      </div>
+      <button type="button" class="eq-submit" id="btn-submit">Enviar mi pulso de la semana →</button>
+    </div>
+    <div class="eq-thanks" id="eq-thanks">
+      <div class="eq-thanks-icon">🎉</div>
+      <h2>¡Gracias por tu honestidad!</h2>
+      <p>Tu respuesta ayuda al equipo a tomar mejores decisiones. Cada semana contamos.</p>
+      <div class="eq-thanks-score" id="thanks-score">–</div>
+      <div class="eq-thanks-score-label">Tu puntuación de esta semana</div>
+      <div id="thanks-feedback-wrap"></div>
+      <div id="thanks-cat-wrap"></div>
+    </div>
+  </div>
+</div>
+
+<div id="app-sofia" style="display:none">
+  <div id="sf-loading" class="sf-loading-screen hidden">
+    <div class="sf-loading-inner">
+      <svg class="sf-loading-spinner" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="22" cy="22" r="18" stroke="rgba(255,255,255,0.08)" stroke-width="3"/>
+        <path d="M22 4a18 18 0 0 1 18 18" stroke="#FF5A1F" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <p class="sf-loading-text">Cargando diagnóstico…</p>
+    </div>
+  </div>
+
+  <header class="sf-header">
+    <div class="sf-logo-wrap">
+      <div>
+        <div class="sf-logo">ULPIK</div>
+        <div class="sf-logo-sub">Pulso del Equipo</div>
+      </div>
+      <div class="sf-badge-sofia">🔒 Diagnóstico General</div>
+    </div>
+    <button type="button" class="sf-clear-btn" id="btn-clear-header">🗑 Limpiar semana actual</button>
+  </header>
+
+  <div class="sf-nav-bar">
+    <div class="sf-period-tabs">
+      <button type="button" class="sf-tab active" id="tab-semana" data-tab="semana">Semana</button>
+      <button type="button" class="sf-tab" id="tab-mes" data-tab="mes">Mes</button>
+      <button type="button" class="sf-tab" id="tab-anio" data-tab="anio">Año</button>
+    </div>
+    <div class="sf-period-nav">
+      <button type="button" class="sf-nav-arrow" id="nav-prev">‹</button>
+      <div class="sf-period-label" id="period-label">–</div>
+      <button type="button" class="sf-nav-arrow" id="nav-next">›</button>
+    </div>
+    <div class="sf-sync-wrap" id="sf-sync-wrap"></div>
+  </div>
+
+  <div class="sf-body">
+    <div class="sf-alert" id="sf-alert">⚠️ <strong>Atención:</strong> El promedio está por debajo de 7/10. Considera tomar acción.</div>
+
+    <div class="sf-kpi-row">
+      <div class="sf-kpi-main">
+        <div class="sf-kpi-label" id="sf-kpi-periodo-label">Esta semana</div>
+        <div class="sf-score-big" id="sf-score-big">–</div>
+        <div class="sf-score-meta">Meta: 8 / 10</div>
+        <div class="sf-progress-bar-wrap">
+          <div class="sf-progress-track"><div class="sf-progress-fill" id="sf-progress-fill" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div class="sf-kpi-grid">
+        <div class="sf-kpi-card"><div class="sf-kpi-card-label">Respuestas</div><div class="sf-kpi-card-value" id="sf-total">0</div><div class="sf-kpi-card-sub" id="sf-total-sub">este período</div></div>
+        <div class="sf-kpi-card"><div class="sf-kpi-card-label">Con sugerencia</div><div class="sf-kpi-card-value" id="sf-con-sugerencia">0</div><div class="sf-kpi-card-sub">comentarios</div></div>
+        <div class="sf-kpi-card"><div class="sf-kpi-card-label">Desbordados</div><div class="sf-kpi-card-value" id="sf-desbordados" style="color:var(--rojo)">0</div><div class="sf-kpi-card-sub">carga máxima</div></div>
+        <div class="sf-kpi-card"><div class="sf-kpi-card-label">Muy motivados</div><div class="sf-kpi-card-value" id="sf-muy-mot" style="color:var(--verde)">0</div><div class="sf-kpi-card-sub">🚀</div></div>
+        <div class="sf-kpi-card"><div class="sf-kpi-card-label">Sin claridad</div><div class="sf-kpi-card-value" id="sf-sin-claridad" style="color:var(--amarillo)">0</div><div class="sf-kpi-card-sub">"No del todo"</div></div>
+        <div class="sf-kpi-card"><div class="sf-kpi-card-label">Mejor semana</div><div class="sf-kpi-card-value" id="sf-mejor" style="font-size:18px;color:var(--text-dim)">–</div><div class="sf-kpi-card-sub">promedio más alto</div></div>
+      </div>
+    </div>
+
+    <div class="sf-ia-panel" id="sf-ia-panel">
+      <div class="sf-panel-title"><span class="sf-dot"></span>Observaciones IA — calificaciones del período</div>
+      <div id="sf-ia-content">
+        <div class="sf-ia-loading"><svg class="spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Generando observaciones…</div>
+      </div>
+    </div>
+
+    <div class="sf-trend-panel" id="sf-trend-panel" style="display:none">
+      <div class="sf-panel-title"><span class="sf-dot"></span><span id="trend-title">Evolución semanal</span></div>
+      <div class="trend-chart" id="trend-chart"></div>
+    </div>
+
+    <div class="sf-2col">
+      <div class="sf-panel">
+        <div class="sf-panel-title"><span class="sf-dot"></span>Carga de trabajo</div>
+        <div id="sf-carga-bars"></div>
+      </div>
+      <div class="sf-panel">
+        <div class="sf-panel-title"><span class="sf-dot"></span>Motivación</div>
+        <div id="sf-mot-bars"></div>
+      </div>
+    </div>
+
+    <div class="sf-2col">
+      <div class="sf-panel">
+        <div class="sf-panel-title"><span class="sf-dot"></span>Sugerencias recientes</div>
+        <div id="sf-sugerencias"></div>
+      </div>
+      <div class="sf-panel">
+        <div class="sf-panel-title"><span class="sf-dot"></span>Categorías (IA)</div>
+        <div class="sf-cat-wrap" id="sf-categorias"></div>
+      </div>
+    </div>
+
+    <div class="sf-footer">Pulso del Equipo Ulpik · Uso interno · Histórico semanal</div>
+    <div class="sf-footer-actions">
+      <button type="button" id="btn-clear-footer" class="sf-clear-btn">🗑 Limpiar semana actual</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-pin">
+  <div class="modal-box">
+    <h3>🔒 Acceso restringido</h3>
+    <p>Ingresa el PIN para ver el Diagnóstico General</p>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pd-0"></div><div class="pin-dot" id="pd-1"></div>
+      <div class="pin-dot" id="pd-2"></div><div class="pin-dot" id="pd-3"></div>
+    </div>
+    <div class="pin-pad" id="pin-pad"></div>
+    <div class="pin-error-msg" id="pin-error"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-limpiar">
+  <div class="modal-box">
+    <h3>¿Limpiar semana actual?</h3>
+    <p>Se eliminan las respuestas de la semana en curso. Las semanas anteriores quedan guardadas en el histórico.</p>
+    <div class="modal-btns">
+      <button type="button" class="modal-cancel" id="btn-modal-cancel">Cancelar</button>
+      <button type="button" class="modal-confirm" id="btn-modal-confirm">Sí, limpiar</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js?v=20250717"></script>
+</body>
+</html>
