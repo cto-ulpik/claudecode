@@ -10,6 +10,7 @@ import { UlpikSatisfaccionPage } from "./pages/UlpikSatisfaccionPage";
 import { UlpikTituloPage } from "./pages/UlpikTituloPage";
 import { UlpikCompraPage } from "./pages/UlpikCompraPage";
 import { UlpikPulsoEquipoPage } from "./pages/UlpikPulsoEquipoPage";
+import { UlpikEstadoMarcaPage } from "./pages/UlpikEstadoMarcaPage";
 import { LoginPage } from "./pages/LoginPage";
 
 export function App() {
@@ -24,6 +25,8 @@ export function App() {
       <Route path="/compra/" element={<UlpikCompraPage />} />
       <Route path="/pulso-equipo" element={<UlpikPulsoEquipoPage />} />
       <Route path="/pulso-equipo/" element={<UlpikPulsoEquipoPage />} />
+      <Route path="/estado-marca" element={<UlpikEstadoMarcaPage />} />
+      <Route path="/estado-marca/" element={<UlpikEstadoMarcaPage />} />
       <Route element={<RequireAuth />}>
         <Route element={<AppShell />}>
           <Route path="/" element={<HomePage />} />
