@@ -25,6 +25,8 @@ export function App() {
       <Route path="/compra/" element={<UlpikCompraPage />} />
       <Route path="/pulso-equipo" element={<UlpikPulsoEquipoPage />} />
       <Route path="/pulso-equipo/" element={<UlpikPulsoEquipoPage />} />
+      <Route path="/estado-marca/:upk" element={<UlpikEstadoMarcaPage />} />
+      <Route path="/estado-marca/:upk/" element={<UlpikEstadoMarcaPage />} />
       <Route path="/estado-marca" element={<UlpikEstadoMarcaPage />} />
       <Route path="/estado-marca/" element={<UlpikEstadoMarcaPage />} />
       <Route element={<RequireAuth />}>
