@@ -294,7 +294,7 @@ function sendMail() {
       to: email,
       titular,
       denominacion,
-      subject: `Tu título de concesión — ${denominacion}`,
+      subject: 'Está listo tu título 🎉',
       body: plain,
       htmlBody: html,
       pdfBase64,

@@ -48,7 +48,7 @@ tituloRouter.post("/send-email", async (req, res) => {
     to,
     titular,
     denominacion,
-    subject: input.subject?.trim() || `Tu título de concesión — ${denominacion}`,
+    subject: input.subject?.trim() || "Está listo tu título 🎉",
     body,
     htmlBody: input.htmlBody?.trim() || undefined,
     pdfBase64,

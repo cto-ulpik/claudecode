@@ -144,7 +144,7 @@ function sendTituloEmail(data) {
   var bytes = Utilities.base64Decode(data.pdfBase64);
   var filename = data.pdfFilename || 'titulo-concesion.pdf';
   var blob = Utilities.newBlob(bytes, 'application/pdf', filename);
-  var subject = data.subject || ('Tu título de concesión — ' + data.denominacion);
+  var subject = data.subject || 'Está listo tu título 🎉';
 
   MailApp.sendEmail({
     to: data.to,
