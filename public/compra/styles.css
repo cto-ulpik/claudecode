@@ -163,7 +163,7 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
 .vid-col{display:flex;flex-direction:column}
 .vid-card{border-radius:18px;overflow:hidden;background:#0a0a0a;box-shadow:0 10px 36px rgba(0,0,0,.25),0 2px 8px rgba(0,0,0,.12);flex:1;position:relative;animation:fu .5s ease .35s both;transition:box-shadow .3s,transform .3s}
 .vid-card:hover{box-shadow:0 16px 48px rgba(0,0,0,.32);transform:translateY(-2px)}
-.vid-card iframe{display:block;width:100%;height:100%;min-height:320px;border:none;background:#0a0a0a}
+.vid-card video{display:block;width:100%;height:100%;min-height:320px;border:none;background:#0a0a0a;object-fit:contain}
 .vid-label{position:absolute;top:0;left:0;right:0;z-index:2;padding:11px 13px;background:linear-gradient(180deg,rgba(0,0,0,.6) 0%,transparent 100%);display:flex;align-items:center;gap:7px;pointer-events:none}
 .vid-dot{width:7px;height:7px;background:#E8431A;border-radius:50%;animation:pd 2s ease-in-out infinite;flex-shrink:0}
 @keyframes pd{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.65)}}
@@ -177,7 +177,7 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
 .toast.er{border-color:var(--acc);color:var(--acc)}
 @media(max-width:520px){
   .succ-bottom{grid-template-columns:1fr}
-  .vid-card iframe{min-height:210px;aspect-ratio:16/9}
+  .vid-card video{min-height:210px;aspect-ratio:16/9}
   .asesor-card{min-height:auto}
   .sbtn{height:42px;font-size:12px}
   .hero h1{font-size:24px}

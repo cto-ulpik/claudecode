@@ -8,18 +8,36 @@ let ASESORES = {};
 
 async function loadAsesores() {
   try {
-    const res = await fetch('asesores.json?v=20250709');
+    const res = await fetch('asesores.json?v=20260721');
     if (!res.ok) throw new Error('json');
     ASESORES = await res.json();
   } catch {
+    const javier = {
+      asesor: 'Javier España',
+      foto: '',
+      mensaje:
+        'Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.',
+      video: 'asesores/presentacion/javier-web.m4v',
+      titulo: 'Mensaje de tu asesor',
+    };
     ASESORES = {
+      'Esteban Maldonado (Estebitan)': { ...javier },
+      'Javier España (Javi)': { ...javier },
+      'Marianela Espinoza (Nela)': { ...javier },
       'Martín Coello (Martín)': {
         asesor: 'Martín Coello',
         foto: 'asesores/martin.jpg',
         mensaje:
           'Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.',
-        video:
-          'https://customer-ovyrjx6190a92qae.cloudflarestream.com/52dc80f8e5baea490cbc57fddfc781ba/iframe?autoplay=1&preload=true&loop=false&startTime=0s&controls=true',
+        video: 'asesores/presentacion/martin-web.m4v',
+        titulo: 'Mensaje de tu asesor',
+      },
+      'Sebastián Lopez (Sebas)': {
+        asesor: 'Sebastián Lopez',
+        foto: '',
+        mensaje:
+          'Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.',
+        video: 'asesores/presentacion/sebastian-web.m4v',
         titulo: 'Mensaje de tu asesor',
       },
     };
@@ -250,7 +268,10 @@ function showSuccess() {
 
   requestAnimationFrame(() =>
     requestAnimationFrame(() => {
-      document.getElementById('cf-video').src = info?.video || '';
+      const video = document.getElementById('cf-video');
+      video.pause();
+      video.src = info?.video || '';
+      video.load();
     })
   );
   document.getElementById('succ').classList.add('show');

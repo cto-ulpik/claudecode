@@ -1,37 +1,37 @@
 {
   "Esteban Maldonado (Estebitan)": {
-    "asesor": "Esteban Maldonado",
-    "foto": "asesores/martin.jpg",
+    "asesor": "Javier España",
+    "foto": "",
     "mensaje": "Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.",
-    "video": "https://customer-ovyrjx6190a92qae.cloudflarestream.com/52dc80f8e5baea490cbc57fddfc781ba/iframe?autoplay=1&preload=true&loop=false&startTime=0s&controls=true",
+    "video": "asesores/presentacion/javier-web.m4v",
     "titulo": "Mensaje de tu asesor"
   },
   "Javier España (Javi)": {
     "asesor": "Javier España",
-    "foto": "asesores/martin.jpg",
+    "foto": "",
     "mensaje": "Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.",
-    "video": "https://customer-ovyrjx6190a92qae.cloudflarestream.com/52dc80f8e5baea490cbc57fddfc781ba/iframe?autoplay=1&preload=true&loop=false&startTime=0s&controls=true",
+    "video": "asesores/presentacion/javier-web.m4v",
     "titulo": "Mensaje de tu asesor"
   },
   "Marianela Espinoza (Nela)": {
-    "asesor": "Marianela Espinoza",
+    "asesor": "Javier España",
     "foto": "",
-    "mensaje": "Nela de tu lado, asegurándonos de que tu trámite avance sin contratiempos. ¡Gracias por confiar!",
-    "video": "https://customer-ovyrjx6190a92qae.cloudflarestream.com/52dc80f8e5baea490cbc57fddfc781ba/iframe?autoplay=1&preload=true&loop=false&startTime=0s&controls=true",
+    "mensaje": "Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.",
+    "video": "asesores/presentacion/javier-web.m4v",
     "titulo": "Mensaje de tu asesor"
   },
   "Martín Coello (Martín)": {
     "asesor": "Martín Coello",
     "foto": "asesores/martin.jpg",
     "mensaje": "Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.",
-    "video": "https://customer-ovyrjx6190a92qae.cloudflarestream.com/52dc80f8e5baea490cbc57fddfc781ba/iframe?autoplay=1&preload=true&loop=false&startTime=0s&controls=true",
+    "video": "asesores/presentacion/martin-web.m4v",
     "titulo": "Mensaje de tu asesor"
   },
   "Sebastián Lopez (Sebas)": {
     "asesor": "Sebastián Lopez",
-    "foto": "asesores/martin.jpg",
+    "foto": "",
     "mensaje": "Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.",
-    "video": "https://customer-ovyrjx6190a92qae.cloudflarestream.com/52dc80f8e5baea490cbc57fddfc781ba/iframe?autoplay=1&preload=true&loop=false&startTime=0s&controls=true",
+    "video": "asesores/presentacion/sebastian-web.m4v",
     "titulo": "Mensaje de tu asesor"
   }
 }
