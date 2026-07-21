@@ -234,6 +234,53 @@ function validate() {
   return ok;
 }
 
+const VIDEO_VOLUME = 0.35;
+
+function getAsesorVideo() {
+  return document.getElementById('cf-video');
+}
+
+/** Desbloquea audio con el clic de envío para poder autoplay con volumen. */
+function unlockAsesorVideo(src) {
+  const video = getAsesorVideo();
+  if (!video || !src) return;
+  video.muted = false;
+  video.volume = VIDEO_VOLUME;
+  if (video.src !== new URL(src, location.href).href) {
+    video.src = src;
+    video.load();
+  }
+  const p = video.play();
+  if (p && typeof p.then === 'function') {
+    p.then(() => {
+      video.pause();
+      video.currentTime = 0;
+    }).catch(() => {});
+  }
+}
+
+function playAsesorVideo(src) {
+  const video = getAsesorVideo();
+  if (!video || !src) return;
+  video.muted = false;
+  video.volume = VIDEO_VOLUME;
+  if (video.src !== new URL(src, location.href).href) {
+    video.src = src;
+    video.load();
+  }
+  const tryPlay = () =>
+    video.play().catch(() => {
+      // Algunos navegadores bloquean sonido: reintentar silenciado y luego bajar mute.
+      video.muted = true;
+      return video.play().then(() => {
+        video.muted = false;
+        video.volume = VIDEO_VOLUME;
+      }).catch(() => {});
+    });
+  if (video.readyState >= 2) tryPlay();
+  else video.addEventListener('canplay', tryPlay, { once: true });
+}
+
 function showSplashThenSuccess() {
   const sp = document.createElement('div');
   sp.className = 'check-splash';
@@ -268,10 +315,7 @@ function showSuccess() {
 
   requestAnimationFrame(() =>
     requestAnimationFrame(() => {
-      const video = document.getElementById('cf-video');
-      video.pause();
-      video.src = info?.video || '';
-      video.load();
+      playAsesorVideo(info?.video || '');
     })
   );
   document.getElementById('succ').classList.add('show');
@@ -288,6 +332,9 @@ async function submitForm() {
   btn.classList.add('loading');
   btn.disabled = true;
   document.getElementById('btn-txt').textContent = 'Enviando…';
+
+  // Mismo gesto del clic: preparar autoplay con volumen (como Cloudflare Stream).
+  unlockAsesorVideo(ASESORES[fd.asesor]?.video || '');
 
   const payload = { ...fd, ts: new Date().toISOString() };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
