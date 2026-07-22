@@ -182,9 +182,9 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
     gap:16px;
     justify-items:center;
   }
-  .asesor-col{width:100%;order:2}
+  .asesor-col{width:100%;order:1}
   .vid-col{
-    order:1;
+    order:2;
     width:min(100%,360px);
     max-width:360px;
     margin:0 auto;
