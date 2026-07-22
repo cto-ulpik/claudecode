@@ -138,18 +138,19 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
 @keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
 /* BOTTOM */
-.succ-bottom{display:grid;grid-template-columns:1fr 240px;gap:16px;align-items:start;animation:fu .5s ease .3s both}
+.succ-bottom{display:grid;grid-template-columns:1fr 240px;gap:16px;align-items:stretch;animation:fu .5s ease .3s both}
 .succ-bottom.hidden,.asesor-col.hidden,.vid-col.hidden{display:none}
 .fw.succ-simple{max-width:560px}
 .fw.succ-wide{max-width:820px}
-.asesor-card{background:#fff;border-radius:18px;box-shadow:var(--sh);padding:0;display:flex;flex-direction:column;overflow:hidden;position:relative;transition:box-shadow .3s,transform .3s}
+.asesor-col{display:flex;flex-direction:column;min-height:0;height:100%}
+.asesor-card{background:#fff;border-radius:18px;box-shadow:var(--sh);padding:0;display:flex;flex-direction:column;overflow:hidden;position:relative;transition:box-shadow .3s,transform .3s;flex:1;height:100%;min-height:100%}
 .asesor-card:hover{box-shadow:var(--sh2);transform:translateY(-3px)}
 .asesor-accent{height:4px;background:linear-gradient(90deg,var(--acc) 0%,var(--acc2) 60%,transparent 100%);flex-shrink:0}
-.asesor-inner{padding:20px 20px 18px;display:flex;flex-direction:column;flex:1}
-.asesor-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;animation:fu .4s ease .5s both}
+.asesor-inner{padding:20px 20px 18px;display:flex;flex-direction:column;flex:1;min-height:0;height:100%}
+.asesor-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;animation:fu .4s ease .5s both;flex-shrink:0}
 .asesor-team-tag{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:var(--txt3)}
-.asesor-label{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--acc);animation:fu .4s ease .55s both;margin-bottom:14px}
-.asesor-profile{display:flex;align-items:center;gap:13px;margin-bottom:16px;animation:fu .4s ease .6s both}
+.asesor-label{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--acc);animation:fu .4s ease .55s both;margin-bottom:14px;flex-shrink:0}
+.asesor-profile{display:flex;align-items:center;gap:13px;margin-bottom:16px;animation:fu .4s ease .6s both;flex-shrink:0}
 .asesor-avatar{width:56px;height:56px;border-radius:50%;flex-shrink:0;overflow:hidden;border:2px solid var(--acc-border);box-shadow:0 3px 12px rgba(232,67,26,.18);background:#f0f0f0;transition:transform .35s cubic-bezier(.175,.885,.32,1.275),box-shadow .35s}
 .asesor-avatar:hover{transform:scale(1.1);box-shadow:0 8px 22px rgba(232,67,26,.3)}
 .asesor-avatar img{width:100%;height:100%;object-fit:cover;display:block}
@@ -157,9 +158,9 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
 .asesor-name{font-size:14.5px;font-weight:800;color:var(--txt);line-height:1.2;margin-bottom:3px}
 .asesor-role{font-size:10.5px;color:var(--txt3);font-weight:500;display:flex;align-items:center;gap:4px}
 .asesor-role::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--acc);flex-shrink:0}
-.asesor-quote{font-size:13px;line-height:1.7;color:var(--txt2);font-style:italic;padding:12px 14px;background:var(--acc-soft);border-radius:10px;border-left:3px solid var(--acc);flex:1;margin-bottom:14px;animation:fu .4s ease .65s both;position:relative}
+.asesor-quote{font-size:13px;line-height:1.7;color:var(--txt2);font-style:italic;padding:12px 14px;background:var(--acc-soft);border-radius:10px;border-left:3px solid var(--acc);flex:1;margin-bottom:14px;animation:fu .4s ease .65s both;position:relative;min-height:0}
 .asesor-quote::before{content:"\201C";position:absolute;top:-4px;left:10px;font-size:40px;line-height:1;color:rgba(232,67,26,.2);font-family:Georgia,serif;font-style:normal}
-.asesor-sig{font-size:11px;color:var(--txt3);font-weight:600;animation:fu .4s ease .7s both}
+.asesor-sig{font-size:11px;color:var(--txt3);font-weight:600;animation:fu .4s ease .7s both;flex-shrink:0;margin-top:auto}
 .asesor-sig span{color:var(--acc);font-weight:700}
 .vid-col{display:flex;flex-direction:column;align-items:stretch}
 .vid-card{border-radius:18px;overflow:hidden;background:#0a0a0a;box-shadow:0 10px 36px rgba(0,0,0,.25),0 2px 8px rgba(0,0,0,.12);position:relative;animation:fu .5s ease .35s both;transition:box-shadow .3s,transform .3s;width:100%;aspect-ratio:9/16;min-height:0;max-height:520px}
@@ -181,8 +182,13 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
     grid-template-columns:1fr;
     gap:16px;
     justify-items:center;
+    align-items:start;
   }
-  .asesor-col{width:100%;order:1}
+  .asesor-col{width:100%;order:1;height:auto}
+  .asesor-card{height:auto;min-height:0;flex:none}
+  .asesor-inner{height:auto}
+  .asesor-quote{flex:0 1 auto}
+  .asesor-sig{margin-top:0}
   .vid-col{
     order:2;
     width:min(100%,360px);
