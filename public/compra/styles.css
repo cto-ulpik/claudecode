@@ -158,7 +158,7 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
 .asesor-name{font-size:14.5px;font-weight:800;color:var(--txt);line-height:1.2;margin-bottom:3px}
 .asesor-role{font-size:10.5px;color:var(--txt3);font-weight:500;display:flex;align-items:center;gap:4px}
 .asesor-role::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--acc);flex-shrink:0}
-.asesor-quote{font-size:13px;line-height:1.7;color:var(--txt2);font-style:italic;padding:12px 14px;background:var(--acc-soft);border-radius:10px;border-left:3px solid var(--acc);flex:1;margin-bottom:14px;animation:fu .4s ease .65s both;position:relative;min-height:0}
+.asesor-quote{font-size:13px;line-height:1.7;color:var(--txt2);font-style:italic;padding:12px 14px;background:var(--acc-soft);border-radius:10px;border-left:3px solid var(--acc);flex:1;margin-bottom:14px;animation:fu .4s ease .65s both;position:relative;min-height:0;display:flex;align-items:center}
 .asesor-quote::before{content:"\201C";position:absolute;top:-4px;left:10px;font-size:40px;line-height:1;color:rgba(232,67,26,.2);font-family:Georgia,serif;font-style:normal}
 .asesor-sig{font-size:11px;color:var(--txt3);font-weight:600;animation:fu .4s ease .7s both;flex-shrink:0;margin-top:auto}
 .asesor-sig span{color:var(--acc);font-weight:700}
@@ -187,7 +187,7 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
   .asesor-col{width:100%;order:1;height:auto}
   .asesor-card{height:auto;min-height:0;flex:none}
   .asesor-inner{height:auto}
-  .asesor-quote{flex:0 1 auto}
+  .asesor-quote{flex:0 1 auto;display:block;align-items:initial}
   .asesor-sig{margin-top:0}
   .vid-col{
     order:2;
