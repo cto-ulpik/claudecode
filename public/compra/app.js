@@ -3,41 +3,46 @@ const STORAGE_KEY = 'ulpik_compra_v1';
 
 const CARGO_FEM = 'Abogada y Asesora Comercial';
 const CARGO_MASC = 'Abogado y Asesor Comercial';
+const CARGO_MARTIN = 'Abogado y jefe de marcas de Ulpik';
+const SERVICIO_REGISTRO = 'Registro de marca';
 
 let ASESORES = {};
 
 async function loadAsesores() {
   try {
-    const res = await fetch('asesores.json?v=20260721');
+    const res = await fetch('asesores.json?v=20260722');
     if (!res.ok) throw new Error('json');
     ASESORES = await res.json();
   } catch {
-    const javier = {
-      asesor: 'Javier España',
-      foto: '',
+    const sebastian = {
+      asesor: 'Sebastián Lopez',
+      foto: 'asesores/sebastian.jpeg',
+      cargo: CARGO_MASC,
       mensaje:
         'Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.',
-      video: 'asesores/presentacion/javier-web.m4v',
+      video: 'asesores/presentacion/sebastian-web.m4v',
       titulo: 'Mensaje de tu asesor',
     };
     ASESORES = {
-      'Esteban Maldonado (Estebitan)': { ...javier },
-      'Javier España (Javi)': { ...javier },
-      'Marianela Espinoza (Nela)': { ...javier },
+      'Esteban Maldonado (Estebitan)': { ...sebastian },
+      'Marianela Espinoza (Nela)': { ...sebastian },
+      'Sebastián Lopez (Sebas)': { ...sebastian },
+      'Javier España (Javi)': {
+        asesor: 'Javier España',
+        foto: '',
+        cargo: CARGO_MASC,
+        mensaje:
+          'Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.',
+        video: 'asesores/presentacion/javier-web.m4v',
+        titulo: 'Mensaje de tu asesor',
+      },
       'Martín Coello (Martín)': {
         asesor: 'Martín Coello',
         foto: 'asesores/martin.jpg',
+        cargo: CARGO_MARTIN,
         mensaje:
           'Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.',
         video: 'asesores/presentacion/martin-web.m4v',
-        titulo: 'Mensaje de tu asesor',
-      },
-      'Sebastián Lopez (Sebas)': {
-        asesor: 'Sebastián Lopez',
-        foto: '',
-        mensaje:
-          'Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.',
-        video: 'asesores/presentacion/sebastian-web.m4v',
         titulo: 'Mensaje de tu asesor',
       },
     };
@@ -54,8 +59,25 @@ function asesorIniciales(nombre) {
     .toUpperCase();
 }
 
-function asesorCargo(nombre) {
+function asesorCargo(info) {
+  if (info?.cargo) return info.cargo;
+  const nombre = info?.asesor || '';
+  if (/mart[ií]n/i.test(nombre)) return CARGO_MARTIN;
   return /marianela/i.test(nombre) ? CARGO_FEM : CARGO_MASC;
+}
+
+function isRegistroMarca() {
+  return fd.servicio === SERVICIO_REGISTRO;
+}
+
+function successMessageForService() {
+  if (fd.servicio === SERVICIO_REGISTRO) {
+    return 'Hemos iniciado el primer paso del proceso de registro marcario.<br><strong>Gracias por confiar en nosotros.</strong>';
+  }
+  if (fd.servicio === 'Constitución de S.A.S') {
+    return 'Hemos recibido tu calificación. Nuestro equipo seguirá acompañándote en la constitución de tu S.A.S.<br><strong>Gracias por confiar en nosotros.</strong>';
+  }
+  return 'Hemos recibido tu calificación. Tu opinión nos ayuda a mejorar cada proceso.<br><strong>Gracias por confiar en nosotros.</strong>';
 }
 
 function setAsesorAvatar(el, info) {
@@ -240,6 +262,14 @@ function getAsesorVideo() {
   return document.getElementById('cf-video');
 }
 
+function stopAsesorVideo() {
+  const video = getAsesorVideo();
+  if (!video) return;
+  video.pause();
+  video.removeAttribute('src');
+  video.load();
+}
+
 /** Desbloquea audio con el clic de envío para poder autoplay con volumen. */
 function unlockAsesorVideo(src) {
   const video = getAsesorVideo();
@@ -270,7 +300,6 @@ function playAsesorVideo(src) {
   }
   const tryPlay = () =>
     video.play().catch(() => {
-      // Algunos navegadores bloquean sonido: reintentar silenciado y luego bajar mute.
       video.muted = true;
       return video.play().then(() => {
         video.muted = false;
@@ -297,27 +326,49 @@ function showSuccess() {
   ['survey-form', 'prog-wrap', 'hero-section'].forEach((id) => {
     document.getElementById(id).style.display = 'none';
   });
-  document.querySelector('.fw')?.classList.add('succ-wide');
 
-  const info = ASESORES[fd.asesor];
+  const fw = document.querySelector('.fw');
+  const bottom = document.getElementById('succ-bottom');
   const block = document.getElementById('asesor-block');
-  if (info) {
+  const vidCol = document.getElementById('vid-col');
+  const showWelcome = isRegistroMarca();
+  const info = showWelcome ? ASESORES[fd.asesor] : null;
+
+  document.getElementById('succ-sub').innerHTML = successMessageForService();
+
+  if (showWelcome) {
+    fw?.classList.add('succ-wide');
+    fw?.classList.remove('succ-simple');
+    bottom.classList.remove('hidden');
+  } else {
+    fw?.classList.remove('succ-wide');
+    fw?.classList.add('succ-simple');
+    bottom.classList.add('hidden');
+    block.classList.add('hidden');
+    vidCol.classList.add('hidden');
+    stopAsesorVideo();
+  }
+
+  if (showWelcome && info) {
     document.getElementById('a-titulo').textContent = info.titulo || 'Mensaje de tu asesor';
     setAsesorAvatar(document.getElementById('a-avatar'), info);
     document.getElementById('a-name').textContent = info.asesor;
-    document.getElementById('a-role').textContent = asesorCargo(info.asesor);
+    document.getElementById('a-role').textContent = asesorCargo(info);
     document.getElementById('a-quote').textContent = info.mensaje;
     document.getElementById('a-sig').innerHTML = '— <span>' + info.asesor + '</span>, Ulpik';
     block.classList.remove('hidden');
-  } else {
+    vidCol.classList.remove('hidden');
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        playAsesorVideo(info.video || '');
+      })
+    );
+  } else if (showWelcome) {
     block.classList.add('hidden');
+    vidCol.classList.add('hidden');
+    stopAsesorVideo();
   }
 
-  requestAnimationFrame(() =>
-    requestAnimationFrame(() => {
-      playAsesorVideo(info?.video || '');
-    })
-  );
   document.getElementById('succ').classList.add('show');
   setTimeout(() => document.getElementById('succ').scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
 }
@@ -333,8 +384,9 @@ async function submitForm() {
   btn.disabled = true;
   document.getElementById('btn-txt').textContent = 'Enviando…';
 
-  // Mismo gesto del clic: preparar autoplay con volumen (como Cloudflare Stream).
-  unlockAsesorVideo(ASESORES[fd.asesor]?.video || '');
+  if (isRegistroMarca()) {
+    unlockAsesorVideo(ASESORES[fd.asesor]?.video || '');
+  }
 
   const payload = { ...fd, ts: new Date().toISOString() };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));

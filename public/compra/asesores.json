@@ -1,35 +1,40 @@
 {
   "Esteban Maldonado (Estebitan)": {
-    "asesor": "Javier España",
-    "foto": "",
+    "asesor": "Sebastián Lopez",
+    "foto": "asesores/sebastian.jpeg",
+    "cargo": "Abogado y Asesor Comercial",
     "mensaje": "Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.",
-    "video": "asesores/presentacion/javier-web.m4v",
+    "video": "asesores/presentacion/sebastian-web.m4v",
     "titulo": "Mensaje de tu asesor"
   },
   "Javier España (Javi)": {
     "asesor": "Javier España",
     "foto": "",
+    "cargo": "Abogado y Asesor Comercial",
     "mensaje": "Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.",
     "video": "asesores/presentacion/javier-web.m4v",
     "titulo": "Mensaje de tu asesor"
   },
   "Marianela Espinoza (Nela)": {
-    "asesor": "Javier España",
-    "foto": "",
+    "asesor": "Sebastián Lopez",
+    "foto": "asesores/sebastian.jpeg",
+    "cargo": "Abogado y Asesor Comercial",
     "mensaje": "Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.",
-    "video": "asesores/presentacion/javier-web.m4v",
+    "video": "asesores/presentacion/sebastian-web.m4v",
     "titulo": "Mensaje de tu asesor"
   },
   "Martín Coello (Martín)": {
     "asesor": "Martín Coello",
     "foto": "asesores/martin.jpg",
+    "cargo": "Abogado y jefe de marcas de Ulpik",
     "mensaje": "Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.",
     "video": "asesores/presentacion/martin-web.m4v",
     "titulo": "Mensaje de tu asesor"
   },
   "Sebastián Lopez (Sebas)": {
     "asesor": "Sebastián Lopez",
-    "foto": "",
+    "foto": "asesores/sebastian.jpeg",
+    "cargo": "Abogado y Asesor Comercial",
     "mensaje": "Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.",
     "video": "asesores/presentacion/sebastian-web.m4v",
     "titulo": "Mensaje de tu asesor"
