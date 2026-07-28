@@ -95,18 +95,17 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
 .succ{display:none}
 .succ.show{display:block}
 
-/* ── Header: marca de agua arriba, texto centrado ── */
+/* ── Header: logo izquierda + texto derecha ── */
 .succ-header{
   position:relative;
-  text-align:center;
+  text-align:left;
   margin-bottom:16px;
-  padding:28px 24px 20px;
+  padding:20px 8px 16px;
   min-height:0;
-  display:flex;
-  flex-direction:column;
+  display:grid;
+  grid-template-columns:auto 1fr;
   align-items:center;
-  justify-content:flex-start;
-  gap:8px;
+  gap:20px 28px;
 }
 .succ-wm{
   position:relative;
@@ -114,9 +113,10 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
   transform:none;
   pointer-events:none;
   z-index:0;
-  width:42%;
-  max-width:180px;
-  margin:0 auto 4px;
+  width:112px;
+  max-width:112px;
+  margin:0;
+  flex-shrink:0;
   animation:succ-wm-pulse 8s ease-in-out infinite;
 }
 @keyframes succ-wm-pulse{
@@ -127,15 +127,16 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
   display:block;
   width:100%;
   height:auto;
-  opacity:.1;
+  opacity:.14;
 }
 .succ-z{
   position:relative;
   z-index:2;
   width:100%;
+  text-align:left;
 }
 .succ h2{font-size:30px;font-weight:800;color:var(--txt);margin-bottom:8px;letter-spacing:-.025em;animation:fu .5s ease .1s both}
-.succ-sub{font-size:14px;color:var(--txt2);line-height:1.72;max-width:340px;margin:0 auto;animation:fu .5s ease .2s both}
+.succ-sub{font-size:14px;color:var(--txt2);line-height:1.72;max-width:420px;margin:0;animation:fu .5s ease .2s both}
 .succ-sub strong{color:var(--txt)}
 @keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
@@ -180,6 +181,13 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
 .toast.ok{border-color:var(--acc-border);color:var(--acc)}
 .toast.er{border-color:var(--acc);color:var(--acc)}
 @media(max-width:720px){
+  .succ-header{
+    grid-template-columns:88px 1fr;
+    gap:14px 16px;
+    padding:16px 4px 12px;
+    align-items:center;
+  }
+  .succ-wm{width:88px;max-width:88px}
   .succ-bottom{
     grid-template-columns:1fr;
     gap:16px;
@@ -211,7 +219,10 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
 @media(max-width:520px){
   .sbtn{height:42px;font-size:12px}
   .hero h1{font-size:24px}
-  .succ h2{font-size:26px}
+  .succ-header{grid-template-columns:72px 1fr;gap:12px}
+  .succ-wm{width:72px;max-width:72px}
+  .succ h2{font-size:24px}
+  .succ-sub{font-size:13px}
   .vid-col{width:min(100%,340px)}
 }
 
