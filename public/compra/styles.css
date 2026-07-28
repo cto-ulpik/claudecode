@@ -95,43 +95,45 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
 .succ{display:none}
 .succ.show{display:block}
 
-/* ── Header con watermark borde a borde ── */
+/* ── Header: marca de agua arriba, texto centrado ── */
 .succ-header{
   position:relative;
   text-align:center;
   margin-bottom:16px;
-  /* Enough vertical space for the watermark to be visible */
-  padding:56px 24px 48px;
-  min-height:260px;
-  display:flex;align-items:center;justify-content:center;
+  padding:28px 24px 20px;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  gap:8px;
 }
-/* 
-  Watermark strategy:
-  - The logo (587×473px) has ratio ~1.24:1
-  - We constrain it to max 80% of container width OR max 200px tall
-  - browser picks whichever is smaller → logo always fits, never clips
-  - No overflow:hidden needed so text above/below is never clipped either
-*/
 .succ-wm{
-  position:absolute;
-  top:50%;left:50%;
-  transform:translate(-50%,-50%);
-  pointer-events:none;z-index:0;
-  /* Size the wrapper to exactly the space we want the logo to occupy */
-  width:80%;
-  max-width:400px;
-  animation:wm-b 8s ease-in-out infinite;
+  position:relative;
+  top:auto;left:auto;
+  transform:none;
+  pointer-events:none;
+  z-index:0;
+  width:42%;
+  max-width:180px;
+  margin:0 auto 4px;
+  animation:succ-wm-pulse 8s ease-in-out infinite;
+}
+@keyframes succ-wm-pulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.04)}
 }
 .succ-wm img{
   display:block;
-  width:100%;    /* fills .succ-wm wrapper */
-  height:auto;   /* proportional — logo will be ~80% wide, proportional tall */
+  width:100%;
+  height:auto;
   opacity:.1;
 }
 .succ-z{
-  position:relative;z-index:2;width:100%;
+  position:relative;
+  z-index:2;
+  width:100%;
 }
-
 .succ h2{font-size:30px;font-weight:800;color:var(--txt);margin-bottom:8px;letter-spacing:-.025em;animation:fu .5s ease .1s both}
 .succ-sub{font-size:14px;color:var(--txt2);line-height:1.72;max-width:340px;margin:0 auto;animation:fu .5s ease .2s both}
 .succ-sub strong{color:var(--txt)}
