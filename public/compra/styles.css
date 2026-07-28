@@ -95,17 +95,20 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
 .succ{display:none}
 .succ.show{display:block}
 
-/* ── Header: logo izquierda + texto derecha ── */
+/* ── Header: logo izquierda + texto derecha, bloque centrado ── */
 .succ-header{
   position:relative;
   text-align:left;
-  margin-bottom:16px;
+  margin:0 auto 16px;
   padding:20px 8px 16px;
   min-height:0;
   display:grid;
   grid-template-columns:auto 1fr;
   align-items:center;
   gap:20px 28px;
+  width:fit-content;
+  max-width:100%;
+  justify-self:center;
 }
 .succ-wm{
   position:relative;
@@ -132,7 +135,8 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
 .succ-z{
   position:relative;
   z-index:2;
-  width:100%;
+  width:auto;
+  max-width:420px;
   text-align:left;
 }
 .succ h2{font-size:30px;font-weight:800;color:var(--txt);margin-bottom:8px;letter-spacing:-.025em;animation:fu .5s ease .1s both}
@@ -184,10 +188,15 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
   .succ-header{
     grid-template-columns:88px 1fr;
     gap:14px 16px;
-    padding:16px 4px 12px;
+    padding:16px 8px 12px;
     align-items:center;
+    width:fit-content;
+    max-width:100%;
+    margin-left:auto;
+    margin-right:auto;
   }
   .succ-wm{width:88px;max-width:88px}
+  .succ-z{max-width:min(280px, calc(100vw - 140px))}
   .succ-bottom{
     grid-template-columns:1fr;
     gap:16px;
@@ -219,8 +228,9 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
 @media(max-width:520px){
   .sbtn{height:42px;font-size:12px}
   .hero h1{font-size:24px}
-  .succ-header{grid-template-columns:72px 1fr;gap:12px}
+  .succ-header{grid-template-columns:72px 1fr;gap:12px;padding:12px 4px}
   .succ-wm{width:72px;max-width:72px}
+  .succ-z{max-width:min(240px, calc(100vw - 110px))}
   .succ h2{font-size:24px}
   .succ-sub{font-size:13px}
   .vid-col{width:min(100%,340px)}
