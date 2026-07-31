@@ -851,19 +851,6 @@ async function obtenerFeedbackPulso(respuesta) {
   }
 }
 
-function withTimeout(promise, ms, fallback) {
-  return new Promise(resolve => {
-    let settled = false;
-    const timer = setTimeout(() => {
-      if (!settled) { settled = true; resolve(fallback); }
-    }, ms);
-    Promise.resolve(promise).then(
-      v => { if (!settled) { settled = true; clearTimeout(timer); resolve(v); } },
-      () => { if (!settled) { settled = true; clearTimeout(timer); resolve(fallback); } }
-    );
-  });
-}
-
 function renderThanksFeedback(respuesta, feedbackResult) {
   const esBajo = respuesta.score <= 5;
   const fb = feedbackResult && feedbackResult.feedback;
