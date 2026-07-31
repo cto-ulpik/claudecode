@@ -29,11 +29,45 @@ function fetchJsonp(url) {
 }
 
 async function sincronizarConSheets(respuesta) {
-  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'PEGAR_URL_AQUI') return { ok: false, reason: 'URL no configurada' };
+  if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === 'PEGAR_URL_AQUI') {
+    return { ok: false, reason: 'URL no configurada' };
+  }
+
+  const body = JSON.stringify(respuesta);
+  const getUrl = APPS_SCRIPT_URL + '?action=save&payload=' + encodeURIComponent(body);
+  const postUrl = APPS_SCRIPT_URL + '?action=save';
+
+  // 1) fetch keepalive GET — suele completarse aunque cierren la pestaña
   try {
-    const url = APPS_SCRIPT_URL + '?action=save&payload=' + encodeURIComponent(JSON.stringify(respuesta));
-    await fetchJsonp(url);
-    return { ok: true };
+    fetch(getUrl, {
+      method: 'GET',
+      keepalive: true,
+      mode: 'no-cors',
+      cache: 'no-store',
+      credentials: 'omit'
+    });
+    return { ok: true, via: 'keepalive' };
+  } catch (e) {
+    console.warn('keepalive GET falló:', e);
+  }
+
+  // 2) sendBeacon POST — pensado para unload / cierre
+  try {
+    if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+      const queued = navigator.sendBeacon(
+        postUrl,
+        new Blob([body], { type: 'text/plain;charset=UTF-8' })
+      );
+      if (queued) return { ok: true, via: 'beacon' };
+    }
+  } catch (e) {
+    console.warn('sendBeacon falló:', e);
+  }
+
+  // 3) JSONP — solo con la página abierta (necesitamos respuesta)
+  try {
+    await fetchJsonp(getUrl);
+    return { ok: true, via: 'jsonp' };
   } catch (e) {
     console.warn('Sheets sync error:', e);
     return { ok: false, reason: e.message };
@@ -949,24 +983,25 @@ async function enviarFormulario() {
 
   mostrarPantallaGracias(respuesta, null, feedbackLocalResult);
 
-  // Background: clasificar (máx 1.2s) → guardar Sheet; feedback IA mejora la UI si llega
-  (async () => {
-    if (sugerencia.length >= 5) {
-      const cat = await withTimeout(clasificarSugerencia(sugerencia), 1200, null);
-      if (cat) {
-        respuesta.categoria = cat;
-        const stored = getStorage();
-        const list = stored[clave] || [];
-        const row = list.find(r => r.id === respuesta.id);
-        if (row) row.categoria = cat;
-        saveStorage(stored);
-        renderThanksCategoria(respuesta, cat);
-      }
-    }
-    const result = await sincronizarConSheets(respuesta);
+  // Guardar en Sheets YA (keepalive/beacon) — no esperar a OpenAI
+  sincronizarConSheets(respuesta).then(result => {
     if (!result.ok) console.warn('No se pudo sincronizar con Sheets:', result.reason);
-    else console.log('✅ Respuesta guardada en Google Sheets');
-  })();
+    else console.log('✅ Respuesta guardada en Google Sheets', result.via || '');
+  });
+
+  // Clasificar solo para UI / localStorage (no re-guardar: evita filas duplicadas)
+  if (sugerencia.length >= 5) {
+    clasificarSugerencia(sugerencia).then(cat => {
+      if (!cat) return;
+      respuesta.categoria = cat;
+      const stored = getStorage();
+      const list = stored[clave] || [];
+      const row = list.find(r => r.id === respuesta.id);
+      if (row) row.categoria = cat;
+      saveStorage(stored);
+      renderThanksCategoria(respuesta, cat);
+    }).catch(() => {});
+  }
 
   if (selectedScore <= 5) {
     obtenerFeedbackPulso(respuesta).then(fb => {
