@@ -817,6 +817,44 @@ async function obtenerFeedbackPulso(respuesta) {
   }
 }
 
+function withTimeout(promise, ms, fallback) {
+  return new Promise(resolve => {
+    let settled = false;
+    const timer = setTimeout(() => {
+      if (!settled) { settled = true; resolve(fallback); }
+    }, ms);
+    Promise.resolve(promise).then(
+      v => { if (!settled) { settled = true; clearTimeout(timer); resolve(v); } },
+      () => { if (!settled) { settled = true; clearTimeout(timer); resolve(fallback); } }
+    );
+  });
+}
+
+function renderThanksFeedback(respuesta, feedbackResult) {
+  const esBajo = respuesta.score <= 5;
+  const fb = feedbackResult && feedbackResult.feedback;
+  const fbWrap = document.getElementById('thanks-feedback-wrap');
+  if (!fbWrap || !fb) return;
+  const fbClass = esBajo ? 'alerta' : respuesta.score >= 8 ? 'positiva' : '';
+  fbWrap.innerHTML = `
+    <div class="eq-thanks-feedback ${fbClass}">
+      <div class="eq-thanks-feedback-label">${esBajo ? '💡 Para ti esta semana' : '✨ Reflexión rápida'}</div>
+      <p class="eq-thanks-feedback-msg">${fb.mensaje}</p>
+      <div class="eq-thanks-feedback-rec"><strong>Recomendación:</strong> ${fb.recomendacion}</div>
+    </div>
+  `;
+}
+
+function renderThanksCategoria(respuesta, categoria) {
+  const catWrap = document.getElementById('thanks-cat-wrap');
+  if (!catWrap) return;
+  if (respuesta.sugerencia && respuesta.sugerencia.length >= 5 && categoria) {
+    catWrap.innerHTML = `<div class="eq-thanks-cat">💬 Tu sugerencia · ${categoria}</div>`;
+  } else {
+    catWrap.innerHTML = '';
+  }
+}
+
 function mostrarPantallaGracias(respuesta, categoria, feedbackResult) {
   const esBajo = respuesta.score <= 5;
   const iconEl = document.querySelector('#eq-thanks .eq-thanks-icon');
@@ -839,23 +877,8 @@ function mostrarPantallaGracias(respuesta, categoria, feedbackResult) {
   scoreEl.textContent = respuesta.score + '/10';
   scoreEl.style.color = esBajo ? '#DC2626' : respuesta.score >= 8 ? '#16A34A' : 'var(--naranja)';
 
-  const fb = feedbackResult.feedback;
-  const fbWrap = document.getElementById('thanks-feedback-wrap');
-  const fbClass = esBajo ? 'alerta' : respuesta.score >= 8 ? 'positiva' : '';
-  fbWrap.innerHTML = `
-    <div class="eq-thanks-feedback ${fbClass}">
-      <div class="eq-thanks-feedback-label">${esBajo ? '💡 Para ti esta semana' : '✨ Reflexión rápida'}</div>
-      <p class="eq-thanks-feedback-msg">${fb.mensaje}</p>
-      <div class="eq-thanks-feedback-rec"><strong>Recomendación:</strong> ${fb.recomendacion}</div>
-    </div>
-  `;
-
-  const catWrap = document.getElementById('thanks-cat-wrap');
-  if (respuesta.sugerencia && respuesta.sugerencia.length >= 5 && categoria) {
-    catWrap.innerHTML = `<div class="eq-thanks-cat">💬 Tu sugerencia · ${categoria}</div>`;
-  } else {
-    catWrap.innerHTML = '';
-  }
+  renderThanksFeedback(respuesta, feedbackResult);
+  renderThanksCategoria(respuesta, categoria);
 }
 
 async function enviarFormulario() {
@@ -894,7 +917,6 @@ async function enviarFormulario() {
   btn.disabled = true;
   const sugerencia = document.getElementById('inp-sugerencia').value.trim();
   const nombre = document.getElementById('inp-nombre').value.trim();
-  btn.innerHTML = '<div class="eq-submit-loading"><svg class="spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>Procesando…</div>';
 
   const respuesta = {
     id: Date.now(),
@@ -912,11 +934,11 @@ async function enviarFormulario() {
     categoria: 'SIN SUGERENCIA'
   };
 
-  const [categoria, feedbackResult] = await Promise.all([
-    clasificarSugerencia(sugerencia),
-    obtenerFeedbackPulso(respuesta)
-  ]);
-  if (categoria) respuesta.categoria = categoria;
+  // Feedback local inmediato — no bloquea por OpenAI
+  const feedbackLocalResult = {
+    feedback: selectedScore > 5 ? feedbackPositivoLocal(respuesta) : feedbackLocal(respuesta),
+    ia: false
+  };
 
   const data = getStorage();
   const clave = semanaActual();
@@ -925,12 +947,32 @@ async function enviarFormulario() {
   saveStorage(data);
   iaObsCache = {};
 
-  sincronizarConSheets(respuesta).then(result => {
+  mostrarPantallaGracias(respuesta, null, feedbackLocalResult);
+
+  // Background: clasificar (máx 1.2s) → guardar Sheet; feedback IA mejora la UI si llega
+  (async () => {
+    if (sugerencia.length >= 5) {
+      const cat = await withTimeout(clasificarSugerencia(sugerencia), 1200, null);
+      if (cat) {
+        respuesta.categoria = cat;
+        const stored = getStorage();
+        const list = stored[clave] || [];
+        const row = list.find(r => r.id === respuesta.id);
+        if (row) row.categoria = cat;
+        saveStorage(stored);
+        renderThanksCategoria(respuesta, cat);
+      }
+    }
+    const result = await sincronizarConSheets(respuesta);
     if (!result.ok) console.warn('No se pudo sincronizar con Sheets:', result.reason);
     else console.log('✅ Respuesta guardada en Google Sheets');
-  });
+  })();
 
-  mostrarPantallaGracias(respuesta, categoria, feedbackResult);
+  if (selectedScore <= 5) {
+    obtenerFeedbackPulso(respuesta).then(fb => {
+      if (fb && fb.ia) renderThanksFeedback(respuesta, fb);
+    }).catch(() => {});
+  }
 }
 
 // ════════════════════════════════════════
