@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20250717">
+<link rel="stylesheet" href="styles.css?v=20260731">
 </head>
 <body>
 
@@ -39,6 +39,10 @@
         <div class="eq-q-label">¿Cómo te has sentido esta semana en el trabajo?</div>
         <div class="score-grid" id="score-grid"></div>
         <div class="score-labels"><span>Difícil 😓</span><span>Excelente 🌟</span></div>
+        <div class="eq-followup hidden" id="followup-score">
+          <label class="eq-followup-label" for="inp-motivo-score">¿Cuál fue el motivo de esta calificación? Cuéntanos para ayudarte a mejorar</label>
+          <textarea id="inp-motivo-score" class="eq-textarea" rows="3" placeholder="Comparte el motivo de tu calificación…"></textarea>
+        </div>
       </div>
       <div class="eq-card">
         <div class="eq-q-num">02 — Carga de trabajo</div>
@@ -47,6 +51,10 @@
           <button type="button" class="opt-btn" data-val="Manejable" data-group="carga"><span class="opt-icon">😌</span> Manejable — fluí bien con mis tareas</button>
           <button type="button" class="opt-btn" data-val="Alta pero bien" data-group="carga"><span class="opt-icon">🔥</span> Alta pero bien — intensa pero lo logré</button>
           <button type="button" class="opt-btn" data-val="Desbordante" data-group="carga"><span class="opt-icon">😰</span> Desbordante — más de lo que puedo manejar</button>
+        </div>
+        <div class="eq-followup hidden" id="followup-carga">
+          <label class="eq-followup-label" for="inp-carga-comentario">Cuéntanos cómo desde sostenibilidad podemos mejorar</label>
+          <textarea id="inp-carga-comentario" class="eq-textarea" rows="3" placeholder="Escribe tu comentario…"></textarea>
         </div>
       </div>
       <div class="eq-card">
@@ -57,6 +65,18 @@
           <button type="button" class="opt-btn" data-val="A veces" data-group="claridad"><span class="opt-icon">🤔</span> A veces — hay momentos de duda</button>
           <button type="button" class="opt-btn" data-val="No del todo" data-group="claridad"><span class="opt-icon">❓</span> No del todo — necesito más claridad</button>
         </div>
+        <div class="eq-followup hidden" id="followup-claridad">
+          <label class="eq-followup-label" for="sel-departamento">Selecciona el departamento al que perteneces:</label>
+          <select id="sel-departamento" class="eq-select">
+            <option value="">Elige una opción…</option>
+            <option value="Procesos">Procesos</option>
+            <option value="Tecnologia">Tecnología</option>
+            <option value="Educacion">Educación</option>
+            <option value="Finanzas">Finanzas</option>
+            <option value="comercial">Comercial</option>
+            <option value="legal">Legal</option>
+          </select>
+        </div>
       </div>
       <div class="eq-card">
         <div class="eq-q-num">04 — Motivación</div>
@@ -66,6 +86,10 @@
           <button type="button" class="opt-btn horizontal" data-val="Motivado/a" data-group="mot"><span class="opt-icon">😊</span>Motivado/a</button>
           <button type="button" class="opt-btn horizontal" data-val="Regular" data-group="mot"><span class="opt-icon">😐</span>Regular</button>
           <button type="button" class="opt-btn horizontal" data-val="Desmotivado/a" data-group="mot"><span class="opt-icon">😔</span>Desmotivado/a</button>
+        </div>
+        <div class="eq-followup hidden" id="followup-mot">
+          <label class="eq-followup-label" for="inp-mot-comentario">¿Cómo desde sostenibilidad podemos mejorar?</label>
+          <textarea id="inp-mot-comentario" class="eq-textarea" rows="3" placeholder="Escribe tu comentario…"></textarea>
         </div>
       </div>
       <div class="eq-card">
@@ -210,6 +234,6 @@
   </div>
 </div>
 
-<script src="app.js?v=20250717"></script>
+<script src="app.js?v=20260731"></script>
 </body>
 </html>

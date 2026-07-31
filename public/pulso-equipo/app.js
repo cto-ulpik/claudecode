@@ -567,16 +567,36 @@ function buildPinPad() {
   });
 }
 
+function setFollowupVisible(id, visible) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.toggle('hidden', !visible);
+  if (!visible) {
+    el.querySelectorAll('textarea, select, input').forEach((field) => {
+      field.value = '';
+    });
+  }
+}
+
+function updateFollowups() {
+  setFollowupVisible('followup-score', selectedScore !== null && selectedScore <= 5);
+  setFollowupVisible('followup-carga', selections.carga === 'Desbordante');
+  setFollowupVisible('followup-claridad', selections.claridad === 'No del todo');
+  setFollowupVisible('followup-mot', selections.mot === 'Desmotivado/a');
+}
+
 function selectScore(val, btn) {
   selectedScore = val;
   document.querySelectorAll('.score-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
+  updateFollowups();
 }
 
 function selectOpt(group, btn) {
   document.querySelectorAll(`#${group}-group .opt-btn`).forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   selections[group] = btn.dataset.val;
+  updateFollowups();
 }
 
 async function clasificarSugerencia(texto) {
@@ -711,6 +731,32 @@ async function enviarFormulario() {
   if (!selections.claridad) { alert('Por favor responde sobre la claridad de tu rol'); return; }
   if (!selections.mot) { alert('Por favor indica tu motivación'); return; }
 
+  const motivoScore = document.getElementById('inp-motivo-score')?.value.trim() || '';
+  const cargaComentario = document.getElementById('inp-carga-comentario')?.value.trim() || '';
+  const departamento = document.getElementById('sel-departamento')?.value || '';
+  const motComentario = document.getElementById('inp-mot-comentario')?.value.trim() || '';
+
+  if (selectedScore <= 5 && motivoScore.length < 3) {
+    alert('Cuéntanos el motivo de tu calificación (pregunta 1).');
+    document.getElementById('inp-motivo-score')?.focus();
+    return;
+  }
+  if (selections.carga === 'Desbordante' && cargaComentario.length < 3) {
+    alert('Cuéntanos cómo podemos mejorar desde sostenibilidad (pregunta 2).');
+    document.getElementById('inp-carga-comentario')?.focus();
+    return;
+  }
+  if (selections.claridad === 'No del todo' && !departamento) {
+    alert('Selecciona el departamento al que perteneces (pregunta 3).');
+    document.getElementById('sel-departamento')?.focus();
+    return;
+  }
+  if (selections.mot === 'Desmotivado/a' && motComentario.length < 3) {
+    alert('Cuéntanos cómo podemos mejorar desde sostenibilidad (pregunta 4).');
+    document.getElementById('inp-mot-comentario')?.focus();
+    return;
+  }
+
   const btn = document.getElementById('btn-submit');
   btn.disabled = true;
   const sugerencia = document.getElementById('inp-sugerencia').value.trim();
@@ -725,6 +771,10 @@ async function enviarFormulario() {
     carga: selections.carga,
     claridad: selections.claridad,
     motivacion: selections.mot,
+    motivoScore: selectedScore <= 5 ? motivoScore : '',
+    cargaComentario: selections.carga === 'Desbordante' ? cargaComentario : '',
+    departamento: selections.claridad === 'No del todo' ? departamento : '',
+    motivacionComentario: selections.mot === 'Desmotivado/a' ? motComentario : '',
     sugerencia: sugerencia,
     categoria: 'SIN SUGERENCIA'
   };
