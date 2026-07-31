@@ -4,7 +4,7 @@
 const STORAGE_KEY = 'ulpik_pulso_v2';
 const PIN_CORRECTO = '3301';
 
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7KF7hi4DSdFeNzYcJfzguU5-MkSFmKV1QAC_BEIkY5gk02xnKGdw2Xmpg8NbNIuhR6Q/exec';
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxXDdmQxXc3rYh5AWzNCs-nkim8L-1fP8YjWK7_w84b7P9cvGwWLNQjGtj2MLQ1A--_ew/exec';
 
 let remoteDatosCargados = false;
 let iaObsCache = {};

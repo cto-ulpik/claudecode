@@ -17,7 +17,7 @@ module.exports = {
           "https://script.google.com/macros/s/AKfycbwAnTCKxLUYJwb4tMNAAGxPsUIYO_FofertmW-FhXlCPGj5FoNw7pmUMmarK5RUJIQA/exec",
         GOOGLE_SHEETS_COMPRA_WEBHOOK_SECRET: "",
         GOOGLE_SHEETS_PULSO_WEBAPP_URL:
-          "https://script.google.com/macros/s/AKfycby7KF7hi4DSdFeNzYcJfzguU5-MkSFmKV1QAC_BEIkY5gk02xnKGdw2Xmpg8NbNIuhR6Q/exec",
+          "https://script.google.com/macros/s/AKfycbxXDdmQxXc3rYh5AWzNCs-nkim8L-1fP8YjWK7_w84b7P9cvGwWLNQjGtj2MLQ1A--_ew/exec",
       },
     },
   ],

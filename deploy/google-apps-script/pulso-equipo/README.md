@@ -11,7 +11,10 @@ Check-in semanal interno Ulpik.
 
 Fuente: [`Code.gs`](./Code.gs)
 
-Web App URL en `GOOGLE_SHEETS_PULSO_WEBAPP_URL` (`.env` / PM2) y hardcodeada en `public/pulso-equipo/app.js`.
+Web App URL (activa):  
+https://script.google.com/macros/s/AKfycbxXDdmQxXc3rYh5AWzNCs-nkim8L-1fP8YjWK7_w84b7P9cvGwWLNQjGtj2MLQ1A--_ew/exec
+
+También en `GOOGLE_SHEETS_PULSO_WEBAPP_URL` (`.env` / PM2) y hardcodeada en `public/pulso-equipo/app.js`.
 
 Desplegar como aplicación web: Ejecutar como **Yo**, acceso **Cualquier persona** (JSONP desde el navegador).
 
