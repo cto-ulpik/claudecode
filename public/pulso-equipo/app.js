@@ -339,7 +339,140 @@ function renderDashboard() {
     `).join('');
   }
 
+  renderSeguimientoSensibles(datos);
   cargarObservacionesIA(periodo, datos, promedio);
+}
+
+function followupField(d, camel, snake) {
+  const val = d[camel] ?? d[snake] ?? '';
+  return String(val || '').trim();
+}
+
+function renderFollowupComments(containerId, items, emptyIcon, emptyText, tagLabel) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (!items.length) {
+    el.innerHTML = `<div class="sf-empty"><div class="sf-empty-icon">${emptyIcon}</div><p>${emptyText}</p></div>`;
+    return;
+  }
+  el.innerHTML = items.slice(0, 8).map(d => {
+    const fecha = new Date(d.timestamp).toLocaleDateString('es-EC', { day: 'numeric', month: 'short' });
+    const metaExtra = d._metaExtra ? `<span class="sf-cat-pill">${d._metaExtra}</span>` : '';
+    return `<div class="sf-sugerencia">
+      ${tagLabel ? `<div class="sf-followup-tag">${tagLabel}</div>` : ''}
+      "${d._texto}"
+      <div class="sf-sugerencia-meta"><span>${d.nombre || 'Anónimo/a'}</span><span>·</span><span>${fecha}</span>${metaExtra}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderSeguimientoSensibles(datos) {
+  const motivos = datos
+    .map(d => ({
+      ...d,
+      _texto: followupField(d, 'motivoScore', 'motivo_score'),
+      _metaExtra: d.score != null ? `${d.score}/10` : ''
+    }))
+    .filter(d => d._texto.length > 2 && Number(d.score) <= 5)
+    .reverse();
+
+  const cargaComents = datos
+    .map(d => ({ ...d, _texto: followupField(d, 'cargaComentario', 'carga_comentario') }))
+    .filter(d => d._texto.length > 2)
+    .reverse();
+
+  const motComents = datos
+    .map(d => ({ ...d, _texto: followupField(d, 'motivacionComentario', 'motivacion_comentario') }))
+    .filter(d => d._texto.length > 2)
+    .reverse();
+
+  const deptLabels = {
+    Procesos: 'Procesos',
+    Tecnologia: 'Tecnología',
+    Educacion: 'Educación',
+    Finanzas: 'Finanzas',
+    comercial: 'Comercial',
+    legal: 'Legal'
+  };
+
+  const depts = datos
+    .map(d => {
+      const departamento = followupField(d, 'departamento', 'departamento');
+      const label = deptLabels[departamento] || departamento;
+      return {
+        ...d,
+        departamento,
+        _texto: label ? `Reportó falta de claridad en ${label}` : '',
+        _metaExtra: label || ''
+      };
+    })
+    .filter(d => d.departamento)
+    .reverse();
+
+  renderFollowupComments(
+    'sf-motivos-score',
+    motivos,
+    '😓',
+    'Sin motivos de calificación baja en este período.',
+    'Bienestar 1–5'
+  );
+  renderFollowupComments(
+    'sf-carga-comentarios',
+    cargaComents,
+    '😰',
+    'Sin comentarios de carga desbordante en este período.',
+    'Sostenibilidad'
+  );
+  renderFollowupComments(
+    'sf-mot-comentarios',
+    motComents,
+    '😔',
+    'Sin comentarios de desmotivación en este período.',
+    'Sostenibilidad'
+  );
+
+  const deptOrder = ['Procesos', 'Tecnologia', 'Educacion', 'Finanzas', 'comercial', 'legal'];
+  const deptCounts = {};
+  deptOrder.forEach(k => { deptCounts[k] = 0; });
+  depts.forEach(d => {
+    if (deptCounts[d.departamento] !== undefined) deptCounts[d.departamento]++;
+    else deptCounts[d.departamento] = (deptCounts[d.departamento] || 0) + 1;
+  });
+
+  const barsEl = document.getElementById('sf-departamentos-bars');
+  if (barsEl) {
+    const entries = Object.entries(deptCounts).filter(([, n]) => n > 0);
+    if (!entries.length) {
+      barsEl.innerHTML = '<div class="sf-empty"><div class="sf-empty-icon">🏢</div><p>Sin departamentos reportados por falta de claridad.</p></div>';
+    } else {
+      const totalDepts = entries.reduce((s, [, n]) => s + n, 0) || 1;
+      barsEl.innerHTML = entries
+        .sort((a, b) => b[1] - a[1])
+        .map(([key, n]) => {
+          const pct = Math.round((n / totalDepts) * 100);
+          const label = deptLabels[key] || key;
+          return `<div class="sf-bar-row">
+            <div class="sf-bar-meta"><span class="sf-bar-name">${label}</span><span class="sf-bar-pct">${n} · ${pct}%</span></div>
+            <div class="sf-bar-track"><div class="sf-bar-fill rojo" style="width:${pct}%"></div></div>
+          </div>`;
+        }).join('');
+    }
+  }
+
+  const listEl = document.getElementById('sf-departamentos-list');
+  if (listEl) {
+    if (!depts.length) {
+      listEl.innerHTML = '';
+    } else {
+      renderFollowupComments(
+        'sf-departamentos-list',
+        depts,
+        '❓',
+        '',
+        'No del todo'
+      );
+    }
+  }
 }
 
 function buildObsPayload(periodo, datos, promedio) {
