@@ -337,8 +337,8 @@ function renderDashboard() {
   }
 
   renderBarras('sf-carga-bars',
-    ['Manejable', 'Alta pero bien', 'Desbordante'],
-    ['verde', 'amarillo', 'rojo'],
+    ['Con poco trabajo', 'Manejable', 'Alta pero bien', 'Desbordante'],
+    ['verde', 'verde', 'amarillo', 'rojo'],
     datos, 'carga');
 
   renderBarras('sf-mot-bars',
@@ -407,7 +407,7 @@ function renderSeguimientoSensibles(datos) {
       _texto: followupField(d, 'motivoScore', 'motivo_score'),
       _metaExtra: d.score != null ? `${d.score}/10` : ''
     }))
-    .filter(d => d._texto.length > 2 && Number(d.score) <= 5)
+    .filter(d => d._texto.length > 2 && Number(d.score) <= 6)
     .reverse();
 
   const cargaComents = datos
@@ -447,8 +447,8 @@ function renderSeguimientoSensibles(datos) {
     'sf-motivos-score',
     motivos,
     '😓',
-    'Sin motivos de calificación baja en este período.',
-    'Bienestar 1–5'
+    'Sin comentarios de qué faltó para un 7 o más en este período.',
+    'Bienestar 1–6'
   );
   renderFollowupComments(
     'sf-carga-comentarios',
@@ -746,7 +746,7 @@ function setFollowupVisible(id, visible) {
 }
 
 function updateFollowups() {
-  setFollowupVisible('followup-score', selectedScore !== null && selectedScore <= 5);
+  setFollowupVisible('followup-score', selectedScore !== null && selectedScore <= 6);
   setFollowupVisible('followup-carga', selections.carga === 'Desbordante');
   setFollowupVisible('followup-claridad', selections.claridad === 'No del todo');
   setFollowupVisible('followup-mot', selections.mot === 'Desmotivado/a');
@@ -790,6 +790,8 @@ function feedbackLocal(respuesta) {
     tips.push('Con carga desbordante, conviene hablar con tu líder para repriorizar entregables urgentes.');
   } else if (respuesta.carga === 'Alta pero bien') {
     tips.push('La semana fue intensa: protege al menos un bloque de descanso sin reuniones.');
+  } else if (respuesta.carga === 'Con poco trabajo') {
+    tips.push('Si te sobró capacidad, es un buen momento para proponer mejoras o apoyar al equipo.');
   }
   if (respuesta.claridad === 'No del todo') {
     tips.push('Pide una conversación breve sobre expectativas y prioridades de tu rol.');
@@ -913,8 +915,8 @@ async function enviarFormulario() {
   const departamento = document.getElementById('sel-departamento')?.value || '';
   const motComentario = document.getElementById('inp-mot-comentario')?.value.trim() || '';
 
-  if (selectedScore <= 5 && motivoScore.length < 3) {
-    alert('Cuéntanos el motivo de tu calificación (pregunta 1).');
+  if (selectedScore <= 6 && motivoScore.length < 3) {
+    alert('Cuéntanos qué faltó para calificar con 7 o más (pregunta 1).');
     document.getElementById('inp-motivo-score')?.focus();
     return;
   }
@@ -947,7 +949,7 @@ async function enviarFormulario() {
     carga: selections.carga,
     claridad: selections.claridad,
     motivacion: selections.mot,
-    motivoScore: selectedScore <= 5 ? motivoScore : '',
+    motivoScore: selectedScore <= 6 ? motivoScore : '',
     cargaComentario: selections.carga === 'Desbordante' ? cargaComentario : '',
     departamento: selections.claridad === 'No del todo' ? departamento : '',
     motivacionComentario: selections.mot === 'Desmotivado/a' ? motComentario : '',

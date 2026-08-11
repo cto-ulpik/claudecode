@@ -8,7 +8,7 @@
 <link rel="apple-touch-icon" href="/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260731b">
+<link rel="stylesheet" href="styles.css?v=20260811">
 </head>
 <body>
 
@@ -40,14 +40,15 @@
         <div class="score-grid" id="score-grid"></div>
         <div class="score-labels"><span>Difícil 😓</span><span>Excelente 🌟</span></div>
         <div class="eq-followup hidden" id="followup-score">
-          <label class="eq-followup-label" for="inp-motivo-score">¿Cuál fue el motivo de esta calificación? Cuéntanos para ayudarte a mejorar</label>
-          <textarea id="inp-motivo-score" class="eq-textarea" rows="3" placeholder="Comparte el motivo de tu calificación…"></textarea>
+          <label class="eq-followup-label" for="inp-motivo-score">¿Qué faltó para que lo califiques con 7 o más?</label>
+          <textarea id="inp-motivo-score" class="eq-textarea" rows="3" placeholder="Cuéntanos qué habría hecho falta para llegar a 7 o más…"></textarea>
         </div>
       </div>
       <div class="eq-card">
         <div class="eq-q-num">02 — Carga de trabajo</div>
         <div class="eq-q-label">¿Cómo describes tu carga de trabajo esta semana?</div>
         <div class="option-row" id="carga-group">
+          <button type="button" class="opt-btn" data-val="Con poco trabajo" data-group="carga"><span class="opt-icon">🍃</span> Con poco trabajo — me sobró capacidad esta semana</button>
           <button type="button" class="opt-btn" data-val="Manejable" data-group="carga"><span class="opt-icon">😌</span> Manejable — fluí bien con mis tareas</button>
           <button type="button" class="opt-btn" data-val="Alta pero bien" data-group="carga"><span class="opt-icon">🔥</span> Alta pero bien — intensa pero lo logré</button>
           <button type="button" class="opt-btn" data-val="Desbordante" data-group="carga"><span class="opt-icon">😰</span> Desbordante — más de lo que puedo manejar</button>
@@ -207,7 +208,7 @@
 
     <div class="sf-2col">
       <div class="sf-panel">
-        <div class="sf-panel-title"><span class="sf-dot"></span>Motivos calificación baja (1–5)</div>
+        <div class="sf-panel-title"><span class="sf-dot"></span>Qué faltó para un 7 o más (1–6)</div>
         <div id="sf-motivos-score"></div>
       </div>
       <div class="sf-panel">
@@ -259,6 +260,6 @@
   </div>
 </div>
 
-<script src="app.js?v=20260731e"></script>
+<script src="app.js?v=20260811"></script>
 </body>
 </html>
