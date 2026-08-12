@@ -44,12 +44,13 @@ compraRouter.post("/", async (req, res) => {
     return;
   }
 
+  const facilidad = input.facilidad!;
   const payload: Record<string, unknown> = {
     action: "append-compra",
     email: input.email!.trim(),
     servicio: input.servicio!.trim(),
-    facilidad: input.facilidad,
-    facilidadMejora: input.facilidad < 10 ? (input.facilidadMejora || "").trim() : "",
+    facilidad,
+    facilidadMejora: facilidad < 10 ? (input.facilidadMejora || "").trim() : "",
     claridad: input.claridad,
     dificultad: input.dificultad!.trim(),
     atencion: input.atencion,
