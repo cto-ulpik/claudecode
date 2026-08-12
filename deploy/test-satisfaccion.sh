@@ -6,7 +6,7 @@
 set -euo pipefail
 
 BASE="${1:-https://ia.ulpik.com}"
-APPS_SCRIPT_URL="${GOOGLE_SHEETS_NPS_WEBAPP_URL:-https://script.google.com/macros/s/AKfycbzTU-aXouMJcdhu10goVd3RWpNwRDQkgq8jiJC6RNAFJRVGP4pQh6078zMTI925HsCr/exec}"
+APPS_SCRIPT_URL="${GOOGLE_SHEETS_NPS_WEBAPP_URL:-https://script.google.com/macros/s/AKfycbyjqz0pwRcUM7V1Seercw9oCJ2bC_7XmRaSzcQu8ecec5CODiFfBKSEv979b04L-Ofw/exec}"
 
 PAYLOAD='{"email":"test-satisfaccion@ulpik.com","asesor":"Esteban Maldonado","servicio":"SAS","nps":10,"claridad":9,"velocidad":8,"calidad":9,"satisfaccion":10,"comentario":"Prueba automatizada deploy/test-satisfaccion.sh","instagram":"","fecha_str":"2026-06-24","hora":"12:00","mes":"2026-06","ts":1719230000000}'
 
