@@ -33,6 +33,10 @@ function doGet(e) {
         sendTituloEmail(payload);
         return jsonOutput({ ok: true });
       }
+      if (payload.action === 'send-auth-email') {
+        sendAuthEmail(payload);
+        return jsonOutput({ ok: true });
+      }
       validatePayload(payload);
       appendSurveyRow(payload);
       return jsonOutput({ ok: true });
@@ -48,6 +52,10 @@ function doPost(e) {
     var payload = parsePayload(e);
     if (payload.action === 'send-titulo') {
       sendTituloEmail(payload);
+      return jsonOutput({ ok: true });
+    }
+    if (payload.action === 'send-auth-email') {
+      sendAuthEmail(payload);
       return jsonOutput({ ok: true });
     }
     validatePayload(payload);
@@ -91,10 +99,14 @@ function validatePayload(data) {
       throw new Error('Falta calificación: ' + key);
     }
   });
+  if (data.satisfaccion < 10 && String(data.satisfaccionMejora || data.satisfaccion_mejora || '').trim().length < 5) {
+    throw new Error('Falta comentario de satisfacción');
+  }
 }
 
 function appendSurveyRow(data) {
   var sheet = getSheet();
+  ensureSatisfaccionMejoraHeader_(sheet);
   var tz = Session.getScriptTimeZone() || 'America/Guayaquil';
   var marca = Utilities.formatDate(new Date(), tz, 'dd/MM/yyyy HH:mm:ss');
 
@@ -102,8 +114,12 @@ function appendSurveyRow(data) {
   if (!servicio || servicio === 'No especificado') servicio = 'N/A';
 
   var instagram = data.instagram || '';
+  var satisfaccionMejora = '';
+  if (Number(data.satisfaccion) < 10) {
+    satisfaccionMejora = String(data.satisfaccionMejora || data.satisfaccion_mejora || '').trim();
+  }
 
-  // Columnas A–K alineadas con "Respuestas de formulario 1"
+  // Columnas A–M alineadas con "Respuestas de formulario 1"
   sheet.appendRow([
     marca,                    // A Marca temporal
     data.email,               // B Correo
@@ -115,10 +131,23 @@ function appendSurveyRow(data) {
     data.satisfaccion,        // H Satisfacción final
     data.comentario || '',    // I Comentario / mejoras
     servicio,                 // J Servicio contratado
-    instagram                 // K Instagram (opcional)
+    instagram,                // K Instagram (opcional)
+    '',                       // L (sin uso por el webhook)
+    satisfaccionMejora        // M Qué faltó para el 10 (Satisfacción)
   ]);
 
   sendSurveyNotification(data, marca);
+}
+
+function ensureSatisfaccionMejoraHeader_(sheet) {
+  var headerL = sheet.getRange(1, 12);
+  if (!String(headerL.getValue() || '').trim()) {
+    headerL.setValue('(sin uso)');
+  }
+  var headerM = sheet.getRange(1, 13);
+  if (!String(headerM.getValue() || '').trim()) {
+    headerM.setValue('Qué faltó para el 10 (Satisfacción)');
+  }
 }
 
 function validateTituloPayload(data) {
@@ -156,6 +185,25 @@ function sendTituloEmail(data) {
   });
 }
 
+function sendAuthEmail(data) {
+  if (!data || !data.to || typeof data.to !== 'string') {
+    throw new Error('Falta destinatario');
+  }
+  if (!data.subject || typeof data.subject !== 'string') {
+    throw new Error('Falta asunto');
+  }
+  if (!data.body || typeof data.body !== 'string') {
+    throw new Error('Falta cuerpo');
+  }
+  MailApp.sendEmail({
+    to: data.to,
+    subject: data.subject,
+    body: data.body,
+    htmlBody: data.htmlBody || '',
+    name: 'Ulpik IA'
+  });
+}
+
 function sendSurveyNotification(data, marca) {
   try {
     var avg = ((data.nps + data.claridad + data.velocidad + data.calidad + data.satisfaccion) / 5).toFixed(1);
@@ -171,6 +219,9 @@ function sendSurveyNotification(data, marca) {
       'NPS: ' + data.nps + ' | Claridad: ' + data.claridad + ' | Velocidad: ' + data.velocidad +
       ' | Calidad: ' + data.calidad + ' | Satisfacción: ' + data.satisfaccion + '\n\n' +
       'Comentario:\n' + (data.comentario || '(sin comentario)') + '\n\n' +
+      (data.satisfaccionMejora || data.satisfaccion_mejora
+        ? 'Qué faltó para el 10 (satisfacción):\n' + String(data.satisfaccionMejora || data.satisfaccion_mejora).trim() + '\n\n'
+        : '') +
       'Enviar título de concesión (correo precargado):\n' + tituloUrl + '\n\n' +
       '— Encuesta NPS Ulpik (automático)';
 
@@ -249,10 +300,11 @@ function testAppendRow() {
     claridad: 9,
     velocidad: 8,
     calidad: 9,
-    satisfaccion: 10,
+    satisfaccion: 9,
+    satisfaccionMejora: 'Más seguimiento post-entrega',
     comentario: 'Prueba desde Apps Script',
     servicio: 'Registro de marca',
     instagram: '@ulpik_test'
   });
-  Logger.log('Fila de prueba agregada.');
+  Logger.log('Fila de prueba agregada — revisa columna M.');
 }

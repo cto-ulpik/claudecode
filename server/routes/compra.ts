@@ -7,6 +7,7 @@ type CompraBody = {
   email?: string;
   servicio?: string;
   facilidad?: number;
+  facilidadMejora?: string;
   claridad?: number;
   dificultad?: string;
   atencion?: number;
@@ -22,6 +23,9 @@ function validate(body: CompraBody): string | null {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Correo inválido";
   if (!body.servicio?.trim()) return "Falta servicio";
   if (!body.facilidad || body.facilidad < 1 || body.facilidad > 10) return "Falta facilidad";
+  if (body.facilidad < 10 && (body.facilidadMejora?.trim().length ?? 0) < 5) {
+    return "Falta comentario de facilidad";
+  }
   if (!body.claridad || body.claridad < 1 || body.claridad > 10) return "Falta claridad";
   if (!body.dificultad?.trim()) return "Falta dificultad";
   if (!body.atencion || body.atencion < 1 || body.atencion > 10) return "Falta atención";
@@ -45,6 +49,7 @@ compraRouter.post("/", async (req, res) => {
     email: input.email!.trim(),
     servicio: input.servicio!.trim(),
     facilidad: input.facilidad,
+    facilidadMejora: input.facilidad < 10 ? (input.facilidadMejora || "").trim() : "",
     claridad: input.claridad,
     dificultad: input.dificultad!.trim(),
     atencion: input.atencion,

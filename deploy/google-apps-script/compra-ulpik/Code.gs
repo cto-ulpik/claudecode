@@ -112,6 +112,7 @@ function parsePayload(e) {
 function appendCompraRow(payload) {
   validateCompraPayload(payload);
   var sheet = getSheet();
+  ensureFacilidadMejoraHeader_(sheet);
   var tz = Session.getScriptTimeZone() || 'America/Guayaquil';
   var now = new Date();
   var marca = Utilities.formatDate(now, tz, 'dd/MM/yyyy HH:mm:ss');
@@ -130,7 +131,8 @@ function appendCompraRow(payload) {
     '',
     String(payload.asesor || '').trim(),
     String(payload.mejora || '').trim(),
-    ''
+    '',
+    String(payload.facilidadMejora || payload.facilidad_mejora || '').trim()
   ];
 
   sheet.appendRow(row);
@@ -144,6 +146,9 @@ function validateCompraPayload(p) {
   }
   if (!String(p.servicio || '').trim()) throw new Error('Falta servicio');
   if (!numCol(p.facilidad)) throw new Error('Falta facilidad');
+  if (numCol(p.facilidad) < 10 && String(p.facilidadMejora || p.facilidad_mejora || '').trim().length < 5) {
+    throw new Error('Falta comentario de facilidad');
+  }
   if (!numCol(p.claridad)) throw new Error('Falta claridad');
   if (!String(p.dificultad || '').trim()) throw new Error('Falta dificultad');
   if (!numCol(p.atencion)) throw new Error('Falta atención');
@@ -220,7 +225,8 @@ function readSurveyData() {
       facturacion: String(r[10] || ''),
       asesor: String(r[11] || ''),
       comentario: String(r[12] || ''),
-      nota_interna: String(r[13] || '')
+      nota_interna: String(r[13] || ''),
+      facilidadMejora: String(r[14] || '')
     });
   }
   return rows;
@@ -260,6 +266,13 @@ function buildDebugReport() {
 function numCol(v) {
   var n = Number(v);
   return isNaN(n) ? 0 : n;
+}
+
+function ensureFacilidadMejoraHeader_(sheet) {
+  var cell = sheet.getRange(1, 15);
+  if (!String(cell.getValue() || '').trim()) {
+    cell.setValue('Qué faltó para el 10 (Facilidad)');
+  }
 }
 
 function getSheet() {

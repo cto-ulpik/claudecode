@@ -4,19 +4,21 @@ Guarda las respuestas de [ia.ulpik.com/satisfaccion](https://ia.ulpik.com/satisf
 
 ## Columnas que escribe el script
 
-| Col | Campo del Sheet |
-|-----|-----------------|
-| A | Marca temporal |
-| B | Dirección de correo electrónico |
-| C | Asesor |
-| D | Recomendación (NPS 1–10) |
-| E | Claridad |
-| F | Velocidad |
-| G | Calidad |
-| H | Satisfacción final |
-| I | Comentario / mejoras |
-| J | Servicio contratado |
-| K | Instagram |
+| Col | Campo del Sheet | Origen |
+|-----|-----------------|--------|
+| A | Marca temporal | Fecha/hora automática |
+| B | Dirección de correo electrónico | Email del cliente |
+| C | Asesor | Selector de asesor |
+| D | Recomendación (NPS 1–10) | Pregunta recomendación |
+| E | Claridad | Pregunta claridad |
+| F | Velocidad | Pregunta velocidad |
+| G | Calidad | Pregunta calidad atención |
+| H | Satisfacción final | Pregunta resultado final |
+| I | Comentario / mejoras | “Si pudieras cambiar algo…” |
+| J | Servicio contratado | Selector de servicio |
+| K | Instagram | Campo opcional @usuario |
+| L | *(sin uso)* | El webhook la deja vacía |
+| M | Qué faltó para el 10 (Satisfacción) | Solo si satisfacción &lt; 10 |
 
 ## Instalación
 
@@ -66,7 +68,9 @@ Webhook activo: [verificar GET](https://script.google.com/macros/s/AKfycbzTU-aXo
 ```bash
 curl -X POST "$GOOGLE_SHEETS_NPS_WEBAPP_URL" \
   -H 'Content-Type: application/json' \
-  -d '{"email":"test@ulpik.com","asesor":"Esteban Maldonado","nps":10,"claridad":9,"velocidad":8,"calidad":9,"satisfaccion":10,"comentario":"Prueba curl","servicio":"SAS","instagram":""}'
+  -d '{"email":"test@ulpik.com","asesor":"Esteban Maldonado","nps":10,"claridad":9,"velocidad":8,"calidad":9,"satisfaccion":9,"satisfaccionMejora":"Más seguimiento post-entrega","comentario":"Prueba curl","servicio":"SAS","instagram":""}'
 ```
 
-Debe aparecer una fila nueva en el Sheet y la respuesta `{"ok":true}`.
+Debe aparecer una fila nueva en el Sheet (columna M con el texto de satisfacción) y la respuesta `{"ok":true}`.
+
+Si satisfacción es 10, `satisfaccionMejora` puede ir vacío y M queda en blanco.

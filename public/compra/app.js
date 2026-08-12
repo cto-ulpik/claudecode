@@ -140,6 +140,7 @@ const fd = {
   email: '',
   servicio: '',
   facilidad: 0,
+  facilidadMejora: '',
   claridad: 0,
   dificultad: '',
   atencion: 0,
@@ -183,9 +184,18 @@ function showToast(msg, t = 'ok') {
   setTimeout(() => el.classList.remove('show'), 3500);
 }
 
+function facilidadMejoraOk() {
+  if (fd.facilidad === 10) return true;
+  if (fd.facilidad > 0 && fd.facilidad < 10) {
+    return String(fd.facilidadMejora || '').trim().length >= 5;
+  }
+  return true;
+}
+
 function isDone(f) {
   const v = fd[f];
   if (f === 'email') return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  if (f === 'facilidad') return fd.facilidad > 0 && facilidadMejoraOk();
   if (typeof v === 'number') return v > 0;
   return String(v || '').length > 0;
 }
@@ -227,6 +237,30 @@ function onMI() {
   upP();
 }
 
+function toggleFacilidadMejora() {
+  const box = document.getElementById('fu-facilidad');
+  const inp = document.getElementById('f-facilidad-mejora');
+  if (!box || !inp) return;
+  const need = fd.facilidad > 0 && fd.facilidad < 10;
+  box.classList.toggle('show', need);
+  if (!need) {
+    box.classList.remove('bad');
+    if (fd.facilidad === 10) {
+      inp.value = '';
+      fd.facilidadMejora = '';
+    }
+  }
+}
+
+function onFacilidadMejora() {
+  const t = document.getElementById('f-facilidad-mejora');
+  fd.facilidadMejora = t ? t.value : '';
+  const box = document.getElementById('fu-facilidad');
+  if (box) box.classList.toggle('bad', fd.facilidad > 0 && fd.facilidad < 10 && fd.facilidadMejora.trim().length < 5);
+  markD('s-facilidad', isDone('facilidad') ? fd.facilidad : '');
+  upP();
+}
+
 function validate() {
   const checks = [
     { f: 'email', s: 's-email' },
@@ -246,10 +280,15 @@ function validate() {
     const el = document.getElementById(s);
     if (!isDone(f)) {
       el.classList.add('bad');
+      if (f === 'facilidad') {
+        const fu = document.getElementById('fu-facilidad');
+        if (fu) fu.classList.toggle('bad', fd.facilidad > 0 && !facilidadMejoraOk());
+      }
       if (!first) first = el;
       ok = false;
     } else {
       el.classList.remove('bad');
+      if (f === 'facilidad') document.getElementById('fu-facilidad')?.classList.remove('bad');
     }
   });
   if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -422,7 +461,8 @@ window.addEventListener('load', () => {
         e.preventDefault();
         fd[sc.f] = i;
         wrap.querySelectorAll('.sbtn').forEach((x, j) => x.classList.toggle('sel', j + 1 === i));
-        markD('s-' + sc.f, i);
+        if (sc.f === 'facilidad') toggleFacilidadMejora();
+        markD('s-' + sc.f, sc.f === 'facilidad' ? (isDone('facilidad') ? i : '') : i);
         const sm = document.getElementById(sc.msg);
         if (sm) {
           sm.textContent = sc.f === 'nps' ? NPS[i] || i + '/10' : i + '/10';
@@ -447,6 +487,7 @@ window.addEventListener('load', () => {
 
   document.getElementById('f-email').addEventListener('input', onEI);
   document.getElementById('f-mejora').addEventListener('input', onMI);
+  document.getElementById('f-facilidad-mejora').addEventListener('input', onFacilidadMejora);
   document.getElementById('btn-sub').addEventListener('click', submitForm);
   document.getElementById('lb-close').addEventListener('click', closeLightbox);
   document.getElementById('lb').addEventListener('click', (e) => {

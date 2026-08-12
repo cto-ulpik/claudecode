@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20250716">
+<link rel="stylesheet" href="styles.css?v=20260812">
 </head>
 <body>
 <div class="toast" id="toast"></div>
@@ -105,6 +105,11 @@
       <div class="stp-top"><div class="stp-num" id="n-satisfaccion">8</div><span class="stp-tag">Satisfacción final</span><span class="req-star">*</span></div>
       <h3>¿Qué tan satisfecho quedaste con el resultado final del servicio?</h3>
       <div class="scale-w"><div class="scale-lbls"><span>No cumplió expectativas</span><span>Las superó por completo</span></div><div class="scale-btns" id="sc-satisfaccion"></div><div class="score-msg" id="sm-satisfaccion">Selecciona del 1 al 10</div></div>
+      <div class="followup" id="fu-satisfaccion">
+        <label class="followup-label" for="f-satisfaccion-mejora">¿Qué podríamos hacer para que su calificación de satisfacción sea un 10? ¿Qué nos faltó?</label>
+        <textarea class="tinp" id="f-satisfaccion-mejora" placeholder="Cuéntanos qué habría hecho falta para llegar al 10…" rows="3" maxlength="500" oninput="onSatisfaccionMejoraInput()"></textarea>
+        <div class="ferr">⚠ Cuéntanos qué faltó para llegar al 10 (mínimo 5 caracteres).</div>
+      </div>
       <div class="ferr">⚠ Selecciona una puntuación.</div>
     </div>
     <div class="divider-label">TU OPINIÓN</div>
@@ -149,6 +154,6 @@
     <p>© Ulpik Business Tech · Registro de marcas y constitución de empresas en Ecuador</p>
   </div>
 </div><!-- /fw -->
-<script src="app.js?v=20250713"></script>
+<script src="app.js?v=20260812"></script>
 </body>
 </html>

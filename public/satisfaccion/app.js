@@ -23,6 +23,7 @@ function getTituloUrl(){
 
 const sel={asesor:null,servicio:null};
 const scv={nps:null,claridad:null,velocidad:null,calidad:null,satisfaccion:null};
+let satisfaccionMejora='';
 
 const SMSG={1:'😞 Muy malo',2:'😟 Malo',3:'😕 Por debajo de lo esperado',4:'😐 Regular',5:'🤔 Podría mejorar',6:'🙂 Aceptable',7:'😊 Bien',8:'😄 Muy bien',9:'🌟 Excelente',10:'🏆 ¡Superó todas las expectativas!'};
 
@@ -62,6 +63,32 @@ function selectOpt(opt){
   if(stp){stp.classList.remove('bad');stp.classList.add('done');markDone(stp);}
   updateProgress();
 }
+function satisfaccionMejoraOk(){
+  if(scv.satisfaccion===10)return true;
+  if(scv.satisfaccion&&scv.satisfaccion<10)return satisfaccionMejora.trim().length>=5;
+  return true;
+}
+function toggleSatisfaccionMejora(){
+  const box=document.getElementById('fu-satisfaccion');
+  const inp=document.getElementById('f-satisfaccion-mejora');
+  if(!box||!inp)return;
+  const need=scv.satisfaccion&&scv.satisfaccion<10;
+  box.classList.toggle('show',!!need);
+  if(!need){
+    box.classList.remove('bad');
+    if(scv.satisfaccion===10){inp.value='';satisfaccionMejora='';}
+  }
+}
+function onSatisfaccionMejoraInput(){
+  const t=document.getElementById('f-satisfaccion-mejora');
+  satisfaccionMejora=t?t.value:'';
+  const box=document.getElementById('fu-satisfaccion');
+  if(box)box.classList.toggle('bad',!!(scv.satisfaccion&&scv.satisfaccion<10&&satisfaccionMejora.trim().length<5));
+  const stp=document.getElementById('s-satisfaccion');
+  if(scv.satisfaccion&&satisfaccionMejoraOk()){stp.classList.remove('bad');stp.classList.add('done');markDone(stp);}
+  else if(scv.satisfaccion){resetStp(stp,8);stp.classList.remove('bad');}
+  updateProgress();
+}
 function buildScales(){
   SCALES.forEach(id=>{
     const wrap=document.getElementById('sc-'+id);
@@ -75,7 +102,13 @@ function buildScales(){
           scv[sid]=val;
           w.querySelectorAll('.sbtn').forEach((x,j)=>x.classList.toggle('sel',j+1===val));
           const stp=document.getElementById('s-'+sid);
-          stp.classList.remove('bad');stp.classList.add('done');markDone(stp);
+          if(sid==='satisfaccion'){
+            toggleSatisfaccionMejora();
+            if(satisfaccionMejoraOk()){stp.classList.remove('bad');stp.classList.add('done');markDone(stp);}
+            else{resetStp(stp,8);stp.classList.remove('bad');}
+          }else{
+            stp.classList.remove('bad');stp.classList.add('done');markDone(stp);
+          }
           const sm=document.getElementById('sm-'+sid);
           sm.textContent=SMSG[val]||val+'/10';sm.className='score-msg set';
           updateProgress();
@@ -112,7 +145,11 @@ function updateProgress(){
   let done=0;
   if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('f-email').value.trim()))done++;
   if(sel.asesor)done++;
-  SCALES.forEach(f=>{if(scv[f])done++;});
+  SCALES.forEach(f=>{
+    if(!scv[f])return;
+    if(f==='satisfaccion'&&!satisfaccionMejoraOk())return;
+    done++;
+  });
   if(document.getElementById('f-comentario').value.trim().length>=5)done++;
   const total=8;
   const pct=Math.min(Math.round(done/total*100),100);
@@ -131,10 +168,18 @@ function showToast(msg,t='ok'){
 async function submitForm(){
   let valid=true;
   document.querySelectorAll('.stp.bad').forEach(s=>s.classList.remove('bad'));
+  document.getElementById('fu-satisfaccion')?.classList.remove('bad');
   const email=document.getElementById('f-email').value.trim();
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){document.getElementById('s-email').classList.add('bad');valid=false;}
   if(!sel.asesor){document.getElementById('s-asesor').classList.add('bad');valid=false;}
-  SCALES.forEach(f=>{if(!scv[f]){document.getElementById('s-'+f).classList.add('bad');valid=false;}});
+  SCALES.forEach(f=>{
+    if(!scv[f]){document.getElementById('s-'+f).classList.add('bad');valid=false;return;}
+    if(f==='satisfaccion'&&!satisfaccionMejoraOk()){
+      document.getElementById('s-satisfaccion').classList.add('bad');
+      document.getElementById('fu-satisfaccion')?.classList.add('bad');
+      valid=false;
+    }
+  });
   const com=document.getElementById('f-comentario').value.trim();
   if(com.length<5){document.getElementById('s-comentario').classList.add('bad');valid=false;}
   if(!valid){
@@ -160,6 +205,7 @@ async function submitForm(){
     nps:scv.nps,claridad:scv.claridad,velocidad:scv.velocidad,
     calidad:scv.calidad,satisfaccion:scv.satisfaccion,
     comentario:com,
+    satisfaccionMejora:scv.satisfaccion<10?satisfaccionMejora.trim():'',
     instagram:document.getElementById('f-instagram').value.trim(),
     ts:Date.now()
   };
@@ -182,6 +228,7 @@ function sendNotif(e,tUrl){
   const txt=`Nueva encuesta NPS — ${e.fecha_str} ${e.hora} | ${e.email} | Asesor: ${e.asesor} | Servicio: ${e.servicio}
 Promedio: ${avg5}/10 | NPS:${e.nps} Claridad:${e.claridad} Velocidad:${e.velocidad} Calidad:${e.calidad} Satisfacción:${e.satisfaccion}
 Comentario: "${e.comentario}"
+${e.satisfaccionMejora?'Qué faltó para 10 (satisfacción): "'+e.satisfaccionMejora+'"':''}
 ${critico?'⚠️ CRÍTICO — contacto en 24h':''}
 Enviar título: ${tituloLink}
 ${tUrl?'PDF título cliente: '+tUrl:'Sin PDF de título en storage'}`;

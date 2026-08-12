@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260728c">
+<link rel="stylesheet" href="styles.css?v=20260811">
 </head>
 <body>
 <div class="toast" id="toast"></div>
@@ -60,6 +60,11 @@
     <div class="stp-top"><div class="stp-num">3</div><span class="stp-tag">Facilidad</span><span class="req-star">*</span></div>
     <h3>¿Qué tan fácil fue contratar el servicio con Ulpik?</h3>
     <div class="scale-w"><div class="scale-lbls"><span>Muy difícil</span><span>Muy fácil</span></div><div class="scale-btns" id="sc-facilidad"></div><div class="score-msg" id="sm-facilidad">Selecciona del 1 al 10</div></div>
+    <div class="followup" id="fu-facilidad">
+      <label class="followup-label" for="f-facilidad-mejora">¿Qué podemos hacer para alcanzar el 10? Cuéntanos en qué podemos mejorar.</label>
+      <textarea class="tinp" id="f-facilidad-mejora" placeholder="Indícanos qué habría hecho falta para llegar al 10…" rows="3" maxlength="500"></textarea>
+      <div class="ferr">⚠ Cuéntanos qué podemos mejorar para llegar al 10 (mínimo 5 caracteres).</div>
+    </div>
     <div class="ferr">⚠ Selecciona una puntuación.</div>
   </div>
   <div class="stp" id="s-claridad">
@@ -176,6 +181,6 @@
   </button>
 </div>
 
-<script src="app.js?v=20260722"></script>
+<script src="app.js?v=20260811"></script>
 </body>
 </html>
