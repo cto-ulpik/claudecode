@@ -594,6 +594,23 @@ async function processPdf(file) {
   }
 }
 
+/** Fuerza https fuera de localhost: un redirect 301 convertiría el POST en GET. */
+function sendEmailEndpoint() {
+  const url = new URL('/api/send-mailer/send-email', location.href);
+  const isLocal = ['localhost', '127.0.0.1'].includes(url.hostname);
+  if (url.protocol === 'http:' && !isLocal) url.protocol = 'https:';
+  return url.toString();
+}
+
+async function readApiResponse(response) {
+  const raw = await response.text();
+  try {
+    return { data: raw ? JSON.parse(raw) : {}, raw };
+  } catch {
+    return { data: {}, raw };
+  }
+}
+
 async function sendEmail() {
   const recipient = document.getElementById('recipient').value.trim();
   const subject = document.getElementById('subject').value.trim();
@@ -611,10 +628,11 @@ async function sendEmail() {
   button.disabled = true;
   button.textContent = 'Enviando…';
   try {
-    const response = await fetch('/api/send-mailer/send-email', {
+    const response = await fetch(sendEmailEndpoint(), {
       method: 'POST',
       credentials: 'same-origin',
-      headers: { 'Content-Type': 'application/json' },
+      cache: 'no-store',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({
         to: recipient,
         stage: selectedStage,
@@ -629,8 +647,13 @@ async function sendEmail() {
         fields: Object.fromEntries(activeTemplate().fields.map((key) => [key, fieldValue(key)])),
       }),
     });
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.error || 'No se pudo enviar el correo');
+    const { data, raw } = await readApiResponse(response);
+    if (!response.ok) {
+      if (/Cannot GET/i.test(raw)) {
+        throw new Error('La API recibió un GET (hubo una redirección). Abre la página con https:// y vuelve a intentar.');
+      }
+      throw new Error(data.error || `No se pudo enviar el correo (HTTP ${response.status})`);
+    }
     const extras = Array.isArray(data.extras) ? data.extras : [];
     const extraNote = extras.length
       ? ` · adjuntos: ${extras.join(', ')}`

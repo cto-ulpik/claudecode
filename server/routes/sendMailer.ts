@@ -105,6 +105,25 @@ function collectExtraAttachments(input: SendMailerBody): ExtraAttachment[] {
   return extras;
 }
 
+sendMailerRouter.get("/health", (_req, res) => {
+  const available = Object.entries(STATIC_ATTACHMENTS).reduce<Record<string, boolean>>(
+    (acc, [key, def]) => {
+      acc[key] = def.relativePaths.some((relative) => fs.existsSync(path.join(ROOT, relative)));
+      return acc;
+    },
+    {},
+  );
+  res.json({ ok: true, attachments: available });
+});
+
+/** Un 301 (p. ej. http→https) degrada el POST a GET; se responde con la causa. */
+sendMailerRouter.get("/send-email", (_req, res) => {
+  res.status(405).json({
+    error:
+      "Este endpoint solo acepta POST. Si llegaste aquí por un GET, hubo una redirección: usa https://ia.ulpik.com/send-mailer.",
+  });
+});
+
 sendMailerRouter.post("/send-email", async (req, res) => {
   const input = req.body as SendMailerBody;
   const to = input.to?.trim() ?? "";
