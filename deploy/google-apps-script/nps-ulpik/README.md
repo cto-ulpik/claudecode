@@ -95,7 +95,7 @@ curl -X POST "$GOOGLE_SHEETS_NPS_WEBAPP_URL" \
   }'
 ```
 
-Respuesta esperada: `{"ok":true,"version":"2026-08-14-send-mailer-no-asesor"}`.
+Respuesta esperada: `{"ok":true,"version":"2026-08-14-send-mailer-attachments"}`.
 
 ## Auth interna (`send-auth-email`)
 

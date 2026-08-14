@@ -11,7 +11,7 @@
 
 var SHEET_NAME = 'Respuestas de formulario 1';
 var NOTIFY_EMAIL = 'churchill@ulpik.com,legal5@ulpik.com';
-var SCRIPT_VERSION = '2026-08-14-send-mailer-no-asesor';
+var SCRIPT_VERSION = '2026-08-14-send-mailer-attachments';
 
 function doGet(e) {
   e = e || {};
@@ -35,8 +35,12 @@ function doGet(e) {
         return jsonOutput({ ok: true });
       }
       if (payload.action === 'send-stage-email') {
-        sendStageEmail(payload);
-        return jsonOutput({ ok: true, version: SCRIPT_VERSION });
+        var stageResultGet = sendStageEmail(payload);
+        return jsonOutput({
+          ok: true,
+          version: SCRIPT_VERSION,
+          attachments: stageResultGet && stageResultGet.attachments ? stageResultGet.attachments : 1
+        });
       }
       if (payload.action === 'send-auth-email') {
         sendAuthEmail(payload);
@@ -60,8 +64,12 @@ function doPost(e) {
       return jsonOutput({ ok: true });
     }
     if (payload.action === 'send-stage-email') {
-      sendStageEmail(payload);
-      return jsonOutput({ ok: true, version: SCRIPT_VERSION });
+      var stageResultPost = sendStageEmail(payload);
+      return jsonOutput({
+        ok: true,
+        version: SCRIPT_VERSION,
+        attachments: stageResultPost && stageResultPost.attachments ? stageResultPost.attachments : 1
+      });
     }
     if (payload.action === 'send-auth-email') {
       sendAuthEmail(payload);
@@ -236,6 +244,8 @@ function sendStageEmail(data) {
     name: 'Ulpik',
     attachments: attachments
   });
+
+  return { attachments: attachments.length };
 }
 
 function sendAuthEmail(data) {

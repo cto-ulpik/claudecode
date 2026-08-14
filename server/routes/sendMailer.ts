@@ -1,13 +1,13 @@
 import { Router } from "express";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { postToAppsScriptPostOnly } from "../lib/appsScriptPost.js";
 
 export const sendMailerRouter = Router();
 
-type ExtraAttachment = {
-  filename?: string;
-  mimeType?: string;
-  base64?: string;
-};
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT = path.join(__dirname, "..", "..");
 
 type SendMailerBody = {
   to?: string;
@@ -19,7 +19,14 @@ type SendMailerBody = {
   pdfBase64?: string;
   pdfFilename?: string;
   fields?: Record<string, string>;
-  extraAttachments?: ExtraAttachment[];
+  attachGarantia?: boolean;
+  attachCronologia?: boolean;
+};
+
+type ExtraAttachment = {
+  filename: string;
+  mimeType: string;
+  base64: string;
 };
 
 const STAGES = new Set([
@@ -30,6 +37,25 @@ const STAGES = new Set([
   "resolucion",
   "titulo",
 ]);
+
+const STATIC_ATTACHMENTS = {
+  garantia: {
+    filename: "garantia.jpg",
+    mimeType: "image/jpeg",
+    relativePaths: [
+      path.join("public", "send-mailer", "img", "garantia.jpg"),
+      path.join("dist", "send-mailer", "img", "garantia.jpg"),
+    ],
+  },
+  cronologia: {
+    filename: "cronologia.jpg",
+    mimeType: "image/jpeg",
+    relativePaths: [
+      path.join("public", "send-mailer", "img", "cronologia.jpg"),
+      path.join("dist", "send-mailer", "img", "cronologia.jpg"),
+    ],
+  },
+} as const;
 
 /**
  * El Apps Script antiguo no conoce `send-stage-email` y valida el payload como
@@ -54,20 +80,29 @@ function bodyToSafeHtml(body: string): string {
     .replace(/\n/g, "<br>");
 }
 
-function normalizeExtraAttachments(input: ExtraAttachment[] | undefined): Array<{
-  filename: string;
-  mimeType: string;
-  base64: string;
-}> {
-  if (!Array.isArray(input)) return [];
-  return input
-    .map((item, index) => ({
-      filename: item.filename?.trim() || `adjunto-${index + 1}`,
-      mimeType: item.mimeType?.trim() || "application/octet-stream",
-      base64: item.base64?.trim() || "",
-    }))
-    .filter((item) => item.base64.length > 0)
-    .slice(0, 5);
+function loadStaticAttachment(
+  key: keyof typeof STATIC_ATTACHMENTS,
+): ExtraAttachment {
+  const def = STATIC_ATTACHMENTS[key];
+  for (const relative of def.relativePaths) {
+    const absolute = path.join(ROOT, relative);
+    if (!fs.existsSync(absolute)) continue;
+    const base64 = fs.readFileSync(absolute).toString("base64");
+    if (!base64) continue;
+    return {
+      filename: def.filename,
+      mimeType: def.mimeType,
+      base64,
+    };
+  }
+  throw new Error(`No se encontró el archivo de adjunto: ${def.filename}`);
+}
+
+function collectExtraAttachments(input: SendMailerBody): ExtraAttachment[] {
+  const extras: ExtraAttachment[] = [];
+  if (input.attachGarantia) extras.push(loadStaticAttachment("garantia"));
+  if (input.attachCronologia) extras.push(loadStaticAttachment("cronologia"));
+  return extras;
 }
 
 sendMailerRouter.post("/send-email", async (req, res) => {
@@ -77,7 +112,6 @@ sendMailerRouter.post("/send-email", async (req, res) => {
   const subject = input.subject?.trim() ?? "";
   const body = input.body?.trim() ?? "";
   const pdfBase64 = input.pdfBase64?.trim() ?? "";
-  const extraAttachments = normalizeExtraAttachments(input.extraAttachments);
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
     res.status(400).json({ error: "Correo destinatario inválido." });
@@ -97,6 +131,16 @@ sendMailerRouter.post("/send-email", async (req, res) => {
   }
   if (!pdfBase64) {
     res.status(400).json({ error: "Falta el PDF adjunto." });
+    return;
+  }
+
+  let extraAttachments: ExtraAttachment[] = [];
+  try {
+    extraAttachments = collectExtraAttachments(input);
+  } catch (error) {
+    res.status(500).json({
+      error: error instanceof Error ? error.message : "No se pudieron cargar los adjuntos.",
+    });
     return;
   }
 
@@ -120,10 +164,23 @@ sendMailerRouter.post("/send-email", async (req, res) => {
   try {
     const url = process.env.GOOGLE_SHEETS_NPS_WEBAPP_URL?.trim();
     if (!url) throw new Error("Webhook de Apps Script no configurado.");
+    console.log(
+      `[send-mailer] enviando a ${to} etapa=${stage} extras=${extraAttachments.map((a) => a.filename).join(",") || "(ninguno)"}`,
+    );
     const text = await postToAppsScriptPostOnly(url, payload);
-    const result = JSON.parse(text) as { ok?: boolean; error?: string };
+    const result = JSON.parse(text) as {
+      ok?: boolean;
+      error?: string;
+      attachments?: number;
+      version?: string;
+    };
     if (result.ok === false) throw new Error(result.error || "Apps Script rechazó el correo.");
-    res.json({ ok: true });
+    res.json({
+      ok: true,
+      attachments: Number(result.attachments) || 1 + extraAttachments.length,
+      extras: extraAttachments.map((item) => item.filename),
+      version: result.version || "",
+    });
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
     console.warn("[send-mailer] send-email:", detail);

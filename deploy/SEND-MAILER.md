@@ -90,7 +90,11 @@ muestran para revisión antes de enviar.
 El título cita su resolución de origen, por eso se detecta antes que el PDF de
 resolución favorable.
 
-En la sección **Datos email** se pueden marcar adjuntos opcionales:
+En la sección **Datos email** se pueden marcar adjuntos opcionales. El **servidor**
+los lee desde disco y los envía a Apps Script (no dependen del navegador):
 
 - `public/send-mailer/img/garantia.jpg`
 - `public/send-mailer/img/cronologia.jpg`
+
+Tras marcarlos, el toast de éxito debe listar esos nombres. Si el Apps Script
+está desactualizado, republica con versión `2026-08-14-send-mailer-attachments`.

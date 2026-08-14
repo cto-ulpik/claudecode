@@ -594,41 +594,13 @@ async function processPdf(file) {
   }
 }
 
-async function fileToBase64(url) {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`No se pudo cargar ${url}`);
-  const blob = await response.blob();
-  const dataUrl = await new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-  const [meta, base64] = String(dataUrl).split(',');
-  const mime = (meta.match(/data:([^;]+)/) || [])[1] || blob.type || 'application/octet-stream';
-  return { base64, mime, filename: url.split('/').pop() };
-}
-
-async function buildExtraAttachments() {
-  const extras = [];
-  if (document.getElementById('attach-garantia')?.checked) {
-    extras.push(await fileToBase64('/send-mailer/img/garantia.jpg'));
-  }
-  if (document.getElementById('attach-cronologia')?.checked) {
-    extras.push(await fileToBase64('/send-mailer/img/cronologia.jpg'));
-  }
-  return extras.map((item) => ({
-    filename: item.filename,
-    mimeType: item.mime,
-    base64: item.base64,
-  }));
-}
-
 async function sendEmail() {
   const recipient = document.getElementById('recipient').value.trim();
   const subject = document.getElementById('subject').value.trim();
   const body = document.getElementById('body-preview').value.trim();
   const missing = activeTemplate().fields.filter((key) => !fieldValue(key));
+  const attachGarantia = !!document.getElementById('attach-garantia')?.checked;
+  const attachCronologia = !!document.getElementById('attach-cronologia')?.checked;
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)) return showToast('Ingresa un destinatario válido', 'er');
   if (!pdfDataUrl) return showToast('Adjunta el PDF de respaldo', 'er');
@@ -639,7 +611,6 @@ async function sendEmail() {
   button.disabled = true;
   button.textContent = 'Enviando…';
   try {
-    const extraAttachments = await buildExtraAttachments();
     const response = await fetch('/api/send-mailer/send-email', {
       method: 'POST',
       credentials: 'same-origin',
@@ -653,13 +624,18 @@ async function sendEmail() {
         htmlBody: body.split('\n').map((line) => line || '<br>').join('<br>'),
         pdfBase64: pdfDataUrl.split(',')[1],
         pdfFilename: pdfFileName || 'documento-senadi.pdf',
-        extraAttachments,
+        attachGarantia,
+        attachCronologia,
         fields: Object.fromEntries(activeTemplate().fields.map((key) => [key, fieldValue(key)])),
       }),
     });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(data.error || 'No se pudo enviar el correo');
-    showToast(`Correo enviado a ${recipient}`);
+    const extras = Array.isArray(data.extras) ? data.extras : [];
+    const extraNote = extras.length
+      ? ` · adjuntos: ${extras.join(', ')}`
+      : (attachGarantia || attachCronologia ? ' · sin adjuntos extra' : '');
+    showToast(`Correo enviado a ${recipient}${extraNote}`);
   } catch (error) {
     showToast(error.message || 'Error al enviar', 'er');
   } finally {
