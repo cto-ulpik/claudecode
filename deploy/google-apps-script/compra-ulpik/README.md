@@ -30,11 +30,12 @@ La respuesta de `GET ?data=` **debe** incluir `"row":{...}`. Si solo devuelve `"
 
 `https://ia.ulpik.com/compra` → `POST /api/compra` → Apps Script → nueva fila en el Sheet.
 
-## Columnas nuevas
+## Columna P (recomendación)
 
-| Col | Header | Campo JSON | Condición |
-|-----|--------|------------|-----------|
-| O | Qué faltó para el 10 (Facilidad) | `facilidadMejora` | facilidad &lt; 10 |
-| P | Qué faltó para el 10 (Recomendación) | `npsMejora` | nps &lt; 10 |
+Si NPS / recomendación es menor a 10, el cliente debe indicar qué faltó para llegar al 10.
 
-Redesplegar `Code.gs` para que se escriban esas columnas. Las filas antiguas quedan con O/P vacías.
+| Col | Header | Campo JSON |
+|-----|--------|------------|
+| P | Qué faltó para el 10 (Recomendación) | `npsMejora` |
+
+La columna O queda vacía (ya no se pide comentario de facilidad). Redesplegar `Code.gs` con nueva versión.

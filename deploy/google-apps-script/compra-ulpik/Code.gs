@@ -112,29 +112,28 @@ function parsePayload(e) {
 function appendCompraRow(payload) {
   validateCompraPayload(payload);
   var sheet = getSheet();
-  ensureFacilidadMejoraHeader_(sheet);
   ensureNpsMejoraHeader_(sheet);
   var tz = Session.getScriptTimeZone() || 'America/Guayaquil';
   var now = new Date();
   var marca = Utilities.formatDate(now, tz, 'dd/MM/yyyy HH:mm:ss');
 
   var row = [
-    marca,
-    String(payload.email || '').trim(),
-    String(payload.servicio || '').trim(),
-    numCol(payload.facilidad),
-    numCol(payload.claridad),
-    String(payload.dificultad || '').trim(),
-    numCol(payload.atencion),
-    String(payload.acomp || '').trim(),
-    numCol(payload.nps),
-    '',
-    '',
-    String(payload.asesor || '').trim(),
-    String(payload.mejora || '').trim(),
-    '',
-    String(payload.facilidadMejora || payload.facilidad_mejora || '').trim(),
-    String(payload.npsMejora || payload.nps_mejora || '').trim()
+    marca,                                                           // A
+    String(payload.email || '').trim(),                              // B
+    String(payload.servicio || '').trim(),                           // C
+    numCol(payload.facilidad),                                       // D
+    numCol(payload.claridad),                                        // E
+    String(payload.dificultad || '').trim(),                         // F
+    numCol(payload.atencion),                                        // G
+    String(payload.acomp || '').trim(),                              // H
+    numCol(payload.nps),                                             // I
+    '',                                                              // J
+    '',                                                              // K
+    String(payload.asesor || '').trim(),                             // L
+    String(payload.mejora || '').trim(),                             // M
+    '',                                                              // N
+    '',                                                              // O (antes facilidadMejora; ya no se usa)
+    String(payload.npsMejora || payload.nps_mejora || '').trim()     // P ← recomendación < 10
   ];
 
   sheet.appendRow(row);
@@ -148,9 +147,6 @@ function validateCompraPayload(p) {
   }
   if (!String(p.servicio || '').trim()) throw new Error('Falta servicio');
   if (!numCol(p.facilidad)) throw new Error('Falta facilidad');
-  if (numCol(p.facilidad) < 10 && String(p.facilidadMejora || p.facilidad_mejora || '').trim().length < 5) {
-    throw new Error('Falta comentario de facilidad');
-  }
   if (!numCol(p.claridad)) throw new Error('Falta claridad');
   if (!String(p.dificultad || '').trim()) throw new Error('Falta dificultad');
   if (!numCol(p.atencion)) throw new Error('Falta atención');
@@ -272,13 +268,6 @@ function buildDebugReport() {
 function numCol(v) {
   var n = Number(v);
   return isNaN(n) ? 0 : n;
-}
-
-function ensureFacilidadMejoraHeader_(sheet) {
-  var cell = sheet.getRange(1, 15);
-  if (!String(cell.getValue() || '').trim()) {
-    cell.setValue('Qué faltó para el 10 (Facilidad)');
-  }
 }
 
 function ensureNpsMejoraHeader_(sheet) {

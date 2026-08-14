@@ -7,7 +7,6 @@ type CompraBody = {
   email?: string;
   servicio?: string;
   facilidad?: number;
-  facilidadMejora?: string;
   claridad?: number;
   dificultad?: string;
   atencion?: number;
@@ -24,9 +23,6 @@ function validate(body: CompraBody): string | null {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Correo inválido";
   if (!body.servicio?.trim()) return "Falta servicio";
   if (!body.facilidad || body.facilidad < 1 || body.facilidad > 10) return "Falta facilidad";
-  if (body.facilidad < 10 && (body.facilidadMejora?.trim().length ?? 0) < 5) {
-    return "Falta comentario de facilidad";
-  }
   if (!body.claridad || body.claridad < 1 || body.claridad > 10) return "Falta claridad";
   if (!body.dificultad?.trim()) return "Falta dificultad";
   if (!body.atencion || body.atencion < 1 || body.atencion > 10) return "Falta atención";
@@ -48,14 +44,12 @@ compraRouter.post("/", async (req, res) => {
     return;
   }
 
-  const facilidad = input.facilidad!;
   const nps = input.nps!;
   const payload: Record<string, unknown> = {
     action: "append-compra",
     email: input.email!.trim(),
     servicio: input.servicio!.trim(),
-    facilidad,
-    facilidadMejora: facilidad < 10 ? (input.facilidadMejora || "").trim() : "",
+    facilidad: input.facilidad,
     claridad: input.claridad,
     dificultad: input.dificultad!.trim(),
     atencion: input.atencion,
