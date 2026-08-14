@@ -11,7 +11,7 @@
 
 var SHEET_NAME = 'Respuestas de formulario 1';
 var NOTIFY_EMAIL = 'churchill@ulpik.com,legal5@ulpik.com';
-var SCRIPT_VERSION = '2026-08-14-send-mailer';
+var SCRIPT_VERSION = '2026-08-14-send-mailer-extras';
 
 function doGet(e) {
   e = e || {};
@@ -220,7 +220,16 @@ function sendStageEmail(data) {
   validateStageEmailPayload(data);
   var bytes = Utilities.base64Decode(data.pdfBase64);
   var filename = data.pdfFilename || 'documento-senadi.pdf';
-  var blob = Utilities.newBlob(bytes, 'application/pdf', filename);
+  var attachments = [Utilities.newBlob(bytes, 'application/pdf', filename)];
+
+  var extras = Array.isArray(data.extraAttachments) ? data.extraAttachments : [];
+  for (var i = 0; i < extras.length; i++) {
+    var item = extras[i] || {};
+    if (!item.base64) continue;
+    var mime = item.mimeType || 'application/octet-stream';
+    var extraName = item.filename || ('adjunto-' + (i + 1));
+    attachments.push(Utilities.newBlob(Utilities.base64Decode(item.base64), mime, extraName));
+  }
 
   MailApp.sendEmail({
     to: data.to,
@@ -228,7 +237,7 @@ function sendStageEmail(data) {
     body: data.body,
     htmlBody: data.htmlBody || '',
     name: 'Ulpik',
-    attachments: [blob]
+    attachments: attachments
   });
 }
 

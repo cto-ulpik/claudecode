@@ -3,6 +3,12 @@ import { postToAppsScriptPostOnly } from "../lib/appsScriptPost.js";
 
 export const sendMailerRouter = Router();
 
+type ExtraAttachment = {
+  filename?: string;
+  mimeType?: string;
+  base64?: string;
+};
+
 type SendMailerBody = {
   to?: string;
   stage?: string;
@@ -13,6 +19,7 @@ type SendMailerBody = {
   pdfBase64?: string;
   pdfFilename?: string;
   fields?: Record<string, string>;
+  extraAttachments?: ExtraAttachment[];
 };
 
 const STAGES = new Set([
@@ -47,6 +54,22 @@ function bodyToSafeHtml(body: string): string {
     .replace(/\n/g, "<br>");
 }
 
+function normalizeExtraAttachments(input: ExtraAttachment[] | undefined): Array<{
+  filename: string;
+  mimeType: string;
+  base64: string;
+}> {
+  if (!Array.isArray(input)) return [];
+  return input
+    .map((item, index) => ({
+      filename: item.filename?.trim() || `adjunto-${index + 1}`,
+      mimeType: item.mimeType?.trim() || "application/octet-stream",
+      base64: item.base64?.trim() || "",
+    }))
+    .filter((item) => item.base64.length > 0)
+    .slice(0, 5);
+}
+
 sendMailerRouter.post("/send-email", async (req, res) => {
   const input = req.body as SendMailerBody;
   const to = input.to?.trim() ?? "";
@@ -55,6 +78,7 @@ sendMailerRouter.post("/send-email", async (req, res) => {
   const body = input.body?.trim() ?? "";
   const pdfBase64 = input.pdfBase64?.trim() ?? "";
   const advisor = input.fields?.asesor?.trim() ?? "";
+  const extraAttachments = normalizeExtraAttachments(input.extraAttachments);
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
     res.status(400).json({ error: "Correo destinatario inválido." });
@@ -91,6 +115,7 @@ sendMailerRouter.post("/send-email", async (req, res) => {
     htmlBody: bodyToSafeHtml(body),
     pdfBase64,
     pdfFilename: input.pdfFilename?.trim() || "documento-senadi.pdf",
+    extraAttachments,
     fields: input.fields ?? {},
   };
 

@@ -103,3 +103,8 @@ resolución favorable.
 El asesor se intenta obtener del PDF (`ABOGADO A CARGO` /
 `Abogado patrocinador` o nombres conocidos). Si falta, el envío se bloquea hasta
 completarlo manualmente.
+
+En la sección **Datos email** se pueden marcar adjuntos opcionales:
+
+- `public/send-mailer/img/garantia.jpg`
+- `public/send-mailer/img/cronologia.jpg`

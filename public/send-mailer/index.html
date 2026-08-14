@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260814g">
+<link rel="stylesheet" href="styles.css?v=20260814h">
 </head>
 <body>
 <div class="toast" id="toast"></div>
@@ -53,8 +53,8 @@
     </section>
 
     <section class="stp">
-      <div class="stp-top"><span class="stp-num">3</span><span class="stp-tag">Destinatario</span></div>
-      <h2>Datos de envío</h2>
+      <div class="stp-top"><span class="stp-num">3</span><span class="stp-tag">Datos email</span></div>
+      <h2>Datos email</h2>
       <label class="field">
         <span>Correo del cliente *</span>
         <input class="input" type="email" id="recipient" placeholder="cliente@ejemplo.com">
@@ -63,6 +63,17 @@
         <span>Asunto *</span>
         <input class="input" type="text" id="subject">
       </label>
+      <div class="attach-checks">
+        <span class="attach-label">Adjuntar también</span>
+        <label class="check">
+          <input type="checkbox" id="attach-garantia">
+          <span>Garantía Luz Verde</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" id="attach-cronologia">
+          <span>Cronología del registro</span>
+        </label>
+      </div>
     </section>
   </div>
 
@@ -98,6 +109,6 @@ if (window.pdfjsLib) {
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
 </script>
-<script src="app.js?v=20260814g"></script>
+<script src="app.js?v=20260814h"></script>
 </body>
 </html>
