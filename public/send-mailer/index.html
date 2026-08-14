@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ulpik · Correos por etapa</title>
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=20260814">
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<nav class="nav"><img src="/titulo/logo.png" alt="Ulpik"></nav>
+
+<main class="wrap">
+  <header class="hero">
+    <div class="hero-watermark"><img src="/titulo/logo.png" alt=""></div>
+    <div class="hero-inner">
+      <div class="hero-pre">Seguimiento de marcas</div>
+      <h1>Envío de correos por etapa</h1>
+      <p>Adjunta el documento, revisa los datos extraídos y envía al cliente la actualización correspondiente.</p>
+      <div class="hero-badge">📄 Los campos se intentan obtener automáticamente del texto del PDF</div>
+    </div>
+  </header>
+
+  <section class="stp">
+    <div class="stp-top"><span class="stp-num">1</span><span class="stp-tag">Etapa</span></div>
+    <h2>Selecciona el avance del trámite</h2>
+    <div class="stage-grid" id="stage-grid"></div>
+    <div class="variant hidden" id="opposition-wrap">
+      <label for="opposition-type">Resultado de la etapa de Gaceta</label>
+      <select class="input" id="opposition-type">
+        <option value="sin">Sin oposición</option>
+        <option value="con">Con oposición</option>
+      </select>
+    </div>
+  </section>
+
+  <div class="columns">
+    <section class="stp">
+      <div class="stp-top"><span class="stp-num">2</span><span class="stp-tag">Documento</span></div>
+      <h2>PDF de respaldo</h2>
+      <p class="hint">PDF con texto seleccionable · Máx. 10 MB</p>
+      <div class="pdf-upload" id="pdf-drop">
+        <input type="file" id="pdf-file" accept=".pdf,application/pdf" hidden>
+        <div class="pdf-icon">📄</div>
+        <div class="pdf-title" id="pdf-title">Arrastra el PDF o haz clic</div>
+        <div class="pdf-sub" id="pdf-sub">Se extraerán los campos disponibles</div>
+      </div>
+      <div class="extract-status" id="extract-status">Esperando documento</div>
+    </section>
+
+    <section class="stp">
+      <div class="stp-top"><span class="stp-num">3</span><span class="stp-tag">Destinatario</span></div>
+      <h2>Datos de envío</h2>
+      <label class="field">
+        <span>Correo del cliente *</span>
+        <input class="input" type="email" id="recipient" placeholder="cliente@ejemplo.com">
+      </label>
+      <label class="field">
+        <span>Asunto *</span>
+        <input class="input" type="text" id="subject">
+      </label>
+    </section>
+  </div>
+
+  <section class="stp">
+    <div class="stp-top"><span class="stp-num">4</span><span class="stp-tag">Datos extraídos</span></div>
+    <div class="section-head">
+      <div>
+        <h2>Campos del documento</h2>
+        <p class="hint">Se completan desde el PDF. Revisa los resultados antes de enviar.</p>
+      </div>
+      <button type="button" class="btn-secondary" id="btn-reextract">↻ Extraer de nuevo</button>
+    </div>
+    <div class="fields-grid" id="fields-grid"></div>
+    <div class="warning hidden" id="advisor-warning">No se pudo reconocer el asesor en el PDF. Revisa el texto extraído del documento.</div>
+  </section>
+
+  <section class="stp">
+    <div class="stp-top"><span class="stp-num">5</span><span class="stp-tag">Vista previa</span></div>
+    <h2>Mensaje que recibirá el cliente</h2>
+    <p class="hint">Puedes editar el texto final antes de enviarlo.</p>
+    <textarea class="preview" id="body-preview" rows="22"></textarea>
+  </section>
+
+  <div class="actions">
+    <button type="button" class="btn-secondary" id="btn-copy">Copiar mensaje</button>
+    <button type="button" class="btn-primary" id="btn-send">✉️ Enviar correo con PDF</button>
+  </div>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+if (window.pdfjsLib) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+</script>
+<script src="app.js?v=20260814"></script>
+</body>
+</html>

@@ -9,6 +9,36 @@
   gap: 0.5rem;
 }
 
+.app-shell__user {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted, #9a939e);
+  text-align: center;
+  padding: 0 0.25rem;
+}
+
+.app-shell__link {
+  border-radius: 999px;
+  border: 1px solid var(--card-border, rgba(255, 255, 255, 0.12));
+  background: var(--bg-elevated, #16141a);
+  color: var(--text, #f2f0f7);
+  font-family: var(--sans, system-ui, sans-serif);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 0.55rem 0.85rem;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.app-shell__link:hover {
+  border-color: var(--accent, #c9a227);
+}
+
 .logout-btn {
   border-radius: 999px;
   border: 1px solid var(--card-border, rgba(255, 255, 255, 0.12));
@@ -31,6 +61,7 @@
   outline-offset: 2px;
 }
 
-html[data-theme="light"] .logout-btn {
+html[data-theme="light"] .logout-btn,
+html[data-theme="light"] .app-shell__link {
   box-shadow: 0 10px 28px rgba(26, 23, 20, 0.12);
 }

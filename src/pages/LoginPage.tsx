@@ -1,7 +1,7 @@
-import { FormEvent, useState } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { APP_LOGIN_PASS, APP_LOGIN_USER } from "../auth/config";
-import { isAuthenticated, loginSession } from "../auth/session";
+import { FormEvent, useEffect, useState } from "react";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { login } from "../auth/api";
+import { getCachedUser, refreshAuth, setCachedSession } from "../auth/session";
 import { ThemeFab } from "../components/ThemeFab";
 import "../styles/login.css";
 
@@ -10,23 +10,44 @@ export function LoginPage() {
   const location = useLocation();
   const fromPath = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname;
 
-  const [user, setUser] = useState("");
+  const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const [authed, setAuthed] = useState(Boolean(getCachedUser()));
 
-  if (isAuthenticated()) {
+  useEffect(() => {
+    let cancelled = false;
+    refreshAuth()
+      .then((user) => {
+        if (!cancelled) setAuthed(Boolean(user));
+      })
+      .finally(() => {
+        if (!cancelled) setChecking(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (!checking && authed) {
     return <Navigate to="/" replace />;
   }
 
-  function onSubmit(event: FormEvent) {
+  async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setError("");
-    if (user.trim() === APP_LOGIN_USER && pass === APP_LOGIN_PASS) {
-      loginSession();
+    setLoading(true);
+    try {
+      const data = await login(email.trim(), pass);
+      setCachedSession(data.user, data.expiresAt);
       navigate(fromPath && fromPath !== "/login" ? fromPath : "/", { replace: true });
-      return;
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "No se pudo iniciar sesión");
+    } finally {
+      setLoading(false);
     }
-    setError("Usuario o contraseña incorrectos.");
   }
 
   return (
@@ -36,16 +57,16 @@ export function LoginPage() {
       </div>
       <div className="login-card">
         <h1 className="login-card__title">Acceso</h1>
-        <p className="login-card__lede">Introduce credenciales para continuar.</p>
+        <p className="login-card__lede">Ingresa con tu correo Ulpik autorizado.</p>
         <form className="login-form" onSubmit={onSubmit}>
-          <label htmlFor="login-user">Usuario</label>
+          <label htmlFor="login-email">Correo</label>
           <input
-            id="login-user"
-            name="user"
-            type="text"
+            id="login-email"
+            name="email"
+            type="email"
             autoComplete="username"
-            value={user}
-            onChange={(e) => setUser(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
           <label htmlFor="login-pass">Contraseña</label>
@@ -59,10 +80,13 @@ export function LoginPage() {
             required
           />
           {error ? <p className="login-form__error">{error}</p> : null}
-          <button type="submit" className="login-form__submit">
-            Entrar
+          <button type="submit" className="login-form__submit" disabled={loading || checking}>
+            {loading ? "Entrando…" : "Entrar"}
           </button>
         </form>
+        <p className="login-card__links">
+          <Link to="/olvide-contrasena">Olvidé mi contraseña</Link>
+        </p>
       </div>
     </div>
   );

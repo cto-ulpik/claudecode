@@ -11,12 +11,20 @@ import { UlpikTituloPage } from "./pages/UlpikTituloPage";
 import { UlpikCompraPage } from "./pages/UlpikCompraPage";
 import { UlpikPulsoEquipoPage } from "./pages/UlpikPulsoEquipoPage";
 import { UlpikEstadoMarcaPage } from "./pages/UlpikEstadoMarcaPage";
+import { UlpikSendMailerPage } from "./pages/UlpikSendMailerPage";
 import { LoginPage } from "./pages/LoginPage";
+import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
+import { ResetPasswordPage } from "./pages/ResetPasswordPage";
+import { ChangePasswordPage } from "./pages/ChangePasswordPage";
 
 export function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/olvide-contrasena" element={<ForgotPasswordPage />} />
+      <Route path="/olvide-contrasena/" element={<ForgotPasswordPage />} />
+      <Route path="/restablecer-contrasena" element={<ResetPasswordPage />} />
+      <Route path="/restablecer-contrasena/" element={<ResetPasswordPage />} />
       <Route path="/satisfaccion" element={<UlpikSatisfaccionPage />} />
       <Route path="/satisfaccion/" element={<UlpikSatisfaccionPage />} />
       <Route path="/titulo" element={<UlpikTituloPage />} />
@@ -38,8 +46,12 @@ export function App() {
           <Route path="/kpi-cto/" element={<KpiCtoPage />} />
           <Route path="/correo-empatico" element={<EmpathicEmailPage />} />
           <Route path="/correo-empatico/" element={<EmpathicEmailPage />} />
+          <Route path="/send-mailer" element={<UlpikSendMailerPage />} />
+          <Route path="/send-mailer/" element={<UlpikSendMailerPage />} />
           <Route path="/visualizador-dashboards" element={<DashboardViewerPage />} />
           <Route path="/visualizador-dashboards/" element={<DashboardViewerPage />} />
+          <Route path="/cuenta/contrasena" element={<ChangePasswordPage />} />
+          <Route path="/cuenta/contrasena/" element={<ChangePasswordPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Route>

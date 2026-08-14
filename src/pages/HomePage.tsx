@@ -44,6 +44,16 @@ export function HomePage() {
           </p>
         </Link>
 
+        <Link className="home__card" to="/send-mailer" role="listitem">
+          <span className="home__card-icon" aria-hidden="true">
+            ◫
+          </span>
+          <h2 className="home__card-title">Send Mailer</h2>
+          <p className="home__card-desc">
+            Extrae datos de documentos SENADI y envía el correo correspondiente a cada etapa del registro.
+          </p>
+        </Link>
+
         <Link className="home__card" to="/visualizador-dashboards" role="listitem">
           <span className="home__card-icon" aria-hidden="true">
             ▣

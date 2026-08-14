@@ -11,6 +11,7 @@
 
 var SHEET_NAME = 'Respuestas de formulario 1';
 var NOTIFY_EMAIL = 'churchill@ulpik.com,legal5@ulpik.com';
+var SCRIPT_VERSION = '2026-08-14-send-mailer';
 
 function doGet(e) {
   e = e || {};
@@ -33,6 +34,10 @@ function doGet(e) {
         sendTituloEmail(payload);
         return jsonOutput({ ok: true });
       }
+      if (payload.action === 'send-stage-email') {
+        sendStageEmail(payload);
+        return jsonOutput({ ok: true, version: SCRIPT_VERSION });
+      }
       if (payload.action === 'send-auth-email') {
         sendAuthEmail(payload);
         return jsonOutput({ ok: true });
@@ -44,7 +49,7 @@ function doGet(e) {
       return jsonOutput({ ok: false, error: String(err.message || err) });
     }
   }
-  return jsonOutput({ ok: true, message: 'Webhook NPS ULPIK activo' });
+  return jsonOutput({ ok: true, message: 'Webhook NPS ULPIK activo', version: SCRIPT_VERSION });
 }
 
 function doPost(e) {
@@ -53,6 +58,10 @@ function doPost(e) {
     if (payload.action === 'send-titulo') {
       sendTituloEmail(payload);
       return jsonOutput({ ok: true });
+    }
+    if (payload.action === 'send-stage-email') {
+      sendStageEmail(payload);
+      return jsonOutput({ ok: true, version: SCRIPT_VERSION });
     }
     if (payload.action === 'send-auth-email') {
       sendAuthEmail(payload);
@@ -178,6 +187,44 @@ function sendTituloEmail(data) {
   MailApp.sendEmail({
     to: data.to,
     subject: subject,
+    body: data.body,
+    htmlBody: data.htmlBody || '',
+    name: 'Ulpik',
+    attachments: [blob]
+  });
+}
+
+function validateStageEmailPayload(data) {
+  var validStages = ['busqueda', 'inicio', 'publicacion', 'fin_gaceta', 'resolucion', 'titulo'];
+  if (!data.to || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.to)) {
+    throw new Error('Correo destinatario inválido');
+  }
+  if (validStages.indexOf(String(data.stage || '')) === -1) {
+    throw new Error('Etapa inválida');
+  }
+  if (!data.subject || typeof data.subject !== 'string') {
+    throw new Error('Falta asunto');
+  }
+  if (!data.body || typeof data.body !== 'string') {
+    throw new Error('Falta cuerpo');
+  }
+  if (!data.pdfBase64 || typeof data.pdfBase64 !== 'string') {
+    throw new Error('Falta PDF');
+  }
+  if (!data.fields || !String(data.fields.asesor || '').trim()) {
+    throw new Error('No se identificó el asesor en el PDF');
+  }
+}
+
+function sendStageEmail(data) {
+  validateStageEmailPayload(data);
+  var bytes = Utilities.base64Decode(data.pdfBase64);
+  var filename = data.pdfFilename || 'documento-senadi.pdf';
+  var blob = Utilities.newBlob(bytes, 'application/pdf', filename);
+
+  MailApp.sendEmail({
+    to: data.to,
+    subject: data.subject,
     body: data.body,
     htmlBody: data.htmlBody || '',
     name: 'Ulpik',

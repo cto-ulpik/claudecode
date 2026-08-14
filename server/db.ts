@@ -2,6 +2,7 @@ import Database from "better-sqlite3";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { ensureAuthTables } from "./lib/authSeed.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const defaultDbPath = path.join(__dirname, "..", "data", "dashboards.db");
@@ -43,6 +44,7 @@ export function getDb(): Database.Database {
     );
     CREATE INDEX IF NOT EXISTS idx_survey_responses_created ON survey_responses(created_at DESC);
   `);
+  ensureAuthTables(db);
   return db;
 }
 

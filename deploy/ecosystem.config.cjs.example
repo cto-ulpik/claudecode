@@ -18,6 +18,9 @@ module.exports = {
         GOOGLE_SHEETS_COMPRA_WEBHOOK_SECRET: "",
         GOOGLE_SHEETS_PULSO_WEBAPP_URL:
           "https://script.google.com/macros/s/AKfycbxXDdmQxXc3rYh5AWzNCs-nkim8L-1fP8YjWK7_w84b7P9cvGwWLNQjGtj2MLQ1A--_ew/exec",
+        AUTH_INITIAL_PASSWORD: "ulpik@2026.",
+        APP_BASE_URL: "https://ia.ulpik.com",
+        AUTH_COOKIE_SECURE: "1",
       },
     },
   ],

@@ -74,3 +74,29 @@ curl -X POST "$GOOGLE_SHEETS_NPS_WEBAPP_URL" \
 Debe aparecer una fila nueva en el Sheet (columna M con el texto de satisfacción) y la respuesta `{"ok":true}`.
 
 Si satisfacción es 10, `satisfaccionMejora` puede ir vacío y M queda en blanco.
+
+## Send Mailer (`send-stage-email`)
+
+Usado por la herramienta interna `/send-mailer` (requiere login en ia.ulpik.com).
+
+```bash
+curl -X POST "$GOOGLE_SHEETS_NPS_WEBAPP_URL" \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "action":"send-stage-email",
+    "to":"cliente@ejemplo.com",
+    "stage":"busqueda",
+    "subject":"Prueba",
+    "body":"Cuerpo plano",
+    "htmlBody":"<p>Cuerpo HTML</p>",
+    "pdfBase64":"...",
+    "pdfFilename":"informe.pdf",
+    "fields":{"asesor":"Esteban Maldonado","marca":"MARCA TEST"}
+  }'
+```
+
+Respuesta esperada: `{"ok":true,"version":"2026-08-14-send-mailer"}`.
+
+## Auth interna (`send-auth-email`)
+
+Enlace de restablecimiento de contraseña para `/olvide-contrasena`. Ver `deploy/AUTH.md`.
