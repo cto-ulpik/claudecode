@@ -113,6 +113,7 @@ function appendCompraRow(payload) {
   validateCompraPayload(payload);
   var sheet = getSheet();
   ensureFacilidadMejoraHeader_(sheet);
+  ensureNpsMejoraHeader_(sheet);
   var tz = Session.getScriptTimeZone() || 'America/Guayaquil';
   var now = new Date();
   var marca = Utilities.formatDate(now, tz, 'dd/MM/yyyy HH:mm:ss');
@@ -132,7 +133,8 @@ function appendCompraRow(payload) {
     String(payload.asesor || '').trim(),
     String(payload.mejora || '').trim(),
     '',
-    String(payload.facilidadMejora || payload.facilidad_mejora || '').trim()
+    String(payload.facilidadMejora || payload.facilidad_mejora || '').trim(),
+    String(payload.npsMejora || payload.nps_mejora || '').trim()
   ];
 
   sheet.appendRow(row);
@@ -154,6 +156,9 @@ function validateCompraPayload(p) {
   if (!numCol(p.atencion)) throw new Error('Falta atención');
   if (!String(p.acomp || '').trim()) throw new Error('Falta acompañamiento');
   if (!numCol(p.nps)) throw new Error('Falta recomendación');
+  if (numCol(p.nps) < 10 && String(p.npsMejora || p.nps_mejora || '').trim().length < 5) {
+    throw new Error('Falta comentario de recomendación');
+  }
   if (!String(p.asesor || '').trim()) throw new Error('Falta asesor');
   if (String(p.mejora || '').trim().length < 5) throw new Error('Falta comentario de mejora');
 }
@@ -226,7 +231,8 @@ function readSurveyData() {
       asesor: String(r[11] || ''),
       comentario: String(r[12] || ''),
       nota_interna: String(r[13] || ''),
-      facilidadMejora: String(r[14] || '')
+      facilidadMejora: String(r[14] || ''),
+      npsMejora: String(r[15] || '')
     });
   }
   return rows;
@@ -272,6 +278,13 @@ function ensureFacilidadMejoraHeader_(sheet) {
   var cell = sheet.getRange(1, 15);
   if (!String(cell.getValue() || '').trim()) {
     cell.setValue('Qué faltó para el 10 (Facilidad)');
+  }
+}
+
+function ensureNpsMejoraHeader_(sheet) {
+  var cell = sheet.getRange(1, 16);
+  if (!String(cell.getValue() || '').trim()) {
+    cell.setValue('Qué faltó para el 10 (Recomendación)');
   }
 }
 

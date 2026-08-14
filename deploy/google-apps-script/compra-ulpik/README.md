@@ -30,12 +30,11 @@ La respuesta de `GET ?data=` **debe** incluir `"row":{...}`. Si solo devuelve `"
 
 `https://ia.ulpik.com/compra` → `POST /api/compra` → Apps Script → nueva fila en el Sheet.
 
-## Columna nueva (O)
+## Columnas nuevas
 
-Si facilidad es menor a 10, el cliente debe indicar qué faltó para llegar al 10.
+| Col | Header | Campo JSON | Condición |
+|-----|--------|------------|-----------|
+| O | Qué faltó para el 10 (Facilidad) | `facilidadMejora` | facilidad &lt; 10 |
+| P | Qué faltó para el 10 (Recomendación) | `npsMejora` | nps &lt; 10 |
 
-| Col | Header | Campo JSON |
-|-----|--------|------------|
-| O | Qué faltó para el 10 (Facilidad) | `facilidadMejora` |
-
-Redesplegar `Code.gs` para que se escriba esa columna. Las filas antiguas quedan con O vacía.
+Redesplegar `Code.gs` para que se escriban esas columnas. Las filas antiguas quedan con O/P vacías.

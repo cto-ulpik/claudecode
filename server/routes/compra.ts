@@ -13,6 +13,7 @@ type CompraBody = {
   atencion?: number;
   acomp?: string;
   nps?: number;
+  npsMejora?: string;
   asesor?: string;
   mejora?: string;
   ts?: string;
@@ -31,6 +32,9 @@ function validate(body: CompraBody): string | null {
   if (!body.atencion || body.atencion < 1 || body.atencion > 10) return "Falta atención";
   if (!body.acomp?.trim()) return "Falta acompañamiento";
   if (!body.nps || body.nps < 1 || body.nps > 10) return "Falta recomendación";
+  if (body.nps < 10 && (body.npsMejora?.trim().length ?? 0) < 5) {
+    return "Falta comentario de recomendación";
+  }
   if (!body.asesor?.trim()) return "Falta asesor";
   if ((body.mejora?.trim().length ?? 0) < 5) return "Falta comentario de mejora";
   return null;
@@ -45,6 +49,7 @@ compraRouter.post("/", async (req, res) => {
   }
 
   const facilidad = input.facilidad!;
+  const nps = input.nps!;
   const payload: Record<string, unknown> = {
     action: "append-compra",
     email: input.email!.trim(),
@@ -55,7 +60,8 @@ compraRouter.post("/", async (req, res) => {
     dificultad: input.dificultad!.trim(),
     atencion: input.atencion,
     acomp: input.acomp!.trim(),
-    nps: input.nps,
+    nps,
+    npsMejora: nps < 10 ? (input.npsMejora || "").trim() : "",
     asesor: input.asesor!.trim(),
     mejora: input.mejora!.trim(),
     ts: input.ts,
