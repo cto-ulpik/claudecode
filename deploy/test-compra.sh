@@ -5,9 +5,9 @@
 
 set -euo pipefail
 BASE="${1:-http://127.0.0.1:3001}"
-APPS_SCRIPT_URL="${GOOGLE_SHEETS_COMPRA_WEBAPP_URL:-https://script.google.com/macros/s/AKfycbwAnTCKxLUYJwb4tMNAAGxPsUIYO_FofertmW-FhXlCPGj5FoNw7pmUMmarK5RUJIQA/exec}"
+APPS_SCRIPT_URL="${GOOGLE_SHEETS_COMPRA_WEBAPP_URL:-https://script.google.com/macros/s/AKfycbzcVAk_FTVu_gy6Zfe597ElY5s86wfNcoPoAhbbHIvAS7eT3-ngk-o_MBcYozLCsV-B/exec}"
 
-PAYLOAD='{"action":"append-compra","email":"test-compra@ulpik.com","servicio":"Registro de marca","facilidad":10,"claridad":9,"dificultad":"Ninguna, todo fue claro","atencion":10,"acomp":"Sí, totalmente","nps":10,"asesor":"Martín Coello (Martín)","mejora":"Prueba deploy/test-compra.sh","ts":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'"}'
+PAYLOAD='{"action":"append-compra","email":"test-compra@ulpik.com","servicio":"Registro de marca","facilidad":10,"claridad":9,"dificultad":"Ninguna, todo fue claro","atencion":10,"acomp":"Sí, totalmente","nps":9,"npsMejora":"Más claridad en tiempos","asesor":"Martín Coello (Martín)","mejora":"Prueba deploy/test-compra.sh","ts":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'"}'
 
 echo "== Apps Script GET (health) =="
 curl -sS "$APPS_SCRIPT_URL"

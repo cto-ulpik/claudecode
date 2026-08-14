@@ -15,7 +15,7 @@ Pestaña: **Respuestas de formulario 1**
 5. Copia la URL `/exec` y configúrala en el servidor:
 
 ```bash
-GOOGLE_SHEETS_COMPRA_WEBAPP_URL=https://script.google.com/macros/s/AKfycbwAnTCKxLUYJwb4tMNAAGxPsUIYO_FofertmW-FhXlCPGj5FoNw7pmUMmarK5RUJIQA/exec
+GOOGLE_SHEETS_COMPRA_WEBAPP_URL=https://script.google.com/macros/s/AKfycbzcVAk_FTVu_gy6Zfe597ElY5s86wfNcoPoAhbbHIvAS7eT3-ngk-o_MBcYozLCsV-B/exec
 ```
 
 ## Verificar escritura
@@ -24,7 +24,14 @@ GOOGLE_SHEETS_COMPRA_WEBAPP_URL=https://script.google.com/macros/s/AKfycbwAnTCKx
 ./deploy/test-compra.sh
 ```
 
-La respuesta de `GET ?data=` **debe** incluir `"row":{...}`. Si solo devuelve `"message":"Encuesta proceso de compra ULPIK activa"`, el despliegue está desactualizado y **no guarda filas**.
+La respuesta de `GET ?data=` **debe** incluir `"row":{...}` con `"colP"` y `"version":"2026-08-13-col-P"`. Si solo devuelve `"message":"Encuesta proceso de compra ULPIK activa"`, el despliegue está desactualizado y **no guarda filas**.
+
+Verificar versión:
+
+```bash
+curl -sL "$GOOGLE_SHEETS_COMPRA_WEBAPP_URL"
+# Debe mostrar: "version":"2026-08-13-col-P"
+```
 
 ## Frontend
 

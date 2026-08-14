@@ -12,13 +12,13 @@
  *   - Ejecutar como: Yo
  *   - Quién tiene acceso: Cualquier persona
  *
- * Verificar URL /exec → debe incluir "version":"2026-06-26-write"
+ * Verificar URL /exec → debe incluir "version":"2026-08-13-col-P"
  */
 
 var SHEET_NAME = 'Respuestas de formulario 1';
 var SHEET_NAME_ALT = 'Form_Responses';
 var WEBHOOK_SECRET = '';
-var SCRIPT_VERSION = '2026-06-26-write';
+var SCRIPT_VERSION = '2026-08-13-col-P';
 
 function doGet(e) {
   e = e || {};
@@ -137,7 +137,15 @@ function appendCompraRow(payload) {
   ];
 
   sheet.appendRow(row);
-  return { marca: marca, email: row[1] };
+  return {
+    marca: marca,
+    email: row[1],
+    nps: row[8],
+    npsMejora: row[15],
+    colP: row[15],
+    totalCols: row.length,
+    version: SCRIPT_VERSION
+  };
 }
 
 function validateCompraPayload(p) {
@@ -271,10 +279,9 @@ function numCol(v) {
 }
 
 function ensureNpsMejoraHeader_(sheet) {
+  // Columna P = 16
   var cell = sheet.getRange(1, 16);
-  if (!String(cell.getValue() || '').trim()) {
-    cell.setValue('Qué faltó para el 10 (Recomendación)');
-  }
+  cell.setValue('Qué faltó para el 10 (Recomendación)');
 }
 
 function getSheet() {

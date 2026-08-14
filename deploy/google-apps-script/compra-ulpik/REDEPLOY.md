@@ -28,7 +28,7 @@ Si `curl` a la URL devuelve solo:
 ## Verificar (debe pasar antes de probar /compra)
 
 ```bash
-curl -sL "https://script.google.com/macros/s/AKfycbwAnTCKxLUYJwb4tMNAAGxPsUIYO_FofertmW-FhXlCPGj5FoNw7pmUMmarK5RUJIQA/exec"
+curl -sL "https://script.google.com/macros/s/AKfycbzcVAk_FTVu_gy6Zfe597ElY5s86wfNcoPoAhbbHIvAS7eT3-ngk-o_MBcYozLCsV-B/exec"
 ```
 
 Respuesta esperada:
