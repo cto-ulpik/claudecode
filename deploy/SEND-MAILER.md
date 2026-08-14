@@ -84,6 +84,22 @@ Mapeo del PDF tipo `… - Resolucion`:
 | Fecha | `Quito, a … de … de …` |
 | Nombre del asesor | No viene en el PDF; hay que completarlo a mano |
 
+### Título de registro (SENADI)
+
+Mapeo del PDF tipo `… - Titulo`:
+
+| Campo UI | Origen en el PDF |
+|----------|------------------|
+| Nombre del cliente / Titular | `TITULAR:` |
+| Marca | `DENOMINACIÓN:` (sin `más logotipo`) |
+| N.º de registro | `SENADI_AAAA_TI_#####` (encabezado del título) |
+| Clase(s) Niza | `Clase Internacional …` |
+| Vigencia | fecha de la resolución de origen – `VENCIMIENTO:` |
+| Nombre del asesor | No viene en el PDF; hay que completarlo a mano |
+
+El título cita su resolución de origen, por eso se detecta antes que el PDF de
+resolución favorable.
+
 El asesor se intenta obtener del PDF (`ABOGADO A CARGO` /
 `Abogado patrocinador` o nombres conocidos). Si falta, el envío se bloquea hasta
 completarlo manualmente.

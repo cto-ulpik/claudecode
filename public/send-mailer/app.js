@@ -465,6 +465,44 @@ function parseResolucionFavorable(text) {
   };
 }
 
+/** Título de registro SENADI */
+function parseTituloRegistro(text) {
+  const flat = unhyphenatePdfText(text).replace(/\s+/g, ' ').trim();
+
+  const numero =
+    flat.match(/\b(SENADI_\d{4}_TI_\d+)\b/i)?.[1] ||
+    flat.match(/tr[aá]mite\s+n[uú]mero\s+(SENADI-\d{4}-\d+)/i)?.[1] ||
+    '';
+
+  let marca =
+    flat.match(/DENOMINACI[ÓO]N\s*:\s*(.+?)(?=\s+PRODUCTOS\s+O\s+SERVICIOS|\s+DESCRIPCI[ÓO]N\s*:|\s+VENCIMIENTO\s*:|$)/i)?.[1] || '';
+  marca = stripMasLogotipo(marca);
+
+  const titular =
+    flat.match(/TITULAR\s*:\s*(.+?)(?=\s+DOMICILIO\s*:|\s+Quito\s*,|\s+Documento\s+firmado|$)/i)?.[1] || '';
+
+  const clases =
+    flat.match(/Clase\s+Internacional\s+(?:No\.?\s*)?(\d+)/i)?.[1] ||
+    flat.match(/Clasificaci[oó]n\s+Internacional\s+No\.?\s*:?\s*(\d+)/i)?.[1] ||
+    '';
+
+  const vencimiento =
+    flat.match(/VENCIMIENTO\s*:\s*(\d{1,2}\s+de\s+[a-záéíóúñ]+\s+de\s+\d{4}|\d{1,2}[/.-]\d{1,2}[/.-]\d{2,4})/i)?.[1] || '';
+  const inicio =
+    flat.match(/Resoluci[oó]n\s+No\.?\s*SENADI_\d{4}_RS_\d+\s+de\s+(\d{1,2}\s+de\s+[a-záéíóúñ]+\s+de\s+\d{4})/i)?.[1] || '';
+  const vigencia = [inicio, vencimiento].filter(Boolean).join(' – ');
+
+  return {
+    cliente: cleanExtracted(titular),
+    titular: cleanExtracted(titular),
+    marca: cleanExtracted(marca),
+    numero: cleanExtracted(numero),
+    clases: cleanExtracted(clases),
+    vigencia: cleanExtracted(vigencia),
+    asesor: extractAdvisor(text),
+  };
+}
+
 function isBusquedaFoneticaPdf(text) {
   return /b[uú]squeda\s+fon[eé]tica/i.test(text) || /INFORME\s+LEGAL\s+[—\-]/i.test(text);
 }
@@ -474,29 +512,40 @@ function isInicioTramitePdf(text) {
     (/No\.\s*de\s+Solicitud/i.test(text) && /SENADI-\d{4}-\d+/i.test(text));
 }
 
+function isTituloPdf(text) {
+  return /SENADI_\d{4}_TI_\d+/i.test(text) ||
+    /OTORGAR\s+el\s+t[ií]tulo/i.test(text) ||
+    (/TITULAR\s*:/i.test(text) && /VENCIMIENTO\s*:/i.test(text));
+}
+
 function isResolucionPdf(text) {
   return /N[uú]mero\s+de\s+resoluci[oó]n\s*:/i.test(text) ||
-    /SENADI_\d{4}_RS_\d+/i.test(text) ||
-    /RESUELVE:\s*CONCEDER/i.test(text);
+    /RESUELVE:\s*CONCEDER/i.test(text) ||
+    /SENADI_\d{4}_RS_\d+/i.test(text);
+}
+
+const STAGE_PARSERS = {
+  busqueda: (text) => {
+    const bf = parseBusquedaFonetica(text);
+    return { ...bf, titular: bf.cliente, fecha: bf.fechaInforme };
+  },
+  inicio: parseInicioTramite,
+  resolucion: parseResolucionFavorable,
+  titulo: parseTituloRegistro,
+};
+
+/** El título menciona su resolución de origen, así que se detecta antes que la resolución. */
+function detectPdfKind(text) {
+  if (isTituloPdf(text)) return 'titulo';
+  if (isResolucionPdf(text)) return 'resolucion';
+  if (isInicioTramitePdf(text)) return 'inicio';
+  if (isBusquedaFoneticaPdf(text)) return 'busqueda';
+  return '';
 }
 
 function parsePdfFields(text) {
-  if (selectedStage === 'resolucion' || (selectedStage !== 'inicio' && selectedStage !== 'busqueda' && isResolucionPdf(text))) {
-    return parseResolucionFavorable(text);
-  }
-
-  if (selectedStage === 'inicio' || (selectedStage !== 'busqueda' && isInicioTramitePdf(text))) {
-    return parseInicioTramite(text);
-  }
-
-  if (selectedStage === 'busqueda' || isBusquedaFoneticaPdf(text)) {
-    const bf = parseBusquedaFonetica(text);
-    return {
-      ...bf,
-      titular: bf.cliente,
-      fecha: bf.fechaInforme,
-    };
-  }
+  const parser = STAGE_PARSERS[selectedStage] || STAGE_PARSERS[detectPdfKind(text)];
+  if (parser) return parser(text);
 
   const result = {};
   Object.entries(FIELD_DEFS).forEach(([key, def]) => {

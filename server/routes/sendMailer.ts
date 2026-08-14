@@ -24,6 +24,20 @@ const STAGES = new Set([
   "titulo",
 ]);
 
+/**
+ * El Apps Script antiguo no conoce `send-stage-email` y valida el payload como
+ * encuesta, así que su error genérico se traduce a la acción que falta hacer.
+ */
+function describeAppsScriptFailure(detail: string): string {
+  if (/Falta (?:email|asesor|calificaci)/i.test(detail)) {
+    return "El Apps Script desplegado no reconoce la acción send-stage-email: publica una Nueva versión del Code.gs actualizado.";
+  }
+  if (/HTTP 40[0-9]|No se pudo abrir el archivo|no se encontr/i.test(detail)) {
+    return `No se pudo contactar el Apps Script (revisa GOOGLE_SHEETS_NPS_WEBAPP_URL). Detalle: ${detail}`;
+  }
+  return detail || "No se pudo enviar el correo.";
+}
+
 function bodyToSafeHtml(body: string): string {
   return body
     .replace(/&/g, "&amp;")
@@ -91,9 +105,8 @@ sendMailerRouter.post("/send-email", async (req, res) => {
     if (result.ok === false) throw new Error(result.error || "Apps Script rechazó el correo.");
     res.json({ ok: true });
   } catch (error) {
-    console.warn("[send-mailer] send-email:", error instanceof Error ? error.message : error);
-    res.status(502).json({
-      error: error instanceof Error ? error.message : "No se pudo enviar el correo.",
-    });
+    const detail = error instanceof Error ? error.message : String(error);
+    console.warn("[send-mailer] send-email:", detail);
+    res.status(502).json({ error: describeAppsScriptFailure(detail) });
   }
 });
