@@ -258,6 +258,17 @@ function cleanExtracted(value) {
     .trim();
 }
 
+/** Une sílabas partidas por guion al final de línea (p. ej. PA- RRALES → PARRALES). */
+function unhyphenatePdfText(text) {
+  return String(text || '')
+    .replace(/([A-Za-zÁÉÍÓÚáéíóúñÑ])-\s*\r?\n\s*([A-Za-zÁÉÍÓÚáéíóúñÑ])/g, '$1$2')
+    .replace(/([A-Za-zÁÉÍÓÚáéíóúñÑ])-\s+([A-Za-zÁÉÍÓÚáéíóúñÑ])/g, '$1$2');
+}
+
+function stripMasLogotipo(value) {
+  return cleanExtracted(value).replace(/\s+M[AÁ]S\s+LOGOTIPO\s*$/i, '').trim();
+}
+
 function extractAfterAliases(text, aliases) {
   const flat = text.replace(/\s+/g, ' ').trim();
   const labels = [
@@ -410,6 +421,50 @@ function parseInicioTramite(text) {
   };
 }
 
+/** Resolución favorable SENADI */
+function parseResolucionFavorable(text) {
+  const flat = unhyphenatePdfText(text).replace(/\s+/g, ' ').trim();
+
+  const resolucion =
+    flat.match(/N[uú]mero\s+de\s+resoluci[oó]n\s*:\s*(SENADI[_\-]\d{4}[_\-]RS[_\-]\d+)/i)?.[1] ||
+    flat.match(/\b(SENADI_\d{4}_RS_\d+)\b/i)?.[1] ||
+    '';
+
+  const numero =
+    flat.match(/Tr[aá]mite\s+No\.?\s*(SENADI-\d{4}-\d+)/i)?.[1] ||
+    flat.match(/solicitud\s+No\.?\s*(SENADI-\d{4}-\d+)/i)?.[1] ||
+    (flat.match(/\bSENADI-\d{4}-\d+\b/i) || [])[0] ||
+    '';
+
+  let marca =
+    flat.match(
+      /registro\s+del\s+signo\s*:\s*(.+?)(?=\s+SERVICIO\s+NACIONAL|\s+SENADI\.|-?\s*Quito|\s*,\s*que\s+proteger)/i
+    )?.[1] ||
+    flat.match(/CONCEDER\s+el\s+registro\s+de\s+(.+?)(?=\s*,\s*en\s+su\s+conjunto)/i)?.[1] ||
+    '';
+  marca = stripMasLogotipo(marca);
+
+  const cliente =
+    flat.match(/presentada\s+por\s+([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑa-záéíóúñ\s.'-]+?)(?=\s*,\s*el\s+\d)/i)?.[1] ||
+    flat.match(/a\s+favor\s+de\s+([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑa-záéíóúñ\s.'-]+?)(?=\s*,\s*que\s+proteger)/i)?.[1] ||
+    '';
+
+  const fecha =
+    flat.match(/(?:Quito|Guayaquil|Cuenca)\s*,\s*a\s+(\d{1,2}\s+de\s+[a-záéíóúñ]+\s+de\s+\d{4})/i)?.[1] ||
+    flat.match(/\ba\s+(\d{1,2}\s+de\s+[a-záéíóúñ]+\s+de\s+\d{4})(?=\s+\d{1,2}h)/i)?.[1] ||
+    '';
+
+  return {
+    cliente: cleanExtracted(cliente),
+    marca: cleanExtracted(marca),
+    numero: cleanExtracted(numero),
+    resolucion: cleanExtracted(resolucion),
+    fecha: cleanExtracted(fecha),
+    asesor: extractAdvisor(text),
+    titular: cleanExtracted(cliente),
+  };
+}
+
 function isBusquedaFoneticaPdf(text) {
   return /b[uú]squeda\s+fon[eé]tica/i.test(text) || /INFORME\s+LEGAL\s+[—\-]/i.test(text);
 }
@@ -419,7 +474,17 @@ function isInicioTramitePdf(text) {
     (/No\.\s*de\s+Solicitud/i.test(text) && /SENADI-\d{4}-\d+/i.test(text));
 }
 
+function isResolucionPdf(text) {
+  return /N[uú]mero\s+de\s+resoluci[oó]n\s*:/i.test(text) ||
+    /SENADI_\d{4}_RS_\d+/i.test(text) ||
+    /RESUELVE:\s*CONCEDER/i.test(text);
+}
+
 function parsePdfFields(text) {
+  if (selectedStage === 'resolucion' || (selectedStage !== 'inicio' && selectedStage !== 'busqueda' && isResolucionPdf(text))) {
+    return parseResolucionFavorable(text);
+  }
+
   if (selectedStage === 'inicio' || (selectedStage !== 'busqueda' && isInicioTramitePdf(text))) {
     return parseInicioTramite(text);
   }
@@ -575,6 +640,7 @@ async function sendEmail() {
   try {
     const response = await fetch('/api/send-mailer/send-email', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         to: recipient,

@@ -1,6 +1,6 @@
 # Send Mailer — avances de registro
 
-Herramienta interna: `https://ia.ulpik.com/send-mailer` (requiere sesión).
+Herramienta: `https://ia.ulpik.com/send-mailer` (mismo patrón público que `/titulo`).
 
 ## Flujo
 
@@ -71,6 +71,19 @@ Mapeo del PDF tipo `… - INICIO DE TRAMITE`:
 | Clase(s) Niza | `Clasificación Internacional No.` |
 | Nombre del asesor | `Nombre:` bajo *Abogado patrocinador* |
 
-El asesor se intenta obtener únicamente del PDF (`ABOGADO A CARGO` /
-`Abogado patrocinador` o nombres conocidos). Si el documento no contiene ese
-dato, el envío se bloquea para evitar firmar con un asesor incorrecto.
+### Resolución favorable (SENADI)
+
+Mapeo del PDF tipo `… - Resolucion`:
+
+| Campo UI | Origen en el PDF |
+|----------|------------------|
+| Nombre del cliente | `presentada por …` (o `a favor de …`) |
+| Marca | `registro del signo:` (sin `MAS LOGOTIPO`) |
+| N.º de trámite | `Trámite No. SENADI-…` |
+| N.º de resolución | `Número de resolución: SENADI_AAAA_RS_#####` |
+| Fecha | `Quito, a … de … de …` |
+| Nombre del asesor | No viene en el PDF; hay que completarlo a mano |
+
+El asesor se intenta obtener del PDF (`ABOGADO A CARGO` /
+`Abogado patrocinador` o nombres conocidos). Si falta, el envío se bloquea hasta
+completarlo manualmente.

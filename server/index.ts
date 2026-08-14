@@ -33,12 +33,12 @@ app.use("/api/auth", authRouter);
 /** Herramientas internas: requieren sesión. */
 app.use("/api/dashboards", requireAuth, dashboardRouter);
 app.use("/api/sheets", requireAuth, sheetsRouter);
-app.use("/api/send-mailer", requireAuth, sendMailerRouter);
 
 /** Formularios públicos Ulpik (sin login). */
 app.use("/api/surveys", surveysRouter);
 app.use("/api/titulo", tituloRouter);
 app.use("/api/compra", compraRouter);
+app.use("/api/send-mailer", sendMailerRouter);
 
 if (serveStatic) {
   app.use(express.static(distDir));

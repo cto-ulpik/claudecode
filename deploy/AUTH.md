@@ -48,9 +48,9 @@ Edita `server/lib/authConfig.ts` (`ALLOWED_USERS`) y reinicia la API. Los nuevos
 
 ## APIs
 
-Protegidas: `/api/dashboards`, `/api/sheets`, `/api/send-mailer`  
-Públicas: `/api/auth/*` (login/forgot/reset), `/api/compra`, `/api/surveys`, `/api/titulo`, `/api/health`
+Protegidas: `/api/dashboards`, `/api/sheets`  
+Públicas: `/api/auth/*` (login/forgot/reset), `/api/compra`, `/api/surveys`, `/api/titulo`, `/api/send-mailer`, `/api/health`
 
 ## Send Mailer
 
-Herramienta interna en `/send-mailer` (requiere sesión). Envía correos por etapa de registro con PDF adjunto vía Apps Script (`action: send-stage-email`). Ver `deploy/SEND-MAILER.md`.
+Herramienta en `/send-mailer` (mismo patrón que `/titulo`, sin login). Envía correos por etapa de registro con PDF adjunto vía Apps Script (`action: send-stage-email`). Ver `deploy/SEND-MAILER.md`.

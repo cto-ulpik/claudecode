@@ -29,6 +29,8 @@ export function App() {
       <Route path="/satisfaccion/" element={<UlpikSatisfaccionPage />} />
       <Route path="/titulo" element={<UlpikTituloPage />} />
       <Route path="/titulo/" element={<UlpikTituloPage />} />
+      <Route path="/send-mailer" element={<UlpikSendMailerPage />} />
+      <Route path="/send-mailer/" element={<UlpikSendMailerPage />} />
       <Route path="/compra" element={<UlpikCompraPage />} />
       <Route path="/compra/" element={<UlpikCompraPage />} />
       <Route path="/pulso-equipo" element={<UlpikPulsoEquipoPage />} />
@@ -46,8 +48,6 @@ export function App() {
           <Route path="/kpi-cto/" element={<KpiCtoPage />} />
           <Route path="/correo-empatico" element={<EmpathicEmailPage />} />
           <Route path="/correo-empatico/" element={<EmpathicEmailPage />} />
-          <Route path="/send-mailer" element={<UlpikSendMailerPage />} />
-          <Route path="/send-mailer/" element={<UlpikSendMailerPage />} />
           <Route path="/visualizador-dashboards" element={<DashboardViewerPage />} />
           <Route path="/visualizador-dashboards/" element={<DashboardViewerPage />} />
           <Route path="/cuenta/contrasena" element={<ChangePasswordPage />} />
