@@ -36,7 +36,7 @@ const STAGES = new Set([
  * encuesta, así que su error genérico se traduce a la acción que falta hacer.
  */
 function describeAppsScriptFailure(detail: string): string {
-  if (/Falta (?:email|asesor|calificaci)/i.test(detail)) {
+  if (/Falta (?:email|calificaci)/i.test(detail)) {
     return "El Apps Script desplegado no reconoce la acción send-stage-email: publica una Nueva versión del Code.gs actualizado.";
   }
   if (/HTTP 40[0-9]|No se pudo abrir el archivo|no se encontr/i.test(detail)) {
@@ -77,7 +77,6 @@ sendMailerRouter.post("/send-email", async (req, res) => {
   const subject = input.subject?.trim() ?? "";
   const body = input.body?.trim() ?? "";
   const pdfBase64 = input.pdfBase64?.trim() ?? "";
-  const advisor = input.fields?.asesor?.trim() ?? "";
   const extraAttachments = normalizeExtraAttachments(input.extraAttachments);
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
@@ -94,10 +93,6 @@ sendMailerRouter.post("/send-email", async (req, res) => {
   }
   if (!subject || !body) {
     res.status(400).json({ error: "Falta asunto o contenido del correo." });
-    return;
-  }
-  if (!advisor) {
-    res.status(400).json({ error: "No se pudo identificar el asesor en el PDF." });
     return;
   }
   if (!pdfBase64) {

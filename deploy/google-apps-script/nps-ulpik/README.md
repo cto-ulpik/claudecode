@@ -91,11 +91,11 @@ curl -X POST "$GOOGLE_SHEETS_NPS_WEBAPP_URL" \
     "htmlBody":"<p>Cuerpo HTML</p>",
     "pdfBase64":"...",
     "pdfFilename":"informe.pdf",
-    "fields":{"asesor":"Esteban Maldonado","marca":"MARCA TEST"}
+    "fields":{"marca":"MARCA TEST","cliente":"Cliente Test"}
   }'
 ```
 
-Respuesta esperada: `{"ok":true,"version":"2026-08-14-send-mailer"}`.
+Respuesta esperada: `{"ok":true,"version":"2026-08-14-send-mailer-no-asesor"}`.
 
 ## Auth interna (`send-auth-email`)
 

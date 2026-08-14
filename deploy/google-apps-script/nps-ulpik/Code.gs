@@ -11,7 +11,7 @@
 
 var SHEET_NAME = 'Respuestas de formulario 1';
 var NOTIFY_EMAIL = 'churchill@ulpik.com,legal5@ulpik.com';
-var SCRIPT_VERSION = '2026-08-14-send-mailer-extras';
+var SCRIPT_VERSION = '2026-08-14-send-mailer-no-asesor';
 
 function doGet(e) {
   e = e || {};
@@ -210,9 +210,6 @@ function validateStageEmailPayload(data) {
   }
   if (!data.pdfBase64 || typeof data.pdfBase64 !== 'string') {
     throw new Error('Falta PDF');
-  }
-  if (!data.fields || !String(data.fields.asesor || '').trim()) {
-    throw new Error('No se identificó el asesor en el PDF');
   }
 }
 

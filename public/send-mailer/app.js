@@ -5,16 +5,6 @@ let pdfFileName = '';
 let pdfText = '';
 let previewDirty = false;
 
-const ADVISORS = [
-  'Esteban Maldonado',
-  'Martín Coello',
-  'Sebastián López',
-  'Sebastian López',
-  'Javier España',
-  'Marianela Espinoza',
-  'Sofía Becerra',
-  'Sofia Becerra',
-];
 
 const FIELD_DEFS = {
   cliente: { label: 'Nombre del cliente', aliases: ['NOMBRE DEL CLIENTE', 'CLIENTE', 'SOLICITANTE'] },
@@ -28,13 +18,12 @@ const FIELD_DEFS = {
   resolucion: { label: 'N.º de resolución', aliases: ['NÚMERO DE RESOLUCIÓN', 'NUMERO DE RESOLUCION', 'N.º DE RESOLUCIÓN', 'RESOLUCIÓN', 'RESOLUCION'] },
   vigencia: { label: 'Vigencia', aliases: ['VIGENCIA', 'FECHA DE INICIO', 'FECHA DE VENCIMIENTO'] },
   fechaInforme: { label: 'Fecha del informe jurídico', aliases: ['FECHA DEL INFORME', 'FECHA DE INFORME', 'FECHA'] },
-  asesor: { label: 'Nombre del asesor', aliases: ['ABOGADO A CARGO', 'ABOGADA A CARGO', 'ABOGADO AL CARGO', 'ABOGADO PATROCINADOR', 'NOMBRE DEL ASESOR', 'ASESOR'] },
 };
 
 const STAGES = {
   busqueda: {
     label: 'Búsqueda fonética',
-    fields: ['cliente', 'marca', 'fechaInforme', 'asesor'],
+    fields: ['cliente', 'marca', 'fechaInforme'],
     subject: '🔎 Informe de búsqueda fonética de [MARCA]',
     body: `Hola [NOMBRE DEL CLIENTE],
 
@@ -53,12 +42,11 @@ Un arte informativo con nuestra política de garantía y los tiempos del proceso
 Desde ULPIK te acompañaremos durante cada etapa para que sepas qué está pasando y qué viene después.
 
 Un abrazo,
-[NOMBRE DEL ASESOR]
 Equipo ULPIK`,
   },
   inicio: {
     label: 'Inicio de trámite',
-    fields: ['cliente', 'marca', 'numero', 'fecha', 'clases', 'asesor'],
+    fields: ['cliente', 'marca', 'numero', 'fecha', 'clases'],
     subject: '🚀 ¡Tu registro de marca [MARCA] ya inició oficialmente!',
     body: `Hola [NOMBRE DEL CLIENTE],
 
@@ -80,12 +68,11 @@ Ahora SENADI continuará con las etapas correspondientes de revisión de la soli
 Por el momento, no necesitas realizar ninguna acción adicional, salvo que tu asesor te indique lo contrario vía WhatsApp.
 
 ¡Seguimos avanzando! 🚀
-[NOMBRE DEL ASESOR]
 Equipo ULPIK`,
   },
   publicacion: {
     label: 'Publicación en Gaceta',
-    fields: ['cliente', 'marca', 'numero', 'gaceta', 'asesor'],
+    fields: ['cliente', 'marca', 'numero', 'gaceta'],
     subject: '📢 Tu marca [MARCA] avanzó a publicación',
     body: `Hola [NOMBRE DEL CLIENTE],
 
@@ -110,12 +97,11 @@ Fecha/publicación de Gaceta: [FECHA / NÚMERO DE GACETA]
 Nada por el momento. Desde ULPIK estaremos pendientes del desarrollo de esta etapa y te notificaremos una vez concluya o si se presenta alguna novedad que requiera nuestra intervención.
 
 Cada vez estamos más cerca. 💪
-[NOMBRE DEL ASESOR]
 Equipo ULPIK`,
   },
   fin_gaceta: {
     label: 'Fin de Gaceta',
-    fields: ['cliente', 'marca', 'asesor'],
+    fields: ['cliente', 'marca'],
     subject: '✅ Buenas noticias: [MARCA] superó su etapa de publicación sin oposiciones',
     body: `Hola [NOMBRE DEL CLIENTE],
 
@@ -132,10 +118,9 @@ Es un avance importante, aunque todavía no significa que la marca haya sido con
 Por ahora no necesitas hacer nada. Nuestro equipo continuará dando seguimiento al expediente y te informaremos cuando tengamos el siguiente avance.
 
 ¡Seguimos avanzando juntos! 🙌
-[NOMBRE DEL ASESOR]
 Equipo ULPIK`,
     opposition: {
-      fields: ['cliente', 'marca', 'numero', 'oponente', 'asesor'],
+      fields: ['cliente', 'marca', 'numero', 'oponente'],
       subject: '⚠️ Actualización importante sobre el registro de [MARCA]',
       body: `Hola [NOMBRE DEL CLIENTE],
 
@@ -156,13 +141,12 @@ Oponente: [NOMBRE DEL OPONENTE]
 Te adjuntamos el documento aquí para que puedas conocerlo. Para cuando recibas este correo nuestro equipo legal ya se habrá puesto en contacto contigo para explicarte el escenario y los próximos pasos de manera clara.
 
 Seguimos acompañándote durante todo el proceso.
-[NOMBRE DEL ASESOR]
 Equipo ULPIK`,
     },
   },
   resolucion: {
     label: 'Resolución favorable',
-    fields: ['cliente', 'marca', 'numero', 'resolucion', 'fecha', 'asesor'],
+    fields: ['cliente', 'marca', 'numero', 'resolucion', 'fecha'],
     subject: '🎉 ¡SENADI resolvió favorablemente el registro de [MARCA]!',
     body: `Hola [NOMBRE DEL CLIENTE],
 
@@ -186,12 +170,11 @@ Ahora continuaremos con las actuaciones correspondientes hasta contar con el tí
 No necesitas realizar ninguna gestión adicional en este momento, salvo que tu asesor te indique lo contrario.
 
 ¡Estamos muy cerca de finalizar! 🚀
-[NOMBRE DEL ASESOR]
 Equipo ULPIK`,
   },
   titulo: {
     label: 'Título de registro',
-    fields: ['cliente', 'marca', 'titular', 'numero', 'clases', 'vigencia', 'asesor'],
+    fields: ['cliente', 'marca', 'titular', 'numero', 'clases', 'vigencia'],
     subject: '🎉 El título de registro de [MARCA] ya está disponible',
     body: `Hola [NOMBRE DEL CLIENTE],
 
@@ -214,7 +197,6 @@ Te recomendamos guardar una copia del título para cualquier eventualidad. A par
 Gracias por confiar en ULPIK para acompañarte en este proceso. 💚
 
 ¡Felicitaciones por este gran paso!
-[NOMBRE DEL ASESOR]
 Equipo ULPIK`,
   },
 };
@@ -231,7 +213,6 @@ const PLACEHOLDERS = {
   resolucion: '[NÚMERO DE RESOLUCIÓN]',
   vigencia: '[FECHA DE INICIO – FECHA DE VENCIMIENTO]',
   fechaInforme: '[FECHA]',
-  asesor: '[NOMBRE DEL ASESOR]',
 };
 
 function activeTemplate() {
@@ -289,57 +270,6 @@ function extractAfterAliases(text, aliases) {
   return '';
 }
 
-function extractAdvisor(text) {
-  const flat = text.replace(/\s+/g, ' ').trim();
-
-  // Abogado patrocinador (Formato SENADI / inicio de trámite)
-  const patrocinador = flat.split(/Abogado\s+patrocinador/i)[1] || '';
-  if (patrocinador) {
-    const name = patrocinador.match(
-      /Nombre:\s*([A-Za-zÁÉÍÓÚáéíóúñÑ.'-]+(?:\s+[A-Za-zÁÉÍÓÚáéíóúñÑ.'-]+){1,4})(?=\s+Direcci[oó]n|\s+Tel[eé]fono|\s+E-mail|\s+Matr[ií]cula|$)/i
-    )?.[1];
-    if (name) {
-      const foldedName = name.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
-      const knownPat = ADVISORS.find((n) =>
-        foldedName.includes(n.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase())
-      );
-      if (knownPat) {
-        const base = knownPat.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
-        return ADVISORS.find((n) => n.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase() === base) || knownPat;
-      }
-      return cleanExtracted(name);
-    }
-  }
-
-  // Preferir nombre conocido si aparece junto a "ABOGADO A CARGO"
-  const cargoChunk = flat.match(/ABOGAD[OA]\s+A(?:L)?\s+CARGO\s*[:.-]?\s*([^●•]{0,80})/i)?.[1] || '';
-  if (cargoChunk) {
-    const foldedChunk = cargoChunk.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
-    const known = ADVISORS.find((name) =>
-      foldedChunk.includes(name.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase())
-    );
-    if (known) {
-      const base = known.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
-      return ADVISORS.find((n) => n.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase() === base) || known;
-    }
-  }
-
-  // Tras la etiqueta: solo el nombre (máx. 4 tokens), corta en bullet / LUZ / cargo / etc.
-  const labeled = flat.match(
-    /ABOGAD[OA]\s+A(?:L)?\s+CARGO\s*[:.-]?\s*(?:Abg\.?\s*)?([A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚáéíóúñÑ.'-]+(?:\s+[A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚáéíóúñÑ.'-]+){0,3})(?=\s*(?:●|•|—|--|LUZ|PROBABILIDAD|CLASES|PRODUCTOS|TIPO\s+DE|Abogad[oa]|Resumen|$))/i
-  );
-  if (labeled) return cleanExtracted(labeled[1]);
-
-  const explicit = extractAfterAliases(text, FIELD_DEFS.asesor.aliases);
-  if (explicit) {
-    return cleanExtracted(
-      explicit
-        .replace(/^(?:abg\.?|abogado|abogada)\s+/i, '')
-        .replace(/\s*(?:●|•|—|LUZ|PROBABILIDAD|Abogad[oa]).*$/i, '')
-    );
-  }
-  return '';
-}
 
 /** Informe BF Ulpik: 3.ª línea = ciudad • fecha; CLIENTE; DENOMINACIÓN DEL SIGNO; ABOGADO A CARGO */
 function parseBusquedaFonetica(text) {
@@ -371,13 +301,10 @@ function parseBusquedaFonetica(text) {
     if (anyDate) fechaInforme = cleanExtracted(anyDate[1]);
   }
 
-  const asesor = extractAdvisor(text);
-
   return {
     cliente: cleanExtracted(cliente),
     marca: cleanExtracted(marca),
     fechaInforme,
-    asesor,
   };
 }
 
@@ -416,7 +343,6 @@ function parseInicioTramite(text) {
     numero: cleanExtracted(numero),
     fecha: cleanExtracted(fecha),
     clases: cleanExtracted(clases),
-    asesor: extractAdvisor(text),
     titular: cleanExtracted(cliente),
   };
 }
@@ -460,7 +386,6 @@ function parseResolucionFavorable(text) {
     numero: cleanExtracted(numero),
     resolucion: cleanExtracted(resolucion),
     fecha: cleanExtracted(fecha),
-    asesor: extractAdvisor(text),
     titular: cleanExtracted(cliente),
   };
 }
@@ -499,7 +424,6 @@ function parseTituloRegistro(text) {
     numero: cleanExtracted(numero),
     clases: cleanExtracted(clases),
     vigencia: cleanExtracted(vigencia),
-    asesor: extractAdvisor(text),
   };
 }
 
@@ -549,7 +473,7 @@ function parsePdfFields(text) {
 
   const result = {};
   Object.entries(FIELD_DEFS).forEach(([key, def]) => {
-    result[key] = key === 'asesor' ? extractAdvisor(text) : extractAfterAliases(text, def.aliases);
+    result[key] = extractAfterAliases(text, def.aliases);
   });
 
   if (!result.cliente) result.cliente = result.titular;
@@ -609,7 +533,6 @@ function renderFields(values = {}) {
   grid.querySelectorAll('[data-field]').forEach((input) => {
     input.addEventListener('input', () => updatePreview());
   });
-  document.getElementById('advisor-warning').classList.toggle('hidden', !fields.includes('asesor') || !!fieldValue('asesor'));
 }
 
 function updatePreview(force = false) {
@@ -617,7 +540,6 @@ function updatePreview(force = false) {
   const body = interpolate(activeTemplate().body);
   document.getElementById('subject').value = subject;
   if (force || !previewDirty) document.getElementById('body-preview').value = body;
-  document.getElementById('advisor-warning').classList.toggle('hidden', !activeTemplate().fields.includes('asesor') || !!fieldValue('asesor'));
 }
 
 async function extractPdfText(file) {

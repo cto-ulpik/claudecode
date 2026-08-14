@@ -20,6 +20,8 @@ Herramienta: `https://ia.ulpik.com/send-mailer` (mismo patrón público que `/ti
 - Resolución favorable
 - Título de registro
 
+Las plantillas cierran con **Equipo ULPIK** (sin nombre de asesor).
+
 ## Despliegue
 
 El Apps Script usado por `GOOGLE_SHEETS_NPS_WEBAPP_URL` debe incluir la función
@@ -49,18 +51,13 @@ muestran para revisión antes de enviar.
 
 ### Búsqueda fonética (informe Ulpik BF)
 
-Mapeo del PDF tipo `Ulpik - BF - …`:
-
 | Campo UI | Origen en el PDF |
 |----------|------------------|
 | Nombre del cliente | `CLIENTE` / `Nombre del cliente` |
 | Marca | `DENOMINACIÓN DEL SIGNO` |
 | Fecha del informe | 3.ª línea del encabezado (p. ej. `… • 27 de mayo de 2025`) |
-| Nombre del asesor | `ABOGADO A CARGO` |
 
 ### Inicio de trámite (Formato Único SENADI)
-
-Mapeo del PDF tipo `… - INICIO DE TRAMITE`:
 
 | Campo UI | Origen en el PDF |
 |----------|------------------|
@@ -69,11 +66,8 @@ Mapeo del PDF tipo `… - INICIO DE TRAMITE`:
 | N.º de trámite | `SENADI-AAAA-#####` |
 | Fecha | `Fecha de Presentación` (solo fecha, sin hora) |
 | Clase(s) Niza | `Clasificación Internacional No.` |
-| Nombre del asesor | `Nombre:` bajo *Abogado patrocinador* |
 
 ### Resolución favorable (SENADI)
-
-Mapeo del PDF tipo `… - Resolucion`:
 
 | Campo UI | Origen en el PDF |
 |----------|------------------|
@@ -82,11 +76,8 @@ Mapeo del PDF tipo `… - Resolucion`:
 | N.º de trámite | `Trámite No. SENADI-…` |
 | N.º de resolución | `Número de resolución: SENADI_AAAA_RS_#####` |
 | Fecha | `Quito, a … de … de …` |
-| Nombre del asesor | No viene en el PDF; hay que completarlo a mano |
 
 ### Título de registro (SENADI)
-
-Mapeo del PDF tipo `… - Titulo`:
 
 | Campo UI | Origen en el PDF |
 |----------|------------------|
@@ -95,14 +86,9 @@ Mapeo del PDF tipo `… - Titulo`:
 | N.º de registro | `SENADI_AAAA_TI_#####` (encabezado del título) |
 | Clase(s) Niza | `Clase Internacional …` |
 | Vigencia | fecha de la resolución de origen – `VENCIMIENTO:` |
-| Nombre del asesor | No viene en el PDF; hay que completarlo a mano |
 
 El título cita su resolución de origen, por eso se detecta antes que el PDF de
 resolución favorable.
-
-El asesor se intenta obtener del PDF (`ABOGADO A CARGO` /
-`Abogado patrocinador` o nombres conocidos). Si falta, el envío se bloquea hasta
-completarlo manualmente.
 
 En la sección **Datos email** se pueden marcar adjuntos opcionales:
 
