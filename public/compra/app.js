@@ -10,7 +10,7 @@ let ASESORES = {};
 
 async function loadAsesores() {
   try {
-    const res = await fetch('asesores.json?v=20260722');
+    const res = await fetch('asesores.json?v=20260814c');
     if (!res.ok) throw new Error('json');
     ASESORES = await res.json();
   } catch {
@@ -27,14 +27,14 @@ async function loadAsesores() {
       'Esteban Maldonado (Estebitan)': { ...sebastian },
       'Marianela Espinoza (Nela)': { ...sebastian },
       'Sebastián Lopez (Sebas)': { ...sebastian },
-      'Javier España (Javi)': {
-        asesor: 'Javier España',
-        foto: '',
-        cargo: CARGO_MASC,
+      'Samantha Carrera': {
+        asesor: 'Samantha Carrera',
+        foto: 'asesores/samantha.jpg',
+        cargo: CARGO_FEM,
         mensaje:
-          'Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.',
-        video: 'asesores/presentacion/javier-web.m4v',
-        titulo: 'Mensaje de tu asesor',
+          'Bienvenida, qué gusto poderte atender. Estoy segura de que te podré ayudar durante todo tu proceso.',
+        video: 'asesores/presentacion/samantha-web.mp4',
+        titulo: 'Mensaje de tu asesora',
       },
       'Martín Coello (Martín)': {
         asesor: 'Martín Coello',
@@ -63,7 +63,7 @@ function asesorCargo(info) {
   if (info?.cargo) return info.cargo;
   const nombre = info?.asesor || '';
   if (/mart[ií]n/i.test(nombre)) return CARGO_MARTIN;
-  return /marianela/i.test(nombre) ? CARGO_FEM : CARGO_MASC;
+  return /marianela|samantha/i.test(nombre) ? CARGO_FEM : CARGO_MASC;
 }
 
 function isRegistroMarca() {

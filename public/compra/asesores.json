@@ -7,13 +7,13 @@
     "video": "asesores/presentacion/sebastian-web.m4v",
     "titulo": "Mensaje de tu asesor"
   },
-  "Javier España (Javi)": {
-    "asesor": "Javier España",
-    "foto": "",
-    "cargo": "Abogado y Asesor Comercial",
-    "mensaje": "Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.",
-    "video": "asesores/presentacion/javier-web.m4v",
-    "titulo": "Mensaje de tu asesor"
+  "Samantha Carrera": {
+    "asesor": "Samantha Carrera",
+    "foto": "asesores/samantha.jpg",
+    "cargo": "Abogada y Asesora Comercial",
+    "mensaje": "Bienvenida, qué gusto poderte atender. Estoy segura de que te podré ayudar durante todo tu proceso.",
+    "video": "asesores/presentacion/samantha-web.mp4",
+    "titulo": "Mensaje de tu asesora"
   },
   "Marianela Espinoza (Nela)": {
     "asesor": "Sebastián Lopez",
