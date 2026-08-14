@@ -58,6 +58,19 @@ Mapeo del PDF tipo `Ulpik - BF - …`:
 | Fecha del informe | 3.ª línea del encabezado (p. ej. `… • 27 de mayo de 2025`) |
 | Nombre del asesor | `ABOGADO A CARGO` |
 
-El asesor se intenta obtener únicamente del PDF, buscando la etiqueta `ASESOR` /
-`ABOGADO A CARGO` o uno de los nombres conocidos. Si el documento no contiene
-ese dato, el envío se bloquea para evitar firmar con un asesor incorrecto.
+### Inicio de trámite (Formato Único SENADI)
+
+Mapeo del PDF tipo `… - INICIO DE TRAMITE`:
+
+| Campo UI | Origen en el PDF |
+|----------|------------------|
+| Nombre del cliente | Primer `Nombre:` en *Identificación de los solicitantes* |
+| Marca | `Denominación del Signo` (sin el sufijo `MAS LOGOTIPO`) |
+| N.º de trámite | `SENADI-AAAA-#####` |
+| Fecha | `Fecha de Presentación` (solo fecha, sin hora) |
+| Clase(s) Niza | `Clasificación Internacional No.` |
+| Nombre del asesor | `Nombre:` bajo *Abogado patrocinador* |
+
+El asesor se intenta obtener únicamente del PDF (`ABOGADO A CARGO` /
+`Abogado patrocinador` o nombres conocidos). Si el documento no contiene ese
+dato, el envío se bloquea para evitar firmar con un asesor incorrecto.

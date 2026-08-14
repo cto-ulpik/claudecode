@@ -28,7 +28,7 @@ const FIELD_DEFS = {
   resolucion: { label: 'N.º de resolución', aliases: ['NÚMERO DE RESOLUCIÓN', 'NUMERO DE RESOLUCION', 'N.º DE RESOLUCIÓN', 'RESOLUCIÓN', 'RESOLUCION'] },
   vigencia: { label: 'Vigencia', aliases: ['VIGENCIA', 'FECHA DE INICIO', 'FECHA DE VENCIMIENTO'] },
   fechaInforme: { label: 'Fecha del informe jurídico', aliases: ['FECHA DEL INFORME', 'FECHA DE INFORME', 'FECHA'] },
-  asesor: { label: 'Nombre del asesor', aliases: ['ABOGADO A CARGO', 'ABOGADA A CARGO', 'ABOGADO AL CARGO', 'NOMBRE DEL ASESOR', 'ASESOR'] },
+  asesor: { label: 'Nombre del asesor', aliases: ['ABOGADO A CARGO', 'ABOGADA A CARGO', 'ABOGADO AL CARGO', 'ABOGADO PATROCINADOR', 'NOMBRE DEL ASESOR', 'ASESOR'] },
 };
 
 const STAGES = {
@@ -279,15 +279,55 @@ function extractAfterAliases(text, aliases) {
 }
 
 function extractAdvisor(text) {
+  const flat = text.replace(/\s+/g, ' ').trim();
+
+  // Abogado patrocinador (Formato SENADI / inicio de trámite)
+  const patrocinador = flat.split(/Abogado\s+patrocinador/i)[1] || '';
+  if (patrocinador) {
+    const name = patrocinador.match(
+      /Nombre:\s*([A-Za-zÁÉÍÓÚáéíóúñÑ.'-]+(?:\s+[A-Za-zÁÉÍÓÚáéíóúñÑ.'-]+){1,4})(?=\s+Direcci[oó]n|\s+Tel[eé]fono|\s+E-mail|\s+Matr[ií]cula|$)/i
+    )?.[1];
+    if (name) {
+      const foldedName = name.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+      const knownPat = ADVISORS.find((n) =>
+        foldedName.includes(n.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase())
+      );
+      if (knownPat) {
+        const base = knownPat.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+        return ADVISORS.find((n) => n.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase() === base) || knownPat;
+      }
+      return cleanExtracted(name);
+    }
+  }
+
+  // Preferir nombre conocido si aparece junto a "ABOGADO A CARGO"
+  const cargoChunk = flat.match(/ABOGAD[OA]\s+A(?:L)?\s+CARGO\s*[:.-]?\s*([^●•]{0,80})/i)?.[1] || '';
+  if (cargoChunk) {
+    const foldedChunk = cargoChunk.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+    const known = ADVISORS.find((name) =>
+      foldedChunk.includes(name.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase())
+    );
+    if (known) {
+      const base = known.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+      return ADVISORS.find((n) => n.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase() === base) || known;
+    }
+  }
+
+  // Tras la etiqueta: solo el nombre (máx. 4 tokens), corta en bullet / LUZ / cargo / etc.
+  const labeled = flat.match(
+    /ABOGAD[OA]\s+A(?:L)?\s+CARGO\s*[:.-]?\s*(?:Abg\.?\s*)?([A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚáéíóúñÑ.'-]+(?:\s+[A-ZÁÉÍÓÚÑ][A-Za-zÁÉÍÓÚáéíóúñÑ.'-]+){0,3})(?=\s*(?:●|•|—|--|LUZ|PROBABILIDAD|CLASES|PRODUCTOS|TIPO\s+DE|Abogad[oa]|Resumen|$))/i
+  );
+  if (labeled) return cleanExtracted(labeled[1]);
+
   const explicit = extractAfterAliases(text, FIELD_DEFS.asesor.aliases);
   if (explicit) {
-    // Quitar título profesional corto al inicio ("Abg.", "Abogada", etc.)
-    return cleanExtracted(explicit.replace(/^(?:abg\.?|abogado|abogada)\s+/i, ''));
+    return cleanExtracted(
+      explicit
+        .replace(/^(?:abg\.?|abogado|abogada)\s+/i, '')
+        .replace(/\s*(?:●|•|—|LUZ|PROBABILIDAD|Abogad[oa]).*$/i, '')
+    );
   }
-  const folded = text.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
-  return ADVISORS.find((name) =>
-    folded.includes(name.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase())
-  ) || '';
+  return '';
 }
 
 /** Informe BF Ulpik: 3.ª línea = ciudad • fecha; CLIENTE; DENOMINACIÓN DEL SIGNO; ABOGADO A CARGO */
@@ -330,11 +370,60 @@ function parseBusquedaFonetica(text) {
   };
 }
 
+/** Formato Único SENADI — inicio de trámite */
+function parseInicioTramite(text) {
+  const flat = text.replace(/\s+/g, ' ').trim();
+
+  const numero = (flat.match(/SENADI-\d{4}-\d+/i) || [])[0] || '';
+
+  const fecha =
+    flat.match(/Fecha\s+de\s+Presentaci[oó]n[^0-9]{0,40}(\d{1,2}\/\d{1,2}\/\d{4})/i)?.[1] ||
+    flat.match(/SENADI-\d{4}-\d+\s+(\d{1,2}\/\d{1,2}\/\d{4})/i)?.[1] ||
+    '';
+
+  let marca =
+    flat.match(
+      /Denominaci[oó]n\s+del\s+Signo\s+(.+?)(?=\s+Naturaleza\s+del\s+signo|\s+Tipo\s+de\s+signo|\s+Nacionalidad\s+del\s+Signo)/i
+    )?.[1] || '';
+  marca = cleanExtracted(marca).replace(/\s+M[AÁ]S\s+LOGOTIPO\s*$/i, '').trim();
+
+  const clases =
+    flat.match(/Clasificaci[oó]n\s+Internacional\s+No\.?\s*:\s*(\d+)/i)?.[1] || '';
+
+  // Primer solicitante (antes del abogado patrocinador)
+  const solicitantesBlock = flat.split(/Abogado\s+patrocinador/i)[0] || flat;
+  const cliente =
+    solicitantesBlock.match(
+      /Identificaci[oó]n\s+de\s+los\s+solicitantes[\s\S]{0,400}?Nombre:\s*([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑa-záéíóúñ\s.'-]+?)(?=\s+Direcci[oó]n|\s+Tipo\s+de\s+Documento|\s+E-mail)/i
+    )?.[1] ||
+    solicitantesBlock.match(/Nombre:\s*([A-ZÁÉÍÓÚÑ][A-ZÁÉÍÓÚÑ\s.'-]{5,}?)(?=\s+Direcci[oó]n)/i)?.[1] ||
+    '';
+
+  return {
+    cliente: cleanExtracted(cliente),
+    marca: cleanExtracted(marca),
+    numero: cleanExtracted(numero),
+    fecha: cleanExtracted(fecha),
+    clases: cleanExtracted(clases),
+    asesor: extractAdvisor(text),
+    titular: cleanExtracted(cliente),
+  };
+}
+
 function isBusquedaFoneticaPdf(text) {
-  return /b[uú]squeda\s+fon[eé]tica/i.test(text) || /DENOMINACI[ÓO]N\s+DEL\s+SIGNO/i.test(text);
+  return /b[uú]squeda\s+fon[eé]tica/i.test(text) || /INFORME\s+LEGAL\s+[—\-]/i.test(text);
+}
+
+function isInicioTramitePdf(text) {
+  return /FORMATO\s+[UÚ]NICO\s+DE\s+REGISTRO/i.test(text) ||
+    (/No\.\s*de\s+Solicitud/i.test(text) && /SENADI-\d{4}-\d+/i.test(text));
 }
 
 function parsePdfFields(text) {
+  if (selectedStage === 'inicio' || (selectedStage !== 'busqueda' && isInicioTramitePdf(text))) {
+    return parseInicioTramite(text);
+  }
+
   if (selectedStage === 'busqueda' || isBusquedaFoneticaPdf(text)) {
     const bf = parseBusquedaFonetica(text);
     return {
