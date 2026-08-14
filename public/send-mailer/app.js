@@ -12,11 +12,13 @@ const ADVISORS = [
   'Sebastian López',
   'Javier España',
   'Marianela Espinoza',
+  'Sofía Becerra',
+  'Sofia Becerra',
 ];
 
 const FIELD_DEFS = {
   cliente: { label: 'Nombre del cliente', aliases: ['NOMBRE DEL CLIENTE', 'CLIENTE', 'SOLICITANTE'] },
-  marca: { label: 'Marca', aliases: ['DENOMINACIÓN', 'DENOMINACION', 'MARCA', 'SIGNO'] },
+  marca: { label: 'Marca', aliases: ['DENOMINACIÓN DEL SIGNO', 'DENOMINACION DEL SIGNO', 'DENOMINACIÓN', 'DENOMINACION', 'MARCA', 'SIGNO'] },
   titular: { label: 'Nombre / razón social', aliases: ['TITULAR', 'RAZÓN SOCIAL', 'RAZON SOCIAL', 'SOLICITANTE'] },
   numero: { label: 'N.º de trámite / registro', aliases: ['NÚMERO DE TRÁMITE', 'NUMERO DE TRAMITE', 'NÚMERO DE SOLICITUD', 'NUMERO DE SOLICITUD', 'N.º DE REGISTRO', 'NO. DE REGISTRO', 'REGISTRO'] },
   clases: { label: 'Clase(s) Niza', aliases: ['CLASES NIZA', 'CLASE NIZA', 'CLASE INTERNACIONAL', 'CLASE'] },
@@ -26,7 +28,7 @@ const FIELD_DEFS = {
   resolucion: { label: 'N.º de resolución', aliases: ['NÚMERO DE RESOLUCIÓN', 'NUMERO DE RESOLUCION', 'N.º DE RESOLUCIÓN', 'RESOLUCIÓN', 'RESOLUCION'] },
   vigencia: { label: 'Vigencia', aliases: ['VIGENCIA', 'FECHA DE INICIO', 'FECHA DE VENCIMIENTO'] },
   fechaInforme: { label: 'Fecha del informe jurídico', aliases: ['FECHA DEL INFORME', 'FECHA DE INFORME', 'FECHA'] },
-  asesor: { label: 'Nombre del asesor', aliases: ['NOMBRE DEL ASESOR', 'ASESOR'] },
+  asesor: { label: 'Nombre del asesor', aliases: ['ABOGADO A CARGO', 'ABOGADA A CARGO', 'ABOGADO AL CARGO', 'NOMBRE DEL ASESOR', 'ASESOR'] },
 };
 
 const STAGES = {
@@ -258,10 +260,18 @@ function cleanExtracted(value) {
 
 function extractAfterAliases(text, aliases) {
   const flat = text.replace(/\s+/g, ' ').trim();
-  const labels = Object.values(FIELD_DEFS).flatMap((d) => d.aliases);
-  const stop = labels.map(escapeRegex).join('|');
+  const labels = [
+    ...Object.values(FIELD_DEFS).flatMap((d) => d.aliases),
+    'TIPO DE SIGNO',
+    'PRODUCTOS O SERVICIOS',
+    'CLASES NIZA RECOMENDADAS',
+    'ABOGADO A CARGO',
+    'ABOGADA A CARGO',
+    'PROBABILIDAD DE REGISTRO',
+  ];
+  const stop = [...new Set(labels)].map(escapeRegex).join('|');
   for (const alias of aliases) {
-    const pattern = new RegExp(`${escapeRegex(alias)}\\s*[:#.-]?\\s*(.+?)(?=\\s+(?:${stop})\\s*[:#.-]|$)`, 'i');
+    const pattern = new RegExp(`${escapeRegex(alias)}\\s*[:#.-]?\\s*(.+?)(?=\\s+(?:${stop})\\s*[:#.-]?|$)`, 'i');
     const match = flat.match(pattern);
     if (match && cleanExtracted(match[1]).length <= 180) return cleanExtracted(match[1]);
   }
@@ -270,14 +280,70 @@ function extractAfterAliases(text, aliases) {
 
 function extractAdvisor(text) {
   const explicit = extractAfterAliases(text, FIELD_DEFS.asesor.aliases);
-  if (explicit) return explicit;
+  if (explicit) {
+    // Quitar título profesional corto al inicio ("Abg.", "Abogada", etc.)
+    return cleanExtracted(explicit.replace(/^(?:abg\.?|abogado|abogada)\s+/i, ''));
+  }
   const folded = text.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
   return ADVISORS.find((name) =>
     folded.includes(name.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase())
   ) || '';
 }
 
+/** Informe BF Ulpik: 3.ª línea = ciudad • fecha; CLIENTE; DENOMINACIÓN DEL SIGNO; ABOGADO A CARGO */
+function parseBusquedaFonetica(text) {
+  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  const flat = text.replace(/\s+/g, ' ').trim();
+
+  const cliente =
+    extractAfterAliases(text, ['NOMBRE DEL CLIENTE', 'CLIENTE']) ||
+    flat.match(/\bCLIENTE\s+(.+?)(?=\s+DENOMINACI[ÓO]N\s+DEL\s+SIGNO|\s+TIPO\s+DE\s+SIGNO|$)/i)?.[1] ||
+    '';
+
+  const marca =
+    extractAfterAliases(text, ['DENOMINACIÓN DEL SIGNO', 'DENOMINACION DEL SIGNO']) ||
+    flat.match(/DENOMINACI[ÓO]N\s+DEL\s+SIGNO\s+(.+?)(?=\s+TIPO\s+DE\s+SIGNO|\s+PRODUCTOS|\s+CLASES|\s+ABOGAD|$)/i)?.[1] ||
+    '';
+
+  // 3.ª línea del encabezado: "Santa Ana… • 27 de mayo de 2025"
+  let fechaInforme = '';
+  const headerLine = lines[2] || '';
+  const dateFromHeader = headerLine.match(
+    /(\d{1,2}\s+de\s+[a-záéíóúñ]+\s+de\s+\d{4}|\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4})/i
+  );
+  if (dateFromHeader) {
+    fechaInforme = cleanExtracted(dateFromHeader[1]);
+  } else {
+    const anyDate = flat.match(
+      /(\d{1,2}\s+de\s+[a-záéíóúñ]+\s+de\s+\d{4})/i
+    );
+    if (anyDate) fechaInforme = cleanExtracted(anyDate[1]);
+  }
+
+  const asesor = extractAdvisor(text);
+
+  return {
+    cliente: cleanExtracted(cliente),
+    marca: cleanExtracted(marca),
+    fechaInforme,
+    asesor,
+  };
+}
+
+function isBusquedaFoneticaPdf(text) {
+  return /b[uú]squeda\s+fon[eé]tica/i.test(text) || /DENOMINACI[ÓO]N\s+DEL\s+SIGNO/i.test(text);
+}
+
 function parsePdfFields(text) {
+  if (selectedStage === 'busqueda' || isBusquedaFoneticaPdf(text)) {
+    const bf = parseBusquedaFonetica(text);
+    return {
+      ...bf,
+      titular: bf.cliente,
+      fecha: bf.fechaInforme,
+    };
+  }
+
   const result = {};
   Object.entries(FIELD_DEFS).forEach(([key, def]) => {
     result[key] = key === 'asesor' ? extractAdvisor(text) : extractAfterAliases(text, def.aliases);

@@ -47,6 +47,17 @@ La extracción funciona en PDFs con texto seleccionable. Un PDF escaneado como
 imagen requiere OCR y no será leído por PDF.js. Todos los datos extraídos se
 muestran para revisión antes de enviar.
 
-El asesor se intenta obtener únicamente del PDF, buscando la etiqueta `ASESOR`
-o uno de los nombres conocidos. Si el documento no contiene ese dato, el envío
-se bloquea para evitar firmar con un asesor incorrecto.
+### Búsqueda fonética (informe Ulpik BF)
+
+Mapeo del PDF tipo `Ulpik - BF - …`:
+
+| Campo UI | Origen en el PDF |
+|----------|------------------|
+| Nombre del cliente | `CLIENTE` / `Nombre del cliente` |
+| Marca | `DENOMINACIÓN DEL SIGNO` |
+| Fecha del informe | 3.ª línea del encabezado (p. ej. `… • 27 de mayo de 2025`) |
+| Nombre del asesor | `ABOGADO A CARGO` |
+
+El asesor se intenta obtener únicamente del PDF, buscando la etiqueta `ASESOR` /
+`ABOGADO A CARGO` o uno de los nombres conocidos. Si el documento no contiene
+ese dato, el envío se bloquea para evitar firmar con un asesor incorrecto.
