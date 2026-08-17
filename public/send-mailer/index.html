@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=20260817">
+<link rel="stylesheet" href="styles.css?v=20260817b">
 </head>
 <body>
 <div class="toast" id="toast"></div>
@@ -41,27 +41,27 @@
   <section class="stp">
     <div class="stp-top"><span class="stp-num">2</span><span class="stp-tag">Documento</span></div>
     <h2>Documentos</h2>
-    <p class="hint">Parte 1 se usa para extraer datos. Parte 2 es un adjunto opcional que viaja con el correo.</p>
+    <p class="hint" id="doc-section-hint">Parte 1 se usa para extraer datos. Parte 2 es un adjunto opcional que viaja con el correo.</p>
     <div class="doc-split">
       <div class="doc-part">
-        <div class="doc-part-label">Parte 1 · Extracción</div>
-        <h3>PDF de respaldo *</h3>
-        <p class="hint">PDF con texto seleccionable · Máx. 10 MB</p>
+        <div class="doc-part-label" id="pdf-part-label">Parte 1 · Extracción</div>
+        <h3 id="pdf-heading">PDF de respaldo *</h3>
+        <p class="hint" id="pdf-hint">PDF con texto seleccionable · Máx. 10 MB</p>
         <div class="pdf-upload" id="pdf-drop">
           <input type="file" id="pdf-file" accept=".pdf,application/pdf" hidden>
-          <div class="pdf-icon">📄</div>
+          <div class="pdf-icon" id="pdf-icon">📄</div>
           <div class="pdf-title" id="pdf-title">Arrastra el PDF o haz clic</div>
           <div class="pdf-sub" id="pdf-sub">Se extraerán los campos disponibles</div>
         </div>
         <div class="extract-status" id="extract-status">Esperando documento</div>
       </div>
-      <div class="doc-part">
-        <div class="doc-part-label">Parte 2 · Adjunto extra</div>
-        <h3>Archivo adicional</h3>
-        <p class="hint">Opcional · PDF, imagen u hoja de cálculo · Máx. 10 MB</p>
+      <div class="doc-part" id="extra-part">
+        <div class="doc-part-label" id="extra-part-label">Parte 2 · Adjunto extra</div>
+        <h3 id="extra-heading">Archivo adicional</h3>
+        <p class="hint" id="extra-hint">Opcional · PDF, imagen u hoja de cálculo · Máx. 10 MB</p>
         <div class="pdf-upload" id="extra-drop">
           <input type="file" id="extra-file" accept=".pdf,.png,.jpg,.jpeg,.webp,.xls,.xlsx,.csv,application/pdf,image/*,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv" hidden>
-          <div class="pdf-icon">📎</div>
+          <div class="pdf-icon" id="extra-icon">📎</div>
           <div class="pdf-title" id="extra-title">Arrastra el archivo o haz clic</div>
           <div class="pdf-sub" id="extra-sub">Se enviará junto al correo</div>
         </div>
@@ -127,6 +127,6 @@ if (window.pdfjsLib) {
   pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 }
 </script>
-<script src="app.js?v=20260817"></script>
+<script src="app.js?v=20260817b"></script>
 </body>
 </html>

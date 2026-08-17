@@ -218,6 +218,140 @@ const PLACEHOLDERS = {
   fechaInforme: '[FECHA]',
 };
 
+const EXTRA_ACCEPT_ALL = '.pdf,.png,.jpg,.jpeg,.webp,.xls,.xlsx,.csv,application/pdf,image/*,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,*/*';
+
+const DOC_UPLOAD_DEFAULT = {
+  sectionHint: 'Parte 1 se usa para extraer datos. Parte 2 es un adjunto opcional que viaja con el correo.',
+  primary: {
+    partLabel: 'Parte 1 · Extracción',
+    title: 'PDF de respaldo *',
+    hint: 'PDF con texto seleccionable · Máx. 10 MB',
+    icon: '📄',
+    dropTitle: 'Arrastra el PDF o haz clic',
+    dropSub: 'Se extraerán los campos disponibles',
+  },
+  secondary: {
+    enabled: true,
+    partLabel: 'Parte 2 · Adjunto extra',
+    title: 'Archivo adicional',
+    hint: 'Opcional · PDF, imagen u hoja de cálculo · Máx. 10 MB',
+    icon: '📎',
+    dropTitle: 'Arrastra el archivo o haz clic',
+    dropSub: 'Se enviará junto al correo',
+    accept: EXTRA_ACCEPT_ALL,
+  },
+};
+
+/** Etiquetas de los cuadros de archivo según etapa. */
+const DOC_UPLOAD_BY_STAGE = {
+  busqueda: {
+    sectionHint: 'BF PDF para extracción. Excel BF (u otro archivo) se adjunta al correo.',
+    primary: {
+      partLabel: 'Parte 1 · Extracción',
+      title: 'BF PDF *',
+      hint: 'PDF del informe de búsqueda fonética · Máx. 10 MB',
+      icon: '📄',
+      dropTitle: 'Arrastra el BF PDF o haz clic',
+      dropSub: 'Se extraerán los campos disponibles',
+    },
+    secondary: {
+      enabled: true,
+      partLabel: 'Parte 2 · Adjunto',
+      title: 'Excel BF',
+      hint: 'Excel u cualquier archivo · Máx. 10 MB',
+      icon: '📊',
+      dropTitle: 'Arrastra el Excel BF o haz clic',
+      dropSub: 'Se enviará junto al correo',
+      accept: EXTRA_ACCEPT_ALL,
+    },
+  },
+  inicio: {
+    sectionHint: 'Solicitud para extracción. Espacio para tasa se adjunta al correo.',
+    primary: {
+      partLabel: 'Parte 1 · Extracción',
+      title: 'Solicitud *',
+      hint: 'PDF de la solicitud / Formato Único · Máx. 10 MB',
+      icon: '📄',
+      dropTitle: 'Arrastra la solicitud o haz clic',
+      dropSub: 'Se extraerán los campos disponibles',
+    },
+    secondary: {
+      enabled: true,
+      partLabel: 'Parte 2 · Adjunto',
+      title: 'Espacio para tasa',
+      hint: 'Comprobante de tasa u otro archivo · Máx. 10 MB',
+      icon: '📎',
+      dropTitle: 'Arrastra el archivo de tasa o haz clic',
+      dropSub: 'Se enviará junto al correo',
+      accept: EXTRA_ACCEPT_ALL,
+    },
+  },
+  publicacion: {
+    sectionHint: 'Solicitud para extracción. Captura gaceta (imagen u otro archivo) se adjunta al correo.',
+    primary: {
+      partLabel: 'Parte 1 · Extracción',
+      title: 'Solicitud *',
+      hint: 'PDF de la solicitud · Máx. 10 MB',
+      icon: '📄',
+      dropTitle: 'Arrastra la solicitud o haz clic',
+      dropSub: 'Se extraerán los campos disponibles',
+    },
+    secondary: {
+      enabled: true,
+      partLabel: 'Parte 2 · Adjunto',
+      title: 'Captura gaceta',
+      hint: 'Imagen u cualquier archivo · Máx. 10 MB',
+      icon: '🖼️',
+      dropTitle: 'Arrastra la captura de gaceta o haz clic',
+      dropSub: 'Se enviará junto al correo',
+      accept: EXTRA_ACCEPT_ALL,
+    },
+  },
+};
+
+function docUploadConfig() {
+  const custom = DOC_UPLOAD_BY_STAGE[selectedStage];
+  if (!custom) return DOC_UPLOAD_DEFAULT;
+  return {
+    sectionHint: custom.sectionHint || DOC_UPLOAD_DEFAULT.sectionHint,
+    primary: { ...DOC_UPLOAD_DEFAULT.primary, ...custom.primary },
+    secondary: { ...DOC_UPLOAD_DEFAULT.secondary, ...custom.secondary },
+  };
+}
+
+function updateDocLabels() {
+  const config = docUploadConfig();
+  const { primary, secondary } = config;
+
+  document.getElementById('doc-section-hint').textContent = config.sectionHint;
+  document.getElementById('pdf-part-label').textContent = primary.partLabel;
+  document.getElementById('pdf-heading').textContent = primary.title;
+  document.getElementById('pdf-hint').textContent = primary.hint;
+  document.getElementById('pdf-icon').textContent = primary.icon;
+  if (!pdfDataUrl) {
+    document.getElementById('pdf-title').textContent = primary.dropTitle;
+    document.getElementById('pdf-sub').textContent = primary.dropSub;
+  }
+
+  const extraPart = document.getElementById('extra-part');
+  if (!secondary.enabled) {
+    extraPart.classList.add('hidden');
+    clearExtraAttachment();
+    return;
+  }
+
+  extraPart.classList.remove('hidden');
+  document.getElementById('extra-part-label').textContent = secondary.partLabel;
+  document.getElementById('extra-heading').textContent = secondary.title;
+  document.getElementById('extra-hint').textContent = secondary.hint;
+  document.getElementById('extra-icon').textContent = secondary.icon;
+  document.getElementById('extra-file').accept = secondary.accept || EXTRA_ACCEPT_ALL;
+  if (!extraDataUrl) {
+    document.getElementById('extra-title').textContent = secondary.dropTitle;
+    document.getElementById('extra-sub').textContent = secondary.dropSub;
+  }
+}
+
 function activeTemplate() {
   const stage = STAGES[selectedStage];
   return selectedStage === 'fin_gaceta' && oppositionType === 'con' ? stage.opposition : stage;
@@ -518,6 +652,7 @@ function renderStages() {
     });
   });
   document.getElementById('opposition-wrap').classList.toggle('hidden', selectedStage !== 'fin_gaceta');
+  updateDocLabels();
 }
 
 function renderFields(values = {}) {
@@ -604,8 +739,9 @@ function clearExtraAttachment() {
   const input = document.getElementById('extra-file');
   if (input) input.value = '';
   document.getElementById('extra-drop').classList.remove('has-file');
-  document.getElementById('extra-title').textContent = 'Arrastra el archivo o haz clic';
-  document.getElementById('extra-sub').textContent = 'Se enviará junto al correo';
+  const secondary = docUploadConfig().secondary;
+  document.getElementById('extra-title').textContent = secondary.dropTitle;
+  document.getElementById('extra-sub').textContent = secondary.dropSub;
   document.getElementById('btn-clear-extra').classList.add('hidden');
 }
 

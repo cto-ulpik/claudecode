@@ -90,11 +90,14 @@ muestran para revisión antes de enviar.
 El título cita su resolución de origen, por eso se detecta antes que el PDF de
 resolución favorable.
 
-En la sección **Documento**:
+En la sección **Documento**, las etiquetas cambian según la etapa:
 
-1. **Parte 1 · Extracción**: PDF SENADI/Ulpik para completar campos.
-2. **Parte 2 · Adjunto extra**: archivo opcional (PDF, imagen o Excel) que
-   también viaja en el correo.
+| Etapa | Parte 1 (extracción) | Parte 2 (adjunto al correo) |
+|-------|----------------------|-----------------------------|
+| Búsqueda fonética | BF PDF | Excel BF (excel u otro archivo) |
+| Inicio de trámite | Solicitud | Espacio para tasa |
+| Publicación en Gaceta | Solicitud | Captura gaceta (imagen u otro) |
+| Resto de etapas | PDF de respaldo | Archivo adicional (opcional) |
 
 En **Datos email** se pueden marcar adjuntos fijos. El **servidor** los lee desde
 disco y los envía a Apps Script:
