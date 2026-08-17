@@ -97,7 +97,9 @@ En la sección **Documento**, las etiquetas cambian según la etapa:
 | Búsqueda fonética | BF PDF | Excel BF (excel u otro archivo) |
 | Inicio de trámite | Solicitud | Espacio para tasa |
 | Publicación en Gaceta | Solicitud | Captura gaceta (imagen u otro) |
-| Resto de etapas | PDF de respaldo | Archivo adicional (opcional) |
+| Fin de Gaceta | Solicitud | Archivo adicional (opcional) |
+| Resolución favorable | Solicitud | Archivo adicional (opcional) |
+| Título de registro | Título PDF | Archivo adicional (opcional) |
 
 En **Datos email** se pueden marcar adjuntos fijos. El **servidor** los lee desde
 disco y los envía a Apps Script:

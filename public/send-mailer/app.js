@@ -307,6 +307,39 @@ const DOC_UPLOAD_BY_STAGE = {
       accept: EXTRA_ACCEPT_ALL,
     },
   },
+  fin_gaceta: {
+    sectionHint: 'Solicitud para extracción. Parte 2 es un adjunto opcional que viaja con el correo.',
+    primary: {
+      partLabel: 'Parte 1 · Extracción',
+      title: 'Solicitud *',
+      hint: 'PDF de la solicitud · Máx. 10 MB',
+      icon: '📄',
+      dropTitle: 'Arrastra la solicitud o haz clic',
+      dropSub: 'Se extraerán los campos disponibles',
+    },
+  },
+  resolucion: {
+    sectionHint: 'Solicitud para extracción. Parte 2 es un adjunto opcional que viaja con el correo.',
+    primary: {
+      partLabel: 'Parte 1 · Extracción',
+      title: 'Solicitud *',
+      hint: 'PDF de la resolución / solicitud · Máx. 10 MB',
+      icon: '📄',
+      dropTitle: 'Arrastra la solicitud o haz clic',
+      dropSub: 'Se extraerán los campos disponibles',
+    },
+  },
+  titulo: {
+    sectionHint: 'Título PDF para extracción. Parte 2 es un adjunto opcional que viaja con el correo.',
+    primary: {
+      partLabel: 'Parte 1 · Extracción',
+      title: 'Título PDF *',
+      hint: 'PDF del título de registro · Máx. 10 MB',
+      icon: '📄',
+      dropTitle: 'Arrastra el título PDF o haz clic',
+      dropSub: 'Se extraerán los campos disponibles',
+    },
+  },
 };
 
 function docUploadConfig() {
