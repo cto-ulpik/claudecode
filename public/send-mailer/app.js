@@ -4,6 +4,9 @@ let pdfDataUrl = '';
 let pdfFileName = '';
 let pdfText = '';
 let previewDirty = false;
+let extraDataUrl = '';
+let extraFileName = '';
+let extraMimeType = '';
 
 
 const FIELD_DEFS = {
@@ -594,6 +597,41 @@ async function processPdf(file) {
   }
 }
 
+function clearExtraAttachment() {
+  extraDataUrl = '';
+  extraFileName = '';
+  extraMimeType = '';
+  const input = document.getElementById('extra-file');
+  if (input) input.value = '';
+  document.getElementById('extra-drop').classList.remove('has-file');
+  document.getElementById('extra-title').textContent = 'Arrastra el archivo o haz clic';
+  document.getElementById('extra-sub').textContent = 'Se enviará junto al correo';
+  document.getElementById('btn-clear-extra').classList.add('hidden');
+}
+
+async function processExtraAttachment(file) {
+  if (!file) return;
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('El adjunto extra supera los 10 MB', 'er');
+    return;
+  }
+
+  extraFileName = file.name;
+  extraMimeType = file.type || 'application/octet-stream';
+  extraDataUrl = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('extra-drop').classList.add('has-file');
+  document.getElementById('extra-title').textContent = file.name;
+  document.getElementById('extra-sub').textContent = `${Math.round(file.size / 1024)} KB · Listo para adjuntar`;
+  document.getElementById('btn-clear-extra').classList.remove('hidden');
+  showToast('Adjunto extra listo');
+}
+
 /** Fuerza https fuera de localhost: un redirect 301 convertiría el POST en GET. */
 function sendEmailEndpoint() {
   const url = new URL('/api/send-mailer/send-email', location.href);
@@ -618,9 +656,17 @@ async function sendEmail() {
   const missing = activeTemplate().fields.filter((key) => !fieldValue(key));
   const attachGarantia = !!document.getElementById('attach-garantia')?.checked;
   const attachCronologia = !!document.getElementById('attach-cronologia')?.checked;
+  const userAttachments = [];
+  if (extraDataUrl) {
+    userAttachments.push({
+      filename: extraFileName || 'adjunto-extra',
+      mimeType: extraMimeType || 'application/octet-stream',
+      base64: String(extraDataUrl).split(',')[1] || '',
+    });
+  }
 
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient)) return showToast('Ingresa un destinatario válido', 'er');
-  if (!pdfDataUrl) return showToast('Adjunta el PDF de respaldo', 'er');
+  if (!pdfDataUrl) return showToast('Adjunta el PDF de la parte 1 (extracción)', 'er');
   if (missing.length) return showToast(`Revisa los campos faltantes: ${missing.map((key) => FIELD_DEFS[key].label).join(', ')}`, 'er');
   if (!subject || !body) return showToast('Falta asunto o mensaje', 'er');
 
@@ -644,6 +690,7 @@ async function sendEmail() {
         pdfFilename: pdfFileName || 'documento-senadi.pdf',
         attachGarantia,
         attachCronologia,
+        userAttachments,
         fields: Object.fromEntries(activeTemplate().fields.map((key) => [key, fieldValue(key)])),
       }),
     });
@@ -657,7 +704,7 @@ async function sendEmail() {
     const extras = Array.isArray(data.extras) ? data.extras : [];
     const extraNote = extras.length
       ? ` · adjuntos: ${extras.join(', ')}`
-      : (attachGarantia || attachCronologia ? ' · sin adjuntos extra' : '');
+      : ((attachGarantia || attachCronologia || userAttachments.length) ? ' · sin adjuntos extra' : '');
     showToast(`Correo enviado a ${recipient}${extraNote}`);
   } catch (error) {
     showToast(error.message || 'Error al enviar', 'er');
@@ -687,6 +734,23 @@ pdfDrop.addEventListener('drop', (event) => {
   processPdf(event.dataTransfer.files[0]);
 });
 document.getElementById('pdf-file').addEventListener('change', (event) => processPdf(event.target.files[0]));
+
+const extraDrop = document.getElementById('extra-drop');
+extraDrop.addEventListener('click', () => document.getElementById('extra-file').click());
+extraDrop.addEventListener('dragover', (event) => {
+  event.preventDefault();
+  extraDrop.classList.add('has-file');
+});
+extraDrop.addEventListener('dragleave', () => {
+  if (!extraDataUrl) extraDrop.classList.remove('has-file');
+});
+extraDrop.addEventListener('drop', (event) => {
+  event.preventDefault();
+  processExtraAttachment(event.dataTransfer.files[0]);
+});
+document.getElementById('extra-file').addEventListener('change', (event) => processExtraAttachment(event.target.files[0]));
+document.getElementById('btn-clear-extra').addEventListener('click', clearExtraAttachment);
+
 document.getElementById('btn-reextract').addEventListener('click', () => {
   if (!pdfText) return showToast('Primero adjunta un PDF', 'er');
   renderFields(parsePdfFields(pdfText));

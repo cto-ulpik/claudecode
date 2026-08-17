@@ -90,11 +90,18 @@ muestran para revisión antes de enviar.
 El título cita su resolución de origen, por eso se detecta antes que el PDF de
 resolución favorable.
 
-En la sección **Datos email** se pueden marcar adjuntos opcionales. El **servidor**
-los lee desde disco y los envía a Apps Script (no dependen del navegador):
+En la sección **Documento**:
+
+1. **Parte 1 · Extracción**: PDF SENADI/Ulpik para completar campos.
+2. **Parte 2 · Adjunto extra**: archivo opcional (PDF, imagen o Excel) que
+   también viaja en el correo.
+
+En **Datos email** se pueden marcar adjuntos fijos. El **servidor** los lee desde
+disco y los envía a Apps Script:
 
 - `public/send-mailer/img/garantia.jpg`
 - `public/send-mailer/img/cronologia.jpg`
 
-Tras marcarlos, el toast de éxito debe listar esos nombres. Si el Apps Script
-está desactualizado, republica con versión `2026-08-14-send-mailer-attachments`.
+Tras marcarlos o subir el adjunto extra, el toast de éxito debe listar esos
+nombres. Si el Apps Script está desactualizado, republica con versión
+`2026-08-14-send-mailer-attachments`.

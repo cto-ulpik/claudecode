@@ -21,6 +21,11 @@ type SendMailerBody = {
   fields?: Record<string, string>;
   attachGarantia?: boolean;
   attachCronologia?: boolean;
+  userAttachments?: Array<{
+    filename?: string;
+    mimeType?: string;
+    base64?: string;
+  }>;
 };
 
 type ExtraAttachment = {
@@ -98,10 +103,25 @@ function loadStaticAttachment(
   throw new Error(`No se encontró el archivo de adjunto: ${def.filename}`);
 }
 
+function normalizeUserAttachments(
+  input: SendMailerBody["userAttachments"],
+): ExtraAttachment[] {
+  if (!Array.isArray(input)) return [];
+  return input
+    .map((item, index) => ({
+      filename: item.filename?.trim() || `adjunto-extra-${index + 1}`,
+      mimeType: item.mimeType?.trim() || "application/octet-stream",
+      base64: item.base64?.trim() || "",
+    }))
+    .filter((item) => item.base64.length > 0)
+    .slice(0, 3);
+}
+
 function collectExtraAttachments(input: SendMailerBody): ExtraAttachment[] {
   const extras: ExtraAttachment[] = [];
   if (input.attachGarantia) extras.push(loadStaticAttachment("garantia"));
   if (input.attachCronologia) extras.push(loadStaticAttachment("cronologia"));
+  extras.push(...normalizeUserAttachments(input.userAttachments));
   return extras;
 }
 
