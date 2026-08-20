@@ -54,3 +54,5 @@ Públicas: `/api/auth/*` (login/forgot/reset), `/api/compra`, `/api/surveys`, `/
 ## Send Mailer
 
 Herramienta en `/send-mailer` (mismo patrón que `/titulo`, sin login). Envía correos por etapa de registro con PDF adjunto vía Apps Script (`action: send-stage-email`). Ver `deploy/SEND-MAILER.md`.
+
+`GET /api/auth/me` responde **200** con `user: null` si no hay sesión (no 401). Safari interpreta un 401 como autenticación HTTP y muestra el diálogo nativo de usuario/contraseña.

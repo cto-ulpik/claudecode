@@ -59,13 +59,14 @@ authRouter.post("/logout", (req, res) => {
 authRouter.get("/me", (req, res) => {
   const token = getSessionToken(req);
   if (!token) {
-    res.status(401).json({ error: "No autenticado" });
+    // 200 (no 401): Safari muestra un diálogo nativo de usuario/contraseña ante cualquier 401.
+    res.json({ ok: true, user: null, expiresAt: 0 });
     return;
   }
   const session = getSessionByToken(token);
   if (!session) {
     clearSessionCookie(res);
-    res.status(401).json({ error: "Sesión inválida o expirada" });
+    res.json({ ok: true, user: null, expiresAt: 0 });
     return;
   }
   res.json({

@@ -24,8 +24,9 @@ async function authFetch<T>(path: string, init?: RequestInit): Promise<T> {
 
 export async function fetchMe(): Promise<{ user: AuthUser; expiresAt: number } | null> {
   try {
-    const data = await authFetch<{ ok: true; user: AuthUser; expiresAt: number }>("/api/auth/me");
-    return { user: data.user, expiresAt: data.expiresAt };
+    const data = await authFetch<{ ok: true; user: AuthUser | null; expiresAt?: number }>("/api/auth/me");
+    if (!data.user) return null;
+    return { user: data.user, expiresAt: data.expiresAt || 0 };
   } catch {
     return null;
   }

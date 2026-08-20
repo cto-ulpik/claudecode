@@ -52,6 +52,26 @@ server {
         client_max_body_size 35m;
         proxy_read_timeout 120s;
         proxy_send_timeout 120s;
+        # Un 401 con WWW-Authenticate hace que Safari pida usuario/contraseña.
+        proxy_hide_header WWW-Authenticate;
+    }
+
+    # Herramientas públicas: sin auth HTTP (auth_basic del server no debe aplicar aquí).
+    location ^~ /send-mailer/ {
+        auth_basic off;
+        try_files $uri $uri/ /send-mailer/index.html;
+    }
+    location = /send-mailer {
+        auth_basic off;
+        return 301 /send-mailer/;
+    }
+    location ^~ /titulo/ {
+        auth_basic off;
+        try_files $uri $uri/ /titulo/index.html;
+    }
+    location = /titulo {
+        auth_basic off;
+        return 301 /titulo/;
     }
 
     location / {
