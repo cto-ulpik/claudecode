@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { isAllowedEmail, normalizeEmail } from "../lib/authConfig.js";
+import { INITIAL_PASSWORD, isAllowedEmail, normalizeEmail } from "../lib/authConfig.js";
 import { appBaseUrl, sendAuthEmail } from "../lib/authEmail.js";
 import {
   consumeResetToken,
@@ -155,13 +155,8 @@ authRouter.post("/forgot-password", async (req, res) => {
 
 authRouter.post("/reset-password", (req, res) => {
   const token = String(req.body?.token || "").trim();
-  const newPassword = String(req.body?.newPassword || "");
   if (!token) {
     res.status(400).json({ error: "Falta el token de renovación" });
-    return;
-  }
-  if (newPassword.length < MIN_PASSWORD_LEN) {
-    res.status(400).json({ error: `La nueva contraseña debe tener al menos ${MIN_PASSWORD_LEN} caracteres` });
     return;
   }
 
@@ -177,10 +172,13 @@ authRouter.post("/reset-password", (req, res) => {
     return;
   }
 
-  updateUserPassword(user.id, hashPassword(newPassword));
+  updateUserPassword(user.id, hashPassword(INITIAL_PASSWORD));
   revokeAllSessionsForUser(user.id);
   clearSessionCookie(res);
-  res.json({ ok: true, message: "Contraseña actualizada. Ya puedes iniciar sesión." });
+  res.json({
+    ok: true,
+    message: `Contraseña restablecida a la de por defecto (${INITIAL_PASSWORD}). Ya puedes iniciar sesión.`,
+  });
 });
 
 function escapeHtml(s: string): string {

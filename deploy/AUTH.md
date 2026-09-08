@@ -25,7 +25,7 @@ Configurable con `AUTH_INITIAL_PASSWORD`. No se sobrescribe si el usuario ya exi
 |------|-----|
 | `/login` | Entrar con correo + contraseña |
 | `/olvide-contrasena` | Pide enlace por correo |
-| `/restablecer-contrasena?token=…` | Nueva contraseña desde el enlace |
+| `/restablecer-contrasena?token=…` | Restablece la contraseña a la de por defecto (`ulpik@2026.` / `AUTH_INITIAL_PASSWORD`) |
 | `/cuenta/contrasena` | Cambiar contraseña (logueado) |
 
 ## Correo de renovación

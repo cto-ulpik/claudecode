@@ -61,9 +61,9 @@ export async function forgotPassword(email: string) {
   });
 }
 
-export async function resetPassword(token: string, newPassword: string) {
+export async function resetPassword(token: string) {
   return authFetch<{ ok: true; message?: string }>("/api/auth/reset-password", {
     method: "POST",
-    body: JSON.stringify({ token, newPassword }),
+    body: JSON.stringify({ token }),
   });
 }
