@@ -24,25 +24,33 @@ GOOGLE_SHEETS_COMPRA_WEBAPP_URL=https://script.google.com/macros/s/AKfycbzcVAk_F
 ./deploy/test-compra.sh
 ```
 
-La respuesta de `GET ?data=` **debe** incluir `"row":{...}` con `"colP"` y `"version":"2026-08-13-col-P"`. Si solo devuelve `"message":"Encuesta proceso de compra ULPIK activa"`, el despliegue está desactualizado y **no guarda filas**.
+La respuesta de `GET ?data=` **debe** incluir `"row":{...}` con `"version":"2026-09-21-col-N-Q"`. Si solo devuelve `"message":"Encuesta proceso de compra ULPIK activa"`, el despliegue está desactualizado y **no guarda filas**.
 
 Verificar versión:
 
 ```bash
 curl -sL "$GOOGLE_SHEETS_COMPRA_WEBAPP_URL"
-# Debe mostrar: "version":"2026-08-13-col-P"
+# Debe mostrar: "version":"2026-09-21-col-N-Q"
 ```
 
 ## Frontend
 
 `https://ia.ulpik.com/compra` → `POST /api/compra` → Apps Script → nueva fila en el Sheet.
 
-## Columna P (recomendación)
+## Mapeo real de columnas
 
-Si NPS / recomendación es menor a 10, el cliente debe indicar qué faltó para llegar al 10.
+El Sheet ya traía preguntas propias (J, K, N, O) de un formulario anterior que el
+webapp actual no pregunta o que coinciden con una pregunta que sí agregamos. El
+mapeo real, verificado contra los encabezados existentes, es:
 
-| Col | Header | Campo JSON |
-|-----|--------|------------|
-| P | Qué faltó para el 10 (Recomendación) | `npsMejora` |
+| Col | Header en el Sheet | Campo JSON | Notas |
+|-----|---------------------|------------|-------|
+| J | ¿Habías contratado antes servicios con Ulpik? | — | no se pide en el form actual, queda vacía |
+| K | ¿Cuál es la facturación anual aproximada de tu negocio? | — | no se pide en el form actual, queda vacía |
+| N | ¿Cómo te enteraste de ULPIK? | `conocio` | pregunta nueva del form (paso 3). Si elige "Otro", se escribe `"Otro: <detalle>"` en esta misma columna — no se usa una columna aparte |
+| O | Desearías recibir las notificaciones periódicas... | — | no se pide en el form actual, queda vacía |
+| P | Columna 1 (genérico/legacy) | — | no se usa |
+| Q | ¿Qué podríamos hacer para que su calificación sea un 10/10? ¿Qué faltó? | `npsMejora` | recomendación < 10 |
+| R, S | (libres) | — | sin uso |
 
-La columna O queda vacía (ya no se pide comentario de facilidad). Redesplegar `Code.gs` con nueva versión.
+Redesplegar `Code.gs` con la nueva versión para que el mapeo tome efecto.

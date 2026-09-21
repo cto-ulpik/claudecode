@@ -6,6 +6,8 @@ export const compraRouter = Router();
 type CompraBody = {
   email?: string;
   servicio?: string;
+  conocio?: string;
+  conocioOtro?: string;
   facilidad?: number;
   claridad?: number;
   dificultad?: string;
@@ -22,6 +24,10 @@ function validate(body: CompraBody): string | null {
   const email = body.email?.trim() ?? "";
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Correo inválido";
   if (!body.servicio?.trim()) return "Falta servicio";
+  if (!body.conocio?.trim()) return "Falta cómo te enteraste";
+  if (body.conocio === "Otro" && (body.conocioOtro?.trim().length ?? 0) < 3) {
+    return "Falta especificar cómo te enteraste";
+  }
   if (!body.facilidad || body.facilidad < 1 || body.facilidad > 10) return "Falta facilidad";
   if (!body.claridad || body.claridad < 1 || body.claridad > 10) return "Falta claridad";
   if (!body.dificultad?.trim()) return "Falta dificultad";
@@ -49,6 +55,8 @@ compraRouter.post("/", async (req, res) => {
     action: "append-compra",
     email: input.email!.trim(),
     servicio: input.servicio!.trim(),
+    conocio: input.conocio!.trim(),
+    conocioOtro: input.conocio === "Otro" ? (input.conocioOtro || "").trim() : "",
     facilidad: input.facilidad,
     claridad: input.claridad,
     dificultad: input.dificultad!.trim(),

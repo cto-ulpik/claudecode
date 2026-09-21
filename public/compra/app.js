@@ -139,6 +139,8 @@ const SCALE_FIELDS = [
 const fd = {
   email: '',
   servicio: '',
+  conocio: '',
+  conocioOtro: '',
   facilidad: 0,
   claridad: 0,
   dificultad: '',
@@ -192,10 +194,16 @@ function npsMejoraOk() {
   return true;
 }
 
+function conocioOtroOk() {
+  if (fd.conocio !== 'Otro') return true;
+  return String(fd.conocioOtro || '').trim().length >= 3;
+}
+
 function isDone(f) {
   const v = fd[f];
   if (f === 'email') return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
   if (f === 'nps') return fd.nps > 0 && npsMejoraOk();
+  if (f === 'conocio') return String(v || '').length > 0 && conocioOtroOk();
   if (typeof v === 'number') return v > 0;
   return String(v || '').length > 0;
 }
@@ -215,7 +223,7 @@ function markD(id, val) {
 }
 
 function upP() {
-  const fields = ['email', 'servicio', 'facilidad', 'claridad', 'dificultad', 'atencion', 'acomp', 'nps', 'asesor', 'mejora'];
+  const fields = ['email', 'servicio', 'conocio', 'facilidad', 'claridad', 'dificultad', 'atencion', 'acomp', 'nps', 'asesor', 'mejora'];
   const done = fields.filter((f) => isDone(f)).length;
   const pct = Math.round((done / fields.length) * 100);
   document.getElementById('prog-fill').style.width = pct + '%';
@@ -261,10 +269,33 @@ function onNpsMejora() {
   upP();
 }
 
+function toggleConocioOtro() {
+  const box = document.getElementById('fu-conocio');
+  const inp = document.getElementById('f-conocio-otro');
+  if (!box || !inp) return;
+  const need = fd.conocio === 'Otro';
+  box.classList.toggle('show', need);
+  if (!need) {
+    box.classList.remove('bad');
+    inp.value = '';
+    fd.conocioOtro = '';
+  }
+}
+
+function onConocioOtro() {
+  const t = document.getElementById('f-conocio-otro');
+  fd.conocioOtro = t ? t.value : '';
+  const box = document.getElementById('fu-conocio');
+  if (box) box.classList.toggle('bad', fd.conocio === 'Otro' && fd.conocioOtro.trim().length < 3);
+  markD('s-conocio', isDone('conocio') ? fd.conocio : '');
+  upP();
+}
+
 function validate() {
   const checks = [
     { f: 'email', s: 's-email' },
     { f: 'servicio', s: 's-servicio' },
+    { f: 'conocio', s: 's-conocio' },
     { f: 'facilidad', s: 's-facilidad' },
     { f: 'claridad', s: 's-claridad' },
     { f: 'dificultad', s: 's-dificultad' },
@@ -284,11 +315,16 @@ function validate() {
         const fu = document.getElementById('fu-nps');
         if (fu) fu.classList.toggle('bad', fd.nps > 0 && !npsMejoraOk());
       }
+      if (f === 'conocio') {
+        const fu = document.getElementById('fu-conocio');
+        if (fu) fu.classList.toggle('bad', fd.conocio === 'Otro' && !conocioOtroOk());
+      }
       if (!first) first = el;
       ok = false;
     } else {
       el.classList.remove('bad');
       if (f === 'nps') document.getElementById('fu-nps')?.classList.remove('bad');
+      if (f === 'conocio') document.getElementById('fu-conocio')?.classList.remove('bad');
     }
   });
   if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -480,7 +516,8 @@ window.addEventListener('load', () => {
       document.querySelectorAll('.opt[data-group="' + g + '"]').forEach((x) => x.classList.remove('sel'));
       o.classList.add('sel');
       fd[g] = o.dataset.val;
-      markD('s-' + g, o.dataset.val);
+      if (g === 'conocio') toggleConocioOtro();
+      markD('s-' + g, g === 'conocio' ? (isDone('conocio') ? o.dataset.val : '') : o.dataset.val);
       upP();
     });
   });
@@ -488,6 +525,7 @@ window.addEventListener('load', () => {
   document.getElementById('f-email').addEventListener('input', onEI);
   document.getElementById('f-mejora').addEventListener('input', onMI);
   document.getElementById('f-nps-mejora').addEventListener('input', onNpsMejora);
+  document.getElementById('f-conocio-otro').addEventListener('input', onConocioOtro);
   document.getElementById('btn-sub').addEventListener('click', submitForm);
   document.getElementById('lb-close').addEventListener('click', closeLightbox);
   document.getElementById('lb').addEventListener('click', (e) => {

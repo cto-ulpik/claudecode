@@ -12,13 +12,21 @@
  *   - Ejecutar como: Yo
  *   - Quién tiene acceso: Cualquier persona
  *
- * Verificar URL /exec → debe incluir "version":"2026-08-13-col-P"
+ * Columnas reales del Sheet (verificadas contra los encabezados existentes):
+ *   A email... hasta M = igual que antes. N = "¿Cómo te enteraste de ULPIK?"
+ *   (pregunta que YA existía en el Sheet) — si elige "Otro" se escribe
+ *   "Otro: <detalle>" en esta misma columna, sin usar columnas extra. O =
+ *   "notificaciones periódicas" (no se usa). P = "Columna 1" (legacy, no se
+ *   usa). Q = "¿Qué podríamos hacer para que su calificación sea un 10/10?"
+ *   → npsMejora. R y S = libres, sin uso.
+ *
+ * Verificar URL /exec → debe incluir "version":"2026-09-21-col-N-Q"
  */
 
 var SHEET_NAME = 'Respuestas de formulario 1';
 var SHEET_NAME_ALT = 'Form_Responses';
 var WEBHOOK_SECRET = '';
-var SCRIPT_VERSION = '2026-08-13-col-P';
+var SCRIPT_VERSION = '2026-09-21-col-N-Q';
 
 function doGet(e) {
   e = e || {};
@@ -116,6 +124,7 @@ function appendCompraRow(payload) {
   var tz = Session.getScriptTimeZone() || 'America/Guayaquil';
   var now = new Date();
   var marca = Utilities.formatDate(now, tz, 'dd/MM/yyyy HH:mm:ss');
+  var conocioTexto = formatConocio_(payload.conocio, payload.conocioOtro);
 
   var row = [
     marca,                                                           // A
@@ -127,13 +136,14 @@ function appendCompraRow(payload) {
     numCol(payload.atencion),                                        // G
     String(payload.acomp || '').trim(),                              // H
     numCol(payload.nps),                                             // I
-    '',                                                              // J
-    '',                                                              // K
+    '',                                                              // J (¿Habías contratado antes...? — no se pide en el form)
+    '',                                                              // K (facturación anual — no se pide en el form)
     String(payload.asesor || '').trim(),                             // L
     String(payload.mejora || '').trim(),                             // M
-    '',                                                              // N
-    '',                                                              // O (antes facilidadMejora; ya no se usa)
-    String(payload.npsMejora || payload.nps_mejora || '').trim()     // P ← recomendación < 10
+    conocioTexto,                                                    // N ← ¿Cómo te enteraste de Ulpik? ("Otro: <detalle>" si aplica)
+    '',                                                              // O (notificaciones periódicas — no se pide en el form)
+    '',                                                              // P ("Columna 1", legacy, no se usa)
+    String(payload.npsMejora || payload.nps_mejora || '').trim()     // Q ← qué faltó para el 10 (recomendación < 10)
   ];
 
   sheet.appendRow(row);
@@ -141,11 +151,18 @@ function appendCompraRow(payload) {
     marca: marca,
     email: row[1],
     nps: row[8],
-    npsMejora: row[15],
-    colP: row[15],
+    conocio: row[13],
+    npsMejora: row[16],
     totalCols: row.length,
     version: SCRIPT_VERSION
   };
+}
+
+function formatConocio_(conocio, conocioOtro) {
+  var c = String(conocio || '').trim();
+  if (c !== 'Otro') return c;
+  var detalle = String(conocioOtro || '').trim();
+  return detalle ? 'Otro: ' + detalle : 'Otro';
 }
 
 function validateCompraPayload(p) {
@@ -154,6 +171,10 @@ function validateCompraPayload(p) {
     throw new Error('Correo inválido');
   }
   if (!String(p.servicio || '').trim()) throw new Error('Falta servicio');
+  if (!String(p.conocio || '').trim()) throw new Error('Falta cómo te enteraste');
+  if (String(p.conocio || '').trim() === 'Otro' && String(p.conocioOtro || '').trim().length < 3) {
+    throw new Error('Falta especificar cómo te enteraste');
+  }
   if (!numCol(p.facilidad)) throw new Error('Falta facilidad');
   if (!numCol(p.claridad)) throw new Error('Falta claridad');
   if (!String(p.dificultad || '').trim()) throw new Error('Falta dificultad');
@@ -234,9 +255,8 @@ function readSurveyData() {
       facturacion: String(r[10] || ''),
       asesor: String(r[11] || ''),
       comentario: String(r[12] || ''),
-      nota_interna: String(r[13] || ''),
-      facilidadMejora: String(r[14] || ''),
-      npsMejora: String(r[15] || '')
+      conocio: String(r[13] || ''),
+      npsMejora: String(r[16] || '')
     });
   }
   return rows;
@@ -279,9 +299,9 @@ function numCol(v) {
 }
 
 function ensureNpsMejoraHeader_(sheet) {
-  // Columna P = 16
-  var cell = sheet.getRange(1, 16);
-  cell.setValue('Qué faltó para el 10 (Recomendación)');
+  // Columna Q = 17 (ya existe con este texto en el Sheet; se reafirma por si acaso)
+  var cell = sheet.getRange(1, 17);
+  cell.setValue('¿Qué podríamos hacer para que su calificación sea un 10/10? ¿Qué faltó?');
 }
 
 function getSheet() {
@@ -316,6 +336,7 @@ function testAppendCompra() {
   return appendCompraRow({
     email: 'test@ulpik.com',
     servicio: 'Registro de marca',
+    conocio: 'Instagram',
     facilidad: 10,
     claridad: 9,
     dificultad: 'Ninguna, todo fue claro',
