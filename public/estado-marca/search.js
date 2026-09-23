@@ -65,6 +65,17 @@ function logoUrl(raw) {
   return `${LOGO_CDN}/${v}/public`;
 }
 
+function pickUpk(b) {
+  if (!b || typeof b !== "object") return "";
+  return String(
+    b.upk_code ||
+    b.upkCode ||
+    b.upk ||
+    (b.brand && (b.brand.upk_code || b.brand.upkCode)) ||
+    ""
+  ).trim();
+}
+
 function openTimeline(upkCode) {
   const code = displayUpk(upkCode) || normalizeUpk(upkCode);
   if (!code) {
@@ -87,7 +98,7 @@ function formatDate(value) {
 function renderCards(brands) {
   cardsEl.hidden = false;
   cardsEl.innerHTML = brands.map((b, i) => {
-    const upk = b.upkCode || b.upk_code || "";
+    const upk = pickUpk(b);
     const name = b.nameBrand || "Marca";
     const etapa = b.estado_marca || b.etapaTramite || b.estadoMarca || "En trámite";
     const start = formatDate(b.startDate || b.createAt || b.fechaSolicitud);
@@ -108,7 +119,7 @@ function renderCards(brands) {
   cardsEl.querySelectorAll(".card").forEach((el) => {
     el.addEventListener("click", () => {
       const brand = brands[Number(el.dataset.idx)];
-      openTimeline(brand.upkCode || brand.upk_code);
+      openTimeline(pickUpk(brand));
     });
   });
 }
@@ -153,7 +164,7 @@ form.addEventListener("submit", async (event) => {
   try {
     if (mode === "upk") {
       const brand = await searchByUpk(q);
-      openTimeline(brand.upkCode || q);
+      openTimeline(pickUpk(brand) || q);
       return;
     }
 
@@ -165,9 +176,9 @@ form.addEventListener("submit", async (event) => {
 
     if (brands.length === 1) {
       const only = brands[0];
-      const upk = only.upkCode || only.upk_code;
+      const upk = pickUpk(only);
       if (!normalizeUpk(upk)) {
-        showStatus("Se encontró 1 marca, pero aún no tiene código UPK asignado.", "err");
+        showStatus("Se encontró 1 marca, pero la API no devolvió upk_code. Revisa el brands-manager desplegado.", "err");
         renderCards(brands);
         return;
       }
