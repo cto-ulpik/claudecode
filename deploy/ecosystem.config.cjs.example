@@ -21,6 +21,8 @@ module.exports = {
         AUTH_INITIAL_PASSWORD: "ulpik@2026.",
         APP_BASE_URL: "https://ia.ulpik.com",
         AUTH_COOKIE_SECURE: "1",
+        OPENAI_API_KEY: "",
+        // OPENAI_MODEL: "gpt-4o-mini",
       },
     },
   ],

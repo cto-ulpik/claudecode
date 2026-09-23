@@ -73,6 +73,14 @@ server {
         auth_basic off;
         return 301 /titulo/;
     }
+    location ^~ /triple_impact/ {
+        auth_basic off;
+        try_files $uri $uri/ /triple_impact/index.html;
+    }
+    location = /triple_impact {
+        auth_basic off;
+        return 301 /triple_impact/;
+    }
 
     location / {
         try_files $uri $uri/ /index.html;

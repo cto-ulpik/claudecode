@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-store">
+<title>Evaluador de Briefs · Triple Impact Check · Marcas que Impactan</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css?v=20260923b">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="mark"><span class="dots"><i class="dot s"></i><i class="dot a"></i><i class="dot e"></i></span>Triple Impact Check</div>
+    <div class="spacer"></div>
+    <span class="badge-mqi">Evaluador interno · MQI</span>
+    <button class="ghost hidden" id="restartTop">Nuevo</button>
+  </div>
+</div>
+
+<main id="screenIntro" class="wrap intro">
+  <div class="eyebrow">Marcas que Impactan · Uso interno</div>
+  <h1>Sube el brief. <em>Recibe la nota.</em></h1>
+  <p class="lede">Pega o carga el brief de Triple Impacto de una empresa —o su memoria de sostenibilidad— y el evaluador lo lee entero y lo califica de 0 a 100 según qué tan lejos está del mínimo legal. Una nota, un veredicto y las razones detrás de cada dimensión.</p>
+
+  <div class="scalebox">
+    <h3>Cómo se lee la nota</h3>
+    <p>La vara no es la perfección: es la distancia sobre lo que la ley ya obliga. Cumplir exactamente la ley se queda en 40. El 100 es prácticamente inalcanzable —exigiría estar en la frontera de la mejor práctica global en las tres dimensiones a la vez.</p>
+    <div class="scale">
+      <div class="scale-track"></div>
+      <div class="legal"><b>40 · mínimo legal</b></div>
+      <div class="anchor" style="left:40%"><div class="an-dot" style="background:var(--amber)"></div><div class="an-lab">cumplir la ley<b>≈ 40</b></div></div>
+      <div class="anchor" style="left:66%"><div class="an-dot" style="background:var(--social)"></div><div class="an-lab">brief con datos<b>≈ 60–70</b></div></div>
+      <div class="anchor" style="left:90%"><div class="an-dot" style="background:var(--green)"></div><div class="an-lab">memoria GRI madura<b>≈ 85–92</b></div></div>
+      <div class="scale-end l">0 · incumple la ley</div>
+      <div class="scale-end r">100 · frontera global</div>
+    </div>
+  </div>
+
+  <div class="bands">
+    <div class="band"><div class="rng">0–39</div><div class="nm">Inicial</div><p>No llega al piso legal en varias áreas. Primero regularizar.</p></div>
+    <div class="band"><div class="rng">40–59</div><div class="nm">En transición</div><p>En torno al mínimo legal. Acciones sueltas, poca evidencia.</p></div>
+    <div class="band"><div class="rng">60–79</div><div class="nm">Comprometida</div><p>Claramente sobre la ley en varias áreas, con datos.</p></div>
+    <div class="band"><div class="rng">80–100</div><div class="nm">Referente</div><p>Gestión medida, sostenida y documentada. Rara.</p></div>
+  </div>
+
+  <div class="form">
+    <h3>Datos del caso</h3>
+    <div class="frow">
+      <div class="field"><label>Empresa evaluada</label><input id="inEmpresa" placeholder="Nombre de la empresa"></div>
+      <div class="field"><label>Analista MQI</label><input id="inAnalista" placeholder="Quién evalúa"></div>
+    </div>
+
+    <div class="drop" id="drop">
+      <div class="dt">Arrastra el brief o la memoria aquí</div>
+      <div class="dh">PDF o Word (.docx) · hasta 40 MB · se lee en tu navegador</div>
+      <button class="pick" id="pickBtn" type="button">Elegir archivo</button>
+      <input type="file" id="fileInput" accept="application/pdf,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none">
+    </div>
+    <div id="filePill"></div>
+
+    <div class="orpaste">— o pega el texto —</div>
+    <textarea class="pastebox" id="pasteBox" placeholder="Pega aquí el contenido del brief si lo tienes como texto…"></textarea>
+
+    <h3 style="margin-top:22px">Redes y web (opcional, para contrastar)</h3>
+    <p class="disclaimer" style="margin-top:0;margin-bottom:12px">Pega bios, captions o el “about” de Instagram/LinkedIn/web. El evaluador compara el brief con lo declarado en redes. Sin material, marcará hallazgos como [SUPUESTO].</p>
+    <div class="field full" style="margin-bottom:12px">
+      <label>URLs (Instagram, LinkedIn, web…)</label>
+      <input id="inRedesUrls" placeholder="https://instagram.com/… · https://linkedin.com/… · https://…">
+    </div>
+    <textarea class="pastebox" id="redesBox" placeholder="Pega aquí bio, posts recientes, about de LinkedIn o copy de la web…"></textarea>
+
+    <button class="cta" id="evalBtn" disabled>Evaluar brief</button>
+    <p class="disclaimer">El documento se procesa en el navegador y se envía únicamente al modelo para su análisis. La nota es un diagnóstico de madurez, no una certificación. Calíbrala siempre con tu criterio: un brief puede exagerar, y el evaluador señala cuándo faltan datos que lo respalden.</p>
+  </div>
+</main>
+
+<main id="screenLoad" class="wrap hidden">
+  <div class="loading">
+    <div class="spin"></div>
+    <h2 id="loadTitle">Leyendo el documento…</h2>
+    <p id="loadMsg">Esto toma entre 15 y 40 segundos según el tamaño.</p>
+    <div class="steps">
+      <div class="step" id="st1"><span class="sd"></span>Extraer el texto del archivo</div>
+      <div class="step" id="st2"><span class="sd"></span>Analizar las tres dimensiones</div>
+      <div class="step" id="st3"><span class="sd"></span>Calibrar contra el mínimo legal</div>
+      <div class="step" id="st4"><span class="sd"></span>Contrastar redes y briefing Nico</div>
+      <div class="step" id="st5"><span class="sd"></span>Redactar el veredicto</div>
+    </div>
+    <div id="loadErr"></div>
+  </div>
+</main>
+
+<main id="screenRes" class="wrap res hidden"></main>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+</script>
+<script src="app.js?v=20260923b"></script>
+</body>
+</html>

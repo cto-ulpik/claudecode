@@ -12,6 +12,7 @@ import { UlpikCompraPage } from "./pages/UlpikCompraPage";
 import { UlpikPulsoEquipoPage } from "./pages/UlpikPulsoEquipoPage";
 import { UlpikEstadoMarcaPage } from "./pages/UlpikEstadoMarcaPage";
 import { UlpikSendMailerPage } from "./pages/UlpikSendMailerPage";
+import { UlpikTripleImpactPage } from "./pages/UlpikTripleImpactPage";
 import { LoginPage } from "./pages/LoginPage";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
@@ -31,6 +32,8 @@ export function App() {
       <Route path="/titulo/" element={<UlpikTituloPage />} />
       <Route path="/send-mailer" element={<UlpikSendMailerPage />} />
       <Route path="/send-mailer/" element={<UlpikSendMailerPage />} />
+      <Route path="/triple_impact" element={<UlpikTripleImpactPage />} />
+      <Route path="/triple_impact/" element={<UlpikTripleImpactPage />} />
       <Route path="/compra" element={<UlpikCompraPage />} />
       <Route path="/compra/" element={<UlpikCompraPage />} />
       <Route path="/pulso-equipo" element={<UlpikPulsoEquipoPage />} />

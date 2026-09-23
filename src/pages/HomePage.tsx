@@ -54,6 +54,16 @@ export function HomePage() {
           </p>
         </Link>
 
+        <a className="home__card" href="/triple_impact" role="listitem">
+          <span className="home__card-icon" aria-hidden="true">
+            ◎
+          </span>
+          <h2 className="home__card-title">Triple Impact Check</h2>
+          <p className="home__card-desc">
+            Evalúa briefs de triple impacto (MQI): nota 0–100, dimensiones y veredicto asistido por IA.
+          </p>
+        </a>
+
         <Link className="home__card" to="/visualizador-dashboards" role="listitem">
           <span className="home__card-icon" aria-hidden="true">
             ▣
