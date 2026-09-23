@@ -19,8 +19,8 @@ function setMode(next) {
   modeUpk.classList.toggle("on", mode === "upk");
   if (mode === "dni") {
     labelEl.textContent = "Número de CI o RUC";
-    queryEl.placeholder = "Ej. 1712345678";
-    hintEl.textContent = "Búsqueda principal por documento del titular. Si hay varias marcas, se muestran en tarjetas.";
+    queryEl.placeholder = "Ej. 1717567109 o 1717567109001";
+    hintEl.textContent = "Acepta CI (10 dígitos) o RUC (13). Si hay varias marcas, se muestran en tarjetas con su upk_code.";
   } else {
     labelEl.textContent = "Código UPK de tu marca";
     queryEl.placeholder = "Ej. UPK-8N66LY";
@@ -129,7 +129,9 @@ function escapeHtml(s) {
 }
 
 async function searchByDni(dni) {
-  const res = await fetch(`/api/brands/dni/${encodeURIComponent(dni)}`);
+  // Enviar solo dígitos; el backend también prueba CI↔RUC
+  const cleaned = String(dni || "").replace(/\D/g, "") || String(dni || "").trim();
+  const res = await fetch(`/api/brands/dni/${encodeURIComponent(cleaned)}`);
   const data = await res.json().catch(() => null);
   if (!res.ok) {
     const msg = (data && (data.message || data.error)) || `No se pudo buscar (${res.status})`;
