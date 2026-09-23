@@ -49,7 +49,7 @@ Edita `server/lib/authConfig.ts` (`ALLOWED_USERS`) y reinicia la API. Los nuevos
 ## APIs
 
 Protegidas: `/api/dashboards`, `/api/sheets`  
-Públicas: `/api/auth/*` (login/forgot/reset), `/api/compra`, `/api/surveys`, `/api/titulo`, `/api/send-mailer`, `/api/triple-impact`, `/api/health`
+Públicas: `/api/auth/*` (login/forgot/reset), `/api/compra`, `/api/surveys`, `/api/titulo`, `/api/send-mailer`, `/api/triple-impact`, `/api/estado-marca`, `/api/brand/upk`, `/api/brands/dni`, `/api/health`
 
 ## Send Mailer
 

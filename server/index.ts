@@ -11,6 +11,7 @@ import { tituloRouter } from "./routes/titulo.js";
 import { compraRouter } from "./routes/compra.js";
 import { sendMailerRouter } from "./routes/sendMailer.js";
 import { tripleImpactRouter } from "./routes/tripleImpact.js";
+import { estadoMarcaRouter, proxyBrandByUpk, proxyBrandsByDni } from "./routes/estadoMarca.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT) || 3001;
@@ -41,6 +42,10 @@ app.use("/api/titulo", tituloRouter);
 app.use("/api/compra", compraRouter);
 app.use("/api/send-mailer", sendMailerRouter);
 app.use("/api/triple-impact", tripleImpactRouter);
+/** Proxy al brands-manager para /estado-marca */
+app.use("/api/estado-marca", estadoMarcaRouter);
+app.get("/api/brand/upk/:code", proxyBrandByUpk);
+app.get("/api/brands/dni/:dni", proxyBrandsByDni);
 
 if (serveStatic) {
   app.use(express.static(distDir));

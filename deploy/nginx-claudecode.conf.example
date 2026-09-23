@@ -81,6 +81,14 @@ server {
         auth_basic off;
         return 301 /triple_impact/;
     }
+    location ^~ /estado-marca/ {
+        auth_basic off;
+        try_files $uri $uri/ /estado-marca/index.html;
+    }
+    location = /estado-marca {
+        auth_basic off;
+        return 301 /estado-marca/;
+    }
 
     location / {
         try_files $uri $uri/ /index.html;

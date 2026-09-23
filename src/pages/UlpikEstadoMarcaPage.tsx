@@ -1,13 +1,17 @@
 import { useParams, useSearchParams } from "react-router-dom";
 
-/** Página pública a pantalla completa (sin login de claudecode). */
+/**
+ * Estado de marca (público).
+ * - Sin UPK → pantalla de búsqueda (CI/RUC principal, UPK secundario).
+ * - Con UPK (path o ?upk=) → timeline de detalle. El identificador canónico es el código UPK.
+ */
 export function UlpikEstadoMarcaPage() {
   const { upk: upkFromPath } = useParams();
   const [searchParams] = useSearchParams();
   const upk = (upkFromPath || searchParams.get("upk") || "").trim();
 
   const src = upk
-    ? `/estado-marca/index.html?upk=${encodeURIComponent(upk)}`
+    ? `/estado-marca/timeline.html?upk=${encodeURIComponent(upk)}`
     : "/estado-marca/index.html";
 
   return (
