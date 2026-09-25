@@ -64,6 +64,16 @@ export function HomePage() {
           </p>
         </a>
 
+        <a className="home__card" href="/auditor" role="listitem">
+          <span className="home__card-icon" aria-hidden="true">
+            ✓
+          </span>
+          <h2 className="home__card-title">Auditor de Trámites SENADI</h2>
+          <p className="home__card-desc">
+            Revisa formularios de registro marcario antes de subirlos para llegar a cero observaciones de forma.
+          </p>
+        </a>
+
         <Link className="home__card" to="/visualizador-dashboards" role="listitem">
           <span className="home__card-icon" aria-hidden="true">
             ▣

@@ -13,6 +13,7 @@ import { UlpikPulsoEquipoPage } from "./pages/UlpikPulsoEquipoPage";
 import { UlpikEstadoMarcaPage } from "./pages/UlpikEstadoMarcaPage";
 import { UlpikSendMailerPage } from "./pages/UlpikSendMailerPage";
 import { UlpikTripleImpactPage } from "./pages/UlpikTripleImpactPage";
+import { UlpikAuditorPage } from "./pages/UlpikAuditorPage";
 import { LoginPage } from "./pages/LoginPage";
 import { ForgotPasswordPage } from "./pages/ForgotPasswordPage";
 import { ResetPasswordPage } from "./pages/ResetPasswordPage";
@@ -43,6 +44,8 @@ export function App() {
       <Route path="/estado-marca" element={<UlpikEstadoMarcaPage />} />
       <Route path="/estado-marca/" element={<UlpikEstadoMarcaPage />} />
       <Route element={<RequireAuth />}>
+        <Route path="/auditor" element={<UlpikAuditorPage />} />
+        <Route path="/auditor/" element={<UlpikAuditorPage />} />
         <Route element={<AppShell />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/agentes" element={<AgentsPage />} />
