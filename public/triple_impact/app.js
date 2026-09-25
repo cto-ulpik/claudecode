@@ -405,6 +405,135 @@ function buildNicoReport(){
   return L.join("\n");
 }
 
+// Las fuentes estándar de jsPDF solo cubren Latin-1: normaliza comillas/guiones y quita emojis.
+function pdfSafe(t){
+  return String(t==null?"":t)
+    .replace(/[“”„]/g,'"').replace(/[‘’]/g,"'")
+    .replace(/[–—]/g,"-").replace(/…/g,"...").replace(/[•●]/g,"·")
+    .replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF]/g,"").replace(/ {2,}/g," ").trim();
+}
+
+function buildNicoPdf(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:"mm", format:"a4"});
+  const W=210, H=297, M=18, CW=W-2*M;
+  const C = {ink:[16,32,28], muted:[95,110,104], faint:[138,151,145], line:[226,231,227], paper:[244,246,243],
+    green:[16,145,122], amber:[224,138,30], red:[200,72,47], white:[255,255,255]};
+  const LIGHT = {verde:C.green, amarillo:C.amber, rojo:C.red};
+  const e = evaluation, b = e.briefing_nico, f = b.ficha_rapida, s = b.semaforo, rv = e.redes_vs_brief;
+  const emp = f.empresa || meta.empresa || e.empresa_detectada || "Empresa evaluada";
+  const fecha = new Date().toLocaleDateString("es-EC",{year:"numeric",month:"long",day:"numeric"});
+  const lh = size => size*0.3528*1.4;
+  let y = 0;
+
+  const ensure = h=>{ if(y+h > H-20){ doc.addPage(); y = M; } };
+  const font = (size, style, color)=>{ doc.setFont("helvetica", style||"normal"); doc.setFontSize(size); doc.setTextColor(...(color||C.ink)); };
+  const para = (txt, o)=>{
+    o = o || {};
+    const size = o.size || 10, indent = o.indent || 0;
+    font(size, o.style, o.color);
+    const lines = doc.splitTextToSize(pdfSafe(txt) || "-", CW-indent);
+    lines.forEach(l=>{ ensure(lh(size)); doc.text(l, M+indent, y+lh(size)*0.75); y += lh(size); });
+    y += o.gap==null ? 1.6 : o.gap;
+  };
+  const heading = (n, t)=>{
+    ensure(16); y += 5;
+    font(9, "bold", C.green); doc.text(String(n).padStart(2,"0"), M, y+4);
+    font(12.5, "bold"); doc.text(pdfSafe(t), M+8, y+4);
+    y += 6.5; doc.setDrawColor(...C.line); doc.setLineWidth(0.3); doc.line(M, y, W-M, y); y += 4;
+  };
+  const sub = t=>{ ensure(9); y += 1; font(8.5, "bold", C.muted); doc.text(pdfSafe(t).toUpperCase(), M, y+3); y += 5.5; };
+  const bullets = (arr, mark, color, empty)=>{
+    if(!arr || !arr.length){ para(empty, {color:C.faint, style:"italic"}); return; }
+    arr.forEach((x,i)=>{
+      ensure(lh(10));
+      font(10, "bold", color); doc.text(typeof mark==="function" ? mark(i) : mark, M+1, y+lh(10)*0.75);
+      para(x, {indent:7, gap:1.2});
+    });
+  };
+  const cell = (x, cy, w, h, label)=>{
+    doc.setFillColor(...C.paper); doc.setDrawColor(...C.line); doc.setLineWidth(0.3);
+    doc.roundedRect(x, cy, w, h, 1.5, 1.5, "FD");
+    font(7, "bold", C.faint); doc.text(pdfSafe(label).toUpperCase(), x+3.5, cy+5);
+  };
+
+  // Cabecera
+  doc.setFillColor(...C.ink); doc.rect(0, 0, W, 46, "F");
+  font(8.5, "bold", C.green); doc.text("BRIEFING PARA NICO · MARCAS QUE IMPACTAN", M, 15);
+  font(20, "bold", C.white);
+  const title = doc.splitTextToSize(pdfSafe(emp), CW-40).slice(0,2);
+  doc.text(title, M, 25);
+  font(9, "normal", [190,200,195]);
+  doc.text(pdfSafe("Analista: "+(meta.analista||"-")+"   ·   "+fecha), M, 25+title.length*8);
+  font(26, "bold", C.white); doc.text(String(e.indice), W-M, 27, {align:"right"});
+  font(7.5, "normal", [190,200,195]); doc.text("ÍNDICE TRIPLE IMPACTO /100", W-M, 33, {align:"right"});
+  y = 54;
+
+  heading(1, "Ficha rápida");
+  const gap = 4, cw = (CW-2*gap)/3, ch = 17;
+  [["Empresa",f.empresa||emp],["Fundador(a)",f.fundador],["Sector",f.sector],
+   ["Tamaño",f.tamano],["Tiempo operando",f.tiempo_operando],["Mercado",f.mercado]].forEach((c,i)=>{
+    if(i%3===0){ ensure(ch+gap); if(i) y += ch+gap; }
+    const x = M + (i%3)*(cw+gap);
+    cell(x, y, cw, ch, c[0]);
+    font(9.5, "bold"); doc.text(doc.splitTextToSize(pdfSafe(c[1])||"-", cw-7).slice(0,2), x+3.5, y+10.5);
+  });
+  y += ch+3;
+
+  heading(2, "Semáforo de triple impacto");
+  ensure(ch+4);
+  [["Planeta",s.planeta],["Personas",s.personas],["Utilidad / gobernanza",s.utilidad]].forEach((c,i)=>{
+    const x = M + i*(cw+gap);
+    cell(x, y, cw, ch, c[0]);
+    doc.setFillColor(...(LIGHT[c[1]]||C.amber)); doc.circle(x+5.5, y+11, 2.2, "F");
+    font(10, "bold"); doc.text(c[1].charAt(0).toUpperCase()+c[1].slice(1), x+10, y+12.2);
+  });
+  y += ch+4;
+  sub("Justificación");
+  para(s.justificacion || "-");
+
+  heading(3, "Evidencia vs. relato");
+  sub("Comprobado");
+  bullets(b.evidencia, "+", C.green, "Sin evidencia dura clara.");
+  sub("Storytelling / [SUPUESTO]");
+  bullets(b.relato, "·", C.amber, "Sin notas.");
+
+  heading(4, "Contraste brief vs redes");
+  para("Material de redes: "+(rv.material_redes||"-"), {size:9, color:C.muted});
+  para(rv.resumen || "-");
+  if((rv.alineaciones||[]).length){ sub("Alineaciones"); bullets(rv.alineaciones, "+", C.green); }
+  if((rv.contradicciones||[]).length){ sub("Contradicciones / tensiones"); bullets(rv.contradicciones, "!", C.red); }
+  if((rv.solo_storytelling||[]).length){ sub("Solo storytelling"); bullets(rv.solo_storytelling, "·", C.amber); }
+  if((rv.verificar||[]).length){ sub("Verificar aún"); bullets(rv.verificar, "?", C.muted); }
+
+  heading(5, "Gancho de entrevista");
+  const gy = y, gp = doc.getNumberOfPages();
+  para(b.gancho_entrevista || "-", {size:11, style:"italic", indent:5});
+  if(doc.getNumberOfPages()===gp){ doc.setDrawColor(...C.green); doc.setLineWidth(1); doc.line(M+1, gy, M+1, y-1.6); }
+
+  heading(6, "Preguntas fuertes");
+  bullets(b.preguntas_fuertes, i=>String(i+1)+".", C.green, "-");
+
+  heading(7, "Riesgos reputacionales");
+  bullets(b.riesgos_reputacionales, "!", C.red, "Ninguno evidente.");
+
+  heading(8, "Fit con la marca MQI / Nico");
+  para(b.fit_marca || "-");
+
+  heading(9, "Recomendación final");
+  para(b.recomendacion_final || "-", {style:"bold", size:11});
+
+  const pages = doc.getNumberOfPages();
+  for(let p=1; p<=pages; p++){
+    doc.setPage(p);
+    doc.setDrawColor(...C.line); doc.setLineWidth(0.3); doc.line(M, H-14, W-M, H-14);
+    font(7.5, "normal", C.faint);
+    doc.text("Triple Impact Check · Marcas que Impactan · Documento interno para preparación de entrevista. No es una certificación.", M, H-9);
+    doc.text(p+" / "+pages, W-M, H-9, {align:"right"});
+  }
+  return doc;
+}
+
 function buildReport(){
   const e = evaluation;
   const emp = meta.empresa || e.empresa_detectada || "(sin nombre)";
@@ -596,7 +725,13 @@ function renderResults(){
   });
 
   const slug = ((meta.empresa||e.empresa_detectada||"brief").replace(/[^\w\-]+/g,"_"));
-  const downloadNico = ()=> downloadBlob(new Blob([buildNicoReport()],{type:"text/plain;charset=utf-8"}), "BriefingNico-"+slug+".txt");
+  const downloadNico = ()=>{
+    if(!window.jspdf){
+      alert("No se pudo cargar el generador de PDF. Se descargará el briefing en .txt.");
+      return downloadBlob(new Blob([buildNicoReport()],{type:"text/plain;charset=utf-8"}), "BriefingNico-"+slug+".txt");
+    }
+    buildNicoPdf().save("BriefingNico-"+slug+".pdf");
+  };
 
   $("obsBox").value = meta.nota;
   $("obsBox").oninput = ev=> meta.nota = ev.target.value;
