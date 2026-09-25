@@ -11,6 +11,7 @@ import { tituloRouter } from "./routes/titulo.js";
 import { compraRouter } from "./routes/compra.js";
 import { sendMailerRouter } from "./routes/sendMailer.js";
 import { tripleImpactRouter } from "./routes/tripleImpact.js";
+import { auditorRouter } from "./routes/auditor.js";
 import { estadoMarcaRouter, proxyBrandByUpk, proxyBrandsByDni } from "./routes/estadoMarca.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -35,6 +36,7 @@ app.use("/api/auth", authRouter);
 /** Herramientas internas: requieren sesión. */
 app.use("/api/dashboards", requireAuth, dashboardRouter);
 app.use("/api/sheets", requireAuth, sheetsRouter);
+app.use("/api/auditor", requireAuth, auditorRouter);
 
 /** Formularios públicos Ulpik (sin login). */
 app.use("/api/surveys", surveysRouter);
