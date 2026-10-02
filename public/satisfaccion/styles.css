@@ -144,6 +144,16 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
 .dl-btn{display:inline-flex;align-items:center;gap:9px;background:var(--acc-soft);border:1.5px solid var(--acc-border);color:var(--acc);padding:14px 26px;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;transition:.2s;animation:fu .5s ease .3s both}
 .dl-btn:hover{background:var(--acc-border)}
 
+/* ── VIDEO ASESOR (solo Registro de marca) ── */
+.vid-col{display:flex;justify-content:center;margin-top:24px}
+.vid-col.hidden{display:none}
+.vid-card{position:relative;width:min(100%,300px);aspect-ratio:9/16;max-height:540px;border-radius:18px;overflow:hidden;background:#0a0a0a;box-shadow:0 10px 36px rgba(0,0,0,.25),0 2px 8px rgba(0,0,0,.12);animation:fu .5s ease .35s both}
+.vid-card video{display:block;position:absolute;inset:0;width:100%;height:100%;border:none;background:#0a0a0a;object-fit:cover;object-position:center top}
+.vid-label{position:absolute;top:0;left:0;right:0;z-index:2;padding:11px 13px;background:linear-gradient(180deg,rgba(0,0,0,.6) 0%,transparent 100%);display:flex;align-items:center;gap:7px;pointer-events:none}
+.vid-dot{width:7px;height:7px;background:var(--acc);border-radius:50%;animation:vid-pd 2s ease-in-out infinite;flex-shrink:0}
+@keyframes vid-pd{0%,100%{opacity:1}50%{opacity:.35}}
+.vid-lbl-text{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,.88)}
+
 /* ── TOAST ── */
 .toast{position:fixed;bottom:24px;right:24px;background:#fff;border:1.5px solid var(--line);border-radius:13px;padding:13px 18px;font-size:13px;font-weight:600;color:var(--txt);display:flex;align-items:center;gap:9px;transform:translateY(90px);opacity:0;transition:.35s cubic-bezier(.175,.885,.32,1.275);z-index:9999;max-width:360px;box-shadow:var(--shadow);pointer-events:none}
 .toast.show{transform:none;opacity:1;pointer-events:auto}

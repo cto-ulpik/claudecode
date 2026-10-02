@@ -3,6 +3,14 @@ const SK_CLIENT='ulpik_nps_v6';
 const TK_CLIENT='ulpik_titulo_v6';
 const NOTIFY='legal5@ulpik.com';
 const SCALES=['nps','claridad','velocidad','calidad','satisfaccion'];
+const SERVICIO_REGISTRO='Registro de marca';
+const VIDEO_VOLUME=0.35;
+/* Solo asesores con video propio; los demás ven solo el "¡Muchas gracias!". */
+const ASESOR_VIDEOS={
+  'Martín Coello':'videos/martin.mp4?v=20261002',
+  'Sebastian López':'videos/sebastian.mp4?v=20261002',
+  'Rafaela Muñoz':'videos/rafaela.mp4?v=20261002'
+};
 
 async function saveSurvey(entry){
   try{
@@ -37,6 +45,33 @@ function showSplashThenSuccess(tituloUrl){
   setTimeout(()=>{sp.remove();showSuccess(tituloUrl);},2100);
 }
 
+function asesorVideoSrc(){
+  if(sel.servicio!==SERVICIO_REGISTRO)return'';
+  return ASESOR_VIDEOS[sel.asesor]||'';
+}
+function getAsesorVideo(){return document.getElementById('sat-video');}
+/* Desbloquea el audio con el clic de envío para poder reproducir con sonido al mostrar el gracias. */
+function unlockAsesorVideo(src){
+  const v=getAsesorVideo();
+  if(!v||!src)return;
+  v.muted=false;v.volume=VIDEO_VOLUME;
+  if(v.src!==new URL(src,location.href).href){v.src=src;v.preload='auto';v.load();}
+  const p=v.play();
+  if(p&&typeof p.then==='function')p.then(()=>{v.pause();v.currentTime=0;}).catch(()=>{});
+}
+function playAsesorVideo(src){
+  const v=getAsesorVideo();
+  if(!v||!src)return;
+  v.muted=false;v.volume=VIDEO_VOLUME;
+  if(v.src!==new URL(src,location.href).href){v.src=src;v.preload='auto';v.load();}
+  const tryPlay=()=>v.play().catch(()=>{
+    v.muted=true;
+    return v.play().catch(()=>{});
+  });
+  if(v.readyState>=2)tryPlay();
+  else v.addEventListener('canplay',tryPlay,{once:true});
+}
+
 function showSuccess(tituloUrl){
   document.querySelector('.hero').style.display='none';
   document.getElementById('survey-form').style.display='none';
@@ -44,6 +79,12 @@ function showSuccess(tituloUrl){
   document.querySelector('.foot')?.style.setProperty('display','none');
   document.getElementById('succ').classList.add('show');
   if(tituloUrl){const dl=document.getElementById('dl-btn');dl.href=tituloUrl;dl.style.display='inline-flex';}
+  const vsrc=asesorVideoSrc();
+  if(vsrc){
+    document.getElementById('vid-lbl').textContent='Mensaje de '+sel.asesor.split(' ')[0];
+    document.getElementById('vid-col').classList.remove('hidden');
+    requestAnimationFrame(()=>requestAnimationFrame(()=>playAsesorVideo(vsrc)));
+  }
   setTimeout(()=>document.getElementById('succ').scrollIntoView({behavior:'smooth',block:'start'}),80);
 }
 
@@ -194,6 +235,7 @@ async function submitForm(){
   btn.classList.add('loading');
   spin.style.display='block';
   btnTxt.textContent='Enviando...';
+  unlockAsesorVideo(asesorVideoSrc());
 
   const now=new Date();
   const mes=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
