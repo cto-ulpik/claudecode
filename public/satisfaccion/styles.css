@@ -144,9 +144,10 @@ html,body{background:var(--bg);color:var(--txt);font-family:Inter,sans-serif;min
 .dl-btn{display:inline-flex;align-items:center;gap:9px;background:var(--acc-soft);border:1.5px solid var(--acc-border);color:var(--acc);padding:14px 26px;border-radius:12px;font-size:14px;font-weight:700;text-decoration:none;transition:.2s;animation:fu .5s ease .3s both}
 .dl-btn:hover{background:var(--acc-border)}
 
-/* ── BOTÓN RESEÑA GOOGLE (todos los trámites) ── */
+/* ── BOTÓN RESEÑA GOOGLE (solo Registro de marca) ── */
 .g-review{position:relative;display:flex;align-items:center;gap:14px;width:100%;max-width:420px;margin:18px auto 0;padding:14px 18px;background:linear-gradient(135deg,var(--acc) 0%,var(--acc2) 100%);border-radius:16px;color:#fff;text-decoration:none;text-align:left;overflow:hidden;box-shadow:0 6px 20px rgba(232,67,26,.35);animation:fu .5s ease .3s both,g-pulse 2.4s ease-in-out 1s infinite;transition:transform .2s,box-shadow .2s;-webkit-tap-highlight-color:transparent}
 .g-review::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg);animation:g-shine 3.2s ease-in-out 1.2s infinite;pointer-events:none}
+.g-review.hidden{display:none}
 .g-review:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(232,67,26,.45)}
 .g-review:active{transform:translateY(0)}
 .g-review-ico{flex-shrink:0;width:46px;height:46px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15)}
