@@ -1,20 +1,4 @@
 {
-  "Esteban Maldonado (Estebitan)": {
-    "asesor": "Sebastián Lopez",
-    "foto": "asesores/sebastian.jpeg",
-    "cargo": "Abogado y Asesor Comercial",
-    "mensaje": "Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.",
-    "video": "asesores/presentacion/sebastian-web.m4v",
-    "titulo": "Mensaje de tu asesor"
-  },
-  "Marianela Espinoza (Nela)": {
-    "asesor": "Sebastián Lopez",
-    "foto": "asesores/sebastian.jpeg",
-    "cargo": "Abogado y Asesor Comercial",
-    "mensaje": "Bienvenido, qué gusto poderte atender. Estoy seguro de que te podré ayudar durante todo tu proceso.",
-    "video": "asesores/presentacion/sebastian-web.m4v",
-    "titulo": "Mensaje de tu asesor"
-  },
   "Martín Coello (Martín)": {
     "asesor": "Martín Coello",
     "foto": "asesores/martin.jpg",
