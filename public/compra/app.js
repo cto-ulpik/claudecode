@@ -10,7 +10,7 @@ let ASESORES = {};
 
 async function loadAsesores() {
   try {
-    const res = await fetch('asesores.json?v=20260928');
+    const res = await fetch('asesores.json?v=20261002');
     if (!res.ok) throw new Error('json');
     ASESORES = await res.json();
   } catch {
@@ -24,8 +24,6 @@ async function loadAsesores() {
       titulo: 'Mensaje de tu asesor',
     };
     ASESORES = {
-      'Esteban Maldonado (Estebitan)': { ...sebastian },
-      'Marianela Espinoza (Nela)': { ...sebastian },
       'Sebastián Lopez (Sebas)': { ...sebastian },
       'Martín Coello (Martín)': {
         asesor: 'Martín Coello',
