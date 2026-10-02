@@ -79,6 +79,7 @@ function showSuccess(tituloUrl){
   document.querySelector('.foot')?.style.setProperty('display','none');
   document.getElementById('succ').classList.add('show');
   if(tituloUrl){const dl=document.getElementById('dl-btn');dl.href=tituloUrl;dl.style.display='inline-flex';}
+  document.getElementById('g-review').classList.toggle('hidden',sel.servicio!==SERVICIO_REGISTRO);
   const vsrc=asesorVideoSrc();
   if(vsrc){
     document.getElementById('vid-lbl').textContent='Mensaje de '+sel.asesor.split(' ')[0];
