@@ -5,11 +5,16 @@ const NOTIFY='legal5@ulpik.com';
 const SCALES=['nps','claridad','velocidad','calidad','satisfaccion'];
 const SERVICIO_REGISTRO='Registro de marca';
 const VIDEO_VOLUME=0.35;
-/* Solo asesores con video propio; los demás ven solo el "¡Muchas gracias!". */
+const VIDEO_MARTIN={src:'videos/martin.mp4?v=20261002',nombre:'Martín'};
+/* Video del gracias por asesor (solo Registro de marca). Quien no tiene video propio
+   ve el de Martín como jefe de marcas. */
 const ASESOR_VIDEOS={
-  'Martín Coello':'videos/martin.mp4?v=20261002',
-  'Sebastian López':'videos/sebastian.mp4?v=20261002',
-  'Rafaela Muñoz':'videos/rafaela.mp4?v=20261002'
+  'Martín Coello':VIDEO_MARTIN,
+  'Sebastian López':{src:'videos/sebastian.mp4?v=20261002',nombre:'Sebastián'},
+  'Rafaela Muñoz':{src:'videos/rafaela.mp4?v=20261002',nombre:'Rafaela'},
+  'Esteban Maldonado':VIDEO_MARTIN,
+  'Marianela Espinoza':VIDEO_MARTIN,
+  'Daniela Ortega':VIDEO_MARTIN
 };
 
 async function saveSurvey(entry){
@@ -45,10 +50,11 @@ function showSplashThenSuccess(tituloUrl){
   setTimeout(()=>{sp.remove();showSuccess(tituloUrl);},2100);
 }
 
-function asesorVideoSrc(){
-  if(sel.servicio!==SERVICIO_REGISTRO)return'';
-  return ASESOR_VIDEOS[sel.asesor]||'';
+function asesorVideo(){
+  if(sel.servicio!==SERVICIO_REGISTRO)return null;
+  return ASESOR_VIDEOS[sel.asesor]||null;
 }
+function asesorVideoSrc(){return asesorVideo()?.src||'';}
 function getAsesorVideo(){return document.getElementById('sat-video');}
 /* Desbloquea el audio con el clic de envío para poder reproducir con sonido al mostrar el gracias. */
 function unlockAsesorVideo(src){
@@ -78,13 +84,18 @@ function showSuccess(tituloUrl){
   document.getElementById('prog-wrap').style.display='none';
   document.querySelector('.foot')?.style.setProperty('display','none');
   document.getElementById('succ').classList.add('show');
-  if(tituloUrl){const dl=document.getElementById('dl-btn');dl.href=tituloUrl;dl.style.display='inline-flex';}
-  document.getElementById('g-review').classList.toggle('hidden',sel.servicio!==SERVICIO_REGISTRO);
-  const vsrc=asesorVideoSrc();
-  if(vsrc){
-    document.getElementById('vid-lbl').textContent='Mensaje de '+sel.asesor.split(' ')[0];
+  const esRegistro=sel.servicio===SERVICIO_REGISTRO;
+  if(!esRegistro){
+    document.getElementById('succ-box-title').textContent='Gracias por confiar en Ulpik 🧡';
+    document.getElementById('succ-box-txt').textContent='Estamos muy felices de acompañar a tu empresa.';
+    document.getElementById('g-review-title').textContent='Déjanos tu reseña en Google';
+  }
+  if(esRegistro&&tituloUrl){const dl=document.getElementById('dl-btn');dl.href=tituloUrl;dl.style.display='inline-flex';}
+  const vid=asesorVideo();
+  if(vid){
+    document.getElementById('vid-lbl').textContent='Mensaje de '+vid.nombre;
     document.getElementById('vid-col').classList.remove('hidden');
-    requestAnimationFrame(()=>requestAnimationFrame(()=>playAsesorVideo(vsrc)));
+    requestAnimationFrame(()=>requestAnimationFrame(()=>playAsesorVideo(vid.src)));
   }
   setTimeout(()=>document.getElementById('succ').scrollIntoView({behavior:'smooth',block:'start'}),80);
 }
