@@ -18,15 +18,16 @@
  *   "Otro: <detalle>" en esta misma columna, sin usar columnas extra. O =
  *   "notificaciones periódicas" (no se usa). P = "Columna 1" (legacy, no se
  *   usa). Q = "¿Qué podríamos hacer para que su calificación sea un 10/10?"
- *   → npsMejora. R y S = libres, sin uso.
+ *   → npsMejora. R = "¿Nos autorizarías a publicar la historia de tu marca en
+ *   nuestra página web?" (Sí/No). S = libre, sin uso.
  *
- * Verificar URL /exec → debe incluir "version":"2026-09-21-col-N-Q"
+ * Verificar URL /exec → debe incluir "version":"2026-10-20-col-R"
  */
 
 var SHEET_NAME = 'Respuestas de formulario 1';
 var SHEET_NAME_ALT = 'Form_Responses';
 var WEBHOOK_SECRET = '';
-var SCRIPT_VERSION = '2026-09-21-col-N-Q';
+var SCRIPT_VERSION = '2026-10-20-col-R';
 
 function doGet(e) {
   e = e || {};
@@ -143,7 +144,8 @@ function appendCompraRow(payload) {
     conocioTexto,                                                    // N ← ¿Cómo te enteraste de Ulpik? ("Otro: <detalle>" si aplica)
     '',                                                              // O (notificaciones periódicas — no se pide en el form)
     '',                                                              // P ("Columna 1", legacy, no se usa)
-    String(payload.npsMejora || payload.nps_mejora || '').trim()     // Q ← qué faltó para el 10 (recomendación < 10)
+    String(payload.npsMejora || payload.nps_mejora || '').trim(),    // Q ← qué faltó para el 10 (recomendación < 10)
+    String(payload.autorizaHistoria || '').trim()                    // R ← ¿autoriza publicar la historia de su marca? (Sí/No)
   ];
 
   sheet.appendRow(row);
@@ -153,6 +155,7 @@ function appendCompraRow(payload) {
     nps: row[8],
     conocio: row[13],
     npsMejora: row[16],
+    autorizaHistoria: row[17],
     totalCols: row.length,
     version: SCRIPT_VERSION
   };
@@ -186,6 +189,8 @@ function validateCompraPayload(p) {
   }
   if (!String(p.asesor || '').trim()) throw new Error('Falta asesor');
   if (String(p.mejora || '').trim().length < 5) throw new Error('Falta comentario de mejora');
+  var autoriza = String(p.autorizaHistoria || '').trim();
+  if (autoriza !== 'Sí' && autoriza !== 'No') throw new Error('Falta autorización para publicar la historia');
 }
 
 function toMarcaDate(raw) {
@@ -256,7 +261,8 @@ function readSurveyData() {
       asesor: String(r[11] || ''),
       comentario: String(r[12] || ''),
       conocio: String(r[13] || ''),
-      npsMejora: String(r[16] || '')
+      npsMejora: String(r[16] || ''),
+      autorizaHistoria: String(r[17] || '')
     });
   }
   return rows;
@@ -302,6 +308,8 @@ function ensureNpsMejoraHeader_(sheet) {
   // Columna Q = 17 (ya existe con este texto en el Sheet; se reafirma por si acaso)
   var cell = sheet.getRange(1, 17);
   cell.setValue('¿Qué podríamos hacer para que su calificación sea un 10/10? ¿Qué faltó?');
+  // Columna R = 18: autorización para publicar la historia de la marca
+  sheet.getRange(1, 18).setValue('¿Nos autorizarías a publicar la historia de tu marca en nuestra página web?');
 }
 
 function getSheet() {
@@ -344,6 +352,7 @@ function testAppendCompra() {
     acomp: 'Sí, totalmente',
     nps: 10,
     asesor: 'Martín Coello (Martín)',
-    mejora: 'Prueba automática desde Apps Script'
+    mejora: 'Prueba automática desde Apps Script',
+    autorizaHistoria: 'Sí'
   });
 }

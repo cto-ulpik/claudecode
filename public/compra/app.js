@@ -139,6 +139,7 @@ const fd = {
   npsMejora: '',
   asesor: '',
   mejora: '',
+  autorizaHistoria: '',
 };
 
 async function saveSurvey(entry) {
@@ -212,7 +213,7 @@ function markD(id, val) {
 }
 
 function upP() {
-  const fields = ['email', 'servicio', 'conocio', 'facilidad', 'claridad', 'dificultad', 'atencion', 'acomp', 'nps', 'asesor', 'mejora'];
+  const fields = ['email', 'servicio', 'conocio', 'facilidad', 'claridad', 'dificultad', 'atencion', 'acomp', 'nps', 'asesor', 'mejora', 'autorizaHistoria'];
   const done = fields.filter((f) => isDone(f)).length;
   const pct = Math.round((done / fields.length) * 100);
   document.getElementById('prog-fill').style.width = pct + '%';
@@ -293,6 +294,7 @@ function validate() {
     { f: 'nps', s: 's-nps' },
     { f: 'asesor', s: 's-asesor' },
     { f: 'mejora', s: 's-mejora' },
+    { f: 'autorizaHistoria', s: 's-autorizaHistoria' },
   ];
   let ok = true;
   let first = null;

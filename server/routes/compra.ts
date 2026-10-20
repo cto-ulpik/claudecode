@@ -17,6 +17,7 @@ type CompraBody = {
   npsMejora?: string;
   asesor?: string;
   mejora?: string;
+  autorizaHistoria?: string;
   ts?: string;
 };
 
@@ -39,6 +40,9 @@ function validate(body: CompraBody): string | null {
   }
   if (!body.asesor?.trim()) return "Falta asesor";
   if ((body.mejora?.trim().length ?? 0) < 5) return "Falta comentario de mejora";
+  if (body.autorizaHistoria !== "Sí" && body.autorizaHistoria !== "No") {
+    return "Falta autorización para publicar la historia";
+  }
   return null;
 }
 
@@ -66,6 +70,7 @@ compraRouter.post("/", async (req, res) => {
     npsMejora: nps < 10 ? (input.npsMejora || "").trim() : "",
     asesor: input.asesor!.trim(),
     mejora: input.mejora!.trim(),
+    autorizaHistoria: input.autorizaHistoria,
     ts: input.ts,
   };
 
